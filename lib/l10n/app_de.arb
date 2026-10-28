@@ -1,0 +1,30 @@
+{
+  "@@locale": "de",
+  "appTitle": "Homework & Chores",
+
+  "navToday": "Heute",
+  "navPlan": "Plan",
+  "navWorld": "Welt",
+  "navStats": "Statistik",
+  "navSettings": "Einstellungen",
+
+  "comingInVersion": "Kommt in Version {version}",
+  "todayPlaceholder": "Hier erscheinen deine fälligen Aufgaben.",
+  "planPlaceholder": "Wochen- und Monatsübersicht deiner Aufgaben.",
+  "worldPlaceholder": "Gib deine Punkte aus, um deine Welt wachsen zu lassen.",
+  "statsPlaceholder": "Punkte, Serien und Zusammenfassungen.",
+
+  "settingsAppearance": "Darstellung",
+  "settingsTheme": "Design",
+  "themeSystem": "System",
+  "themeLight": "Hell",
+  "themeDark": "Dunkel",
+  "settingsColorblind": "Farbenblind-freundliche Farben",
+  "settingsColorblindSubtitle": "Okabe-Ito-Palette, unterscheidbar bei allen häufigen Formen von Farbenblindheit",
+  "settingsChoreColors": "Aufgabenfarben",
+  "settingsLanguage": "Sprache",
+  "languageSystem": "Systemsprache",
+  "settingsAbout": "Über",
+  "aboutPrivacy": "Alle Daten bleiben auf diesem Gerät. Kein Konto, kein Netzwerk, kein Tracking, keine Werbung.",
+  "aboutLicense": "Open Source unter GPL-3.0"
+}

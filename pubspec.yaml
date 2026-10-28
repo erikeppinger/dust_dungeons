@@ -1,0 +1,30 @@
+name: homework_and_chores
+description: "Local-only gamified household chores app"
+publish_to: 'none'
+
+# SemVer: MAJOR.MINOR.PATCH+BUILD. BUILD = Android versionCode and must always increase.
+# Bump with tool/bump_version.ps1 and record changes in CHANGELOG.md.
+version: 0.0.1+1
+
+environment:
+  sdk: ^3.13.1
+
+# Rule: no dependency may use the network, collect analytics or need Google Play Services.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  intl: ^0.20.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  generate: true

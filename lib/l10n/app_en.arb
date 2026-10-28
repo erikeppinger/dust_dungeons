@@ -1,0 +1,34 @@
+{
+  "@@locale": "en",
+  "appTitle": "Homework & Chores",
+  "@appTitle": { "description": "Working title of the app; final name TBD." },
+
+  "navToday": "Today",
+  "navPlan": "Plan",
+  "navWorld": "World",
+  "navStats": "Stats",
+  "navSettings": "Settings",
+
+  "comingInVersion": "Coming in version {version}",
+  "@comingInVersion": {
+    "placeholders": { "version": { "type": "String", "example": "0.1.0" } }
+  },
+  "todayPlaceholder": "Your due chores will show up here.",
+  "planPlaceholder": "Week and month overview of your chores.",
+  "worldPlaceholder": "Spend your points to grow your world.",
+  "statsPlaceholder": "Points, streaks and summaries.",
+
+  "settingsAppearance": "Appearance",
+  "settingsTheme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "settingsColorblind": "Colorblind-friendly colors",
+  "settingsColorblindSubtitle": "Okabe-Ito palette, distinguishable with all common types of color blindness",
+  "settingsChoreColors": "Chore colors",
+  "settingsLanguage": "Language",
+  "languageSystem": "System default",
+  "settingsAbout": "About",
+  "aboutPrivacy": "All data stays on this device. No account, no network, no tracking, no ads.",
+  "aboutLicense": "Open source under GPL-3.0"
+}
