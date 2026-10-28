@@ -101,6 +101,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Theme modes.
+      await tester.tap(find.text('Appearance'));
+      await tester.pumpAndSettle();
       for (final (label, mode) in [
         ('Dark', ThemeMode.dark),
         ('Light', ThemeMode.light),
@@ -123,15 +125,18 @@ void main() {
         isTrue,
       );
 
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
       // Language override to German and back.
-      await tester.scrollUntilVisible(find.text('Deutsch'), 200);
-      // scrollUntilVisible may stop with the row half under the bottom bar.
-      await tester.ensureVisible(find.text('Deutsch'));
+      await tester.tap(find.text('Language'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Deutsch'));
       await tester.pumpAndSettle();
-      expect(find.text('Einstellungen'), findsWidgets);
+      expect(find.widgetWithText(AppBar, 'Sprache'), findsOneWidget);
       await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      await tester.pageBack();
       await tester.pumpAndSettle();
 
       // Archived chore is gone from Today.

@@ -1,115 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../app/theme/chore_palette.dart';
-import '../../core/widgets/section_header.dart';
-import '../chores/manage_chores_screen.dart';
 import '../../l10n/app_localizations.dart';
+import '../chores/manage_chores_screen.dart';
 import '../notifications/notification_settings.dart';
 import 'settings_controller.dart';
+import 'settings_pages.dart';
 
+/// Settings overview: one entry per category, each opening its own page.
+/// Subtitles show the current state so most settings can be checked at a
+/// glance without opening anything.
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
-
-  // Language names are shown in their own language, so they are not translated.
-  static const _languages = {'de': 'Deutsch', 'en': 'English'};
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsProvider);
-    final controller = ref.read(settingsProvider.notifier);
-    final palette = Theme.of(context).extension<ChorePalette>()!;
+    final permitted = ref.watch(notificationPermissionProvider).value ?? true;
+
+    final theme = switch (settings.themeMode) {
+      ThemeMode.system => l10n.themeSystem,
+      ThemeMode.light => l10n.themeLight,
+      ThemeMode.dark => l10n.themeDark,
+    };
+    final notifications = !settings.notificationsEnabled
+        ? l10n.stateOff
+        : permitted
+        ? l10n.stateOn
+        : l10n.notifBlockedShort;
+    final language =
+        languageNames[settings.locale?.languageCode] ?? l10n.languageSystem;
 
     return ListView(
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 16 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
-        SectionHeader(l10n.settingsChores),
-        ListTile(
-          leading: const Icon(Icons.checklist),
-          title: Text(l10n.manageChores),
-          subtitle: Text(l10n.manageChoresSubtitle),
-          trailing: const Icon(Icons.chevron_right),
+        _Entry(
+          icon: Icons.checklist,
+          title: l10n.manageChores,
+          subtitle: l10n.manageChoresSubtitle,
           onTap: () => ManageChoresScreen.open(context),
         ),
-        SectionHeader(l10n.settingsAppearance),
-        ListTile(
-          title: Text(l10n.settingsTheme),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: SegmentedButton<ThemeMode>(
-              segments: [
-                ButtonSegment(
-                  value: ThemeMode.system,
-                  icon: const Icon(Icons.brightness_auto),
-                  label: Text(l10n.themeSystem),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.light,
-                  icon: const Icon(Icons.light_mode),
-                  label: Text(l10n.themeLight),
-                ),
-                ButtonSegment(
-                  value: ThemeMode.dark,
-                  icon: const Icon(Icons.dark_mode),
-                  label: Text(l10n.themeDark),
-                ),
-              ],
-              selected: {settings.themeMode},
-              onSelectionChanged: (s) => controller.setThemeMode(s.first),
-            ),
+        _Entry(
+          icon: Icons.palette_outlined,
+          title: l10n.settingsAppearance,
+          subtitle: settings.colorblindSafe
+              ? '$theme · ${l10n.colorblindOn}'
+              : theme,
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsAppearance,
+            const AppearanceSettings(),
           ),
         ),
-        SwitchListTile(
-          secondary: const Icon(Icons.visibility),
-          title: Text(l10n.settingsColorblind),
-          subtitle: Text(l10n.settingsColorblindSubtitle),
-          value: settings.colorblindSafe,
-          onChanged: controller.setColorblindSafe,
-        ),
-        ListTile(
-          title: Text(l10n.settingsChoreColors),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final color in palette.colors)
-                  CircleAvatar(radius: 14, backgroundColor: color),
-              ],
-            ),
+        _Entry(
+          icon: Icons.notifications_outlined,
+          title: l10n.settingsNotifications,
+          subtitle: notifications,
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsNotifications,
+            const NotificationSettings(),
           ),
         ),
-        const NotificationSettingsSection(),
-        SectionHeader(l10n.settingsLanguage),
-        RadioGroup<String?>(
-          groupValue: settings.locale?.languageCode,
-          onChanged: (code) =>
-              controller.setLocale(code == null ? null : Locale(code)),
-          child: Column(
-            children: [
-              RadioListTile<String?>(
-                value: null,
-                title: Text(l10n.languageSystem),
-              ),
-              for (final entry in _languages.entries)
-                RadioListTile<String?>(
-                  value: entry.key,
-                  title: Text(entry.value),
-                ),
-            ],
+        _Entry(
+          icon: Icons.language,
+          title: l10n.settingsLanguage,
+          subtitle: language,
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsLanguage,
+            const LanguageSettings(),
           ),
         ),
-        SectionHeader(l10n.settingsAbout),
-        ListTile(
-          leading: const Icon(Icons.lock_outline),
-          title: Text(l10n.aboutPrivacy),
-        ),
-        ListTile(
-          leading: const Icon(Icons.code),
-          title: Text(l10n.aboutLicense),
+        _Entry(
+          icon: Icons.info_outline,
+          title: l10n.settingsAbout,
+          subtitle: l10n.settingsAboutSubtitle,
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsAbout,
+            const AboutSettings(),
+          ),
         ),
       ],
     );
   }
+}
+
+class _Entry extends StatelessWidget {
+  const _Entry({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => ListTile(
+    leading: Icon(icon),
+    title: Text(title),
+    subtitle: Text(subtitle),
+    trailing: const Icon(Icons.chevron_right),
+    onTap: onTap,
+  );
 }

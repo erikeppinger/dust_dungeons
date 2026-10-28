@@ -8,6 +8,7 @@ import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/main.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'helpers.dart';
 
@@ -26,6 +27,13 @@ Finder get _editScrollable => find
       matching: find.byType(Scrollable),
     )
     .first;
+
+/// Opens Settings, then the category [entry] (e.g. 'Appearance').
+Future<void> _openSettingsPage(WidgetTester tester, String entry) async {
+  await _openSettings(tester);
+  await tester.tap(find.text(entry));
+  await tester.pumpAndSettle();
+}
 
 Future<void> _openSettings(WidgetTester tester) async {
   await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
@@ -149,10 +157,7 @@ void main() {
     await pumpApp(tester, notifications: notifications);
     expect(notifications.scheduled, isEmpty);
 
-    await _openSettings(tester);
-    await tester.scrollUntilVisible(find.text('Reminders & summaries'), 200);
-    await tester.ensureVisible(find.text('Reminders & summaries'));
-    await tester.pumpAndSettle();
+    await _openSettingsPage(tester, 'Notifications');
     await tester.tap(find.text('Reminders & summaries'));
     await tester.pumpAndSettle();
 
@@ -184,10 +189,7 @@ void main() {
   testWidgets('denied permission keeps notifications off', (tester) async {
     final notifications = FakeNotificationService(grantPermission: false);
     await pumpApp(tester, notifications: notifications);
-    await _openSettings(tester);
-    await tester.scrollUntilVisible(find.text('Reminders & summaries'), 200);
-    await tester.ensureVisible(find.text('Reminders & summaries'));
-    await tester.pumpAndSettle();
+    await _openSettingsPage(tester, 'Notifications');
     await tester.tap(find.text('Reminders & summaries'));
     await tester.pumpAndSettle();
 
@@ -427,7 +429,7 @@ void main() {
     tester,
   ) async {
     final db = await pumpApp(tester);
-    await _openSettings(tester);
+    await _openSettingsPage(tester, 'Appearance');
 
     await tester.tap(find.text('Dark'));
     await tester.pumpAndSettle();
@@ -447,18 +449,61 @@ void main() {
     final saved = await tester.runAsync(() => SettingsRepository(db).load());
     expect(saved!.themeMode, ThemeMode.dark);
     expect(saved.colorblindSafe, isTrue);
+
+    // The overview summarizes the current state.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Dark · colorblind-friendly colors'), findsOneWidget);
   });
 
   testWidgets('language override switches UI to German', (tester) async {
     await pumpApp(tester);
-    await _openSettings(tester);
+    await _openSettingsPage(tester, 'Language');
 
-    await tester.scrollUntilVisible(find.text('Deutsch'), 200);
-    await tester.ensureVisible(find.text('Deutsch'));
-    await tester.pumpAndSettle();
     await tester.tap(find.text('Deutsch'));
     await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'Sprache'), findsOneWidget);
 
-    expect(find.text('Einstellungen'), findsWidgets);
+    // pageBack() looks for the English "Back" tooltip; the UI is German now.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'Einstellungen'), findsOneWidget);
+    expect(find.text('Deutsch'), findsOneWidget); // overview subtitle
+  });
+
+  testWidgets('settings overview shows each category with its state', (
+    tester,
+  ) async {
+    await pumpApp(tester);
+    await _openSettings(tester);
+    for (final entry in [
+      'Manage chores',
+      'Appearance',
+      'Notifications',
+      'Language',
+      'About',
+    ]) {
+      expect(find.text(entry), findsOneWidget);
+    }
+    expect(find.text('System'), findsOneWidget); // theme
+    expect(find.text('Off'), findsOneWidget); // notifications
+    expect(find.text('System default'), findsOneWidget); // language
+  });
+
+  testWidgets('About shows privacy, license and the version', (tester) async {
+    PackageInfo.setMockInitialValues(
+      appName: 'Homework & Chores',
+      packageName: 'io.github.changeme.homework_and_chores',
+      version: '0.4.1',
+      buildNumber: '6',
+      buildSignature: '',
+    );
+    await pumpApp(tester);
+    await _openSettingsPage(tester, 'About');
+    expect(
+      find.textContaining('All data stays on this device'),
+      findsOneWidget,
+    );
+    expect(find.text('Version 0.4.1 (6)'), findsOneWidget);
   });
 }

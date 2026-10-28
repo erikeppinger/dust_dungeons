@@ -29,7 +29,6 @@
   "noChores": "Keine aktiven Aufgaben. Füge unten eine hinzu.",
   "addChore": "Aufgabe hinzufügen",
   "editChore": "Aufgabe bearbeiten",
-  "settingsChores": "Aufgaben",
   "manageChores": "Aufgaben verwalten",
   "manageChoresSubtitle": "Hinzufügen, bearbeiten, archivieren",
   "activeChores": "Aktiv",
@@ -158,5 +157,11 @@
   "choreReminderOn": "An Fälligkeitstagen erinnern",
   "choreReminderAt": "Um {time}",
   "choreReminderNeedsSchedule": "Wähle oben einen Zeitplan, um Erinnerungen zu nutzen.",
-  "choreReminderNotificationsOff": "Benachrichtigungen sind aus. Schalte sie in den Einstellungen ein."
+  "choreReminderNotificationsOff": "Benachrichtigungen sind aus. Schalte sie in den Einstellungen ein.",
+  "stateOn": "An",
+  "stateOff": "Aus",
+  "notifBlockedShort": "In den Android-Einstellungen blockiert",
+  "colorblindOn": "farbenblind-freundliche Farben",
+  "settingsAboutSubtitle": "Datenschutz, Lizenz, Version",
+  "aboutVersion": "Version {version}"
 }

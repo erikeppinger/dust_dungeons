@@ -8,6 +8,17 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-28
+### Changed
+- Settings is now an overview with one entry per category (Manage chores, Appearance, Notifications,
+  Language, About). Each entry shows the current state and opens its own page.
+
+### Added
+- The About page shows the installed app version (via `package_info_plus`, which only reads it locally).
+
+### Fixed
+- Settings page titles follow a language change made on the page itself.
+
 ## [0.4.0] - 2026-10-28
 ### Added
 - Local notifications (off by default; turning them on asks for Android's permission):
@@ -75,6 +86,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.4.1]: #
 [0.4.0]: #
 [0.3.0]: #
 [0.2.0]: #

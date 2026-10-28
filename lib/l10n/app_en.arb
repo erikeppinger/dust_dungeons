@@ -64,7 +64,6 @@
   "noChores": "No active chores. Add one with the button below.",
   "addChore": "Add chore",
   "editChore": "Edit chore",
-  "settingsChores": "Chores",
   "manageChores": "Manage chores",
   "manageChoresSubtitle": "Add, edit, archive",
   "activeChores": "Active",
@@ -440,5 +439,18 @@
     }
   },
   "choreReminderNeedsSchedule": "Choose a schedule above to use reminders.",
-  "choreReminderNotificationsOff": "Notifications are off. Turn them on in Settings."
+  "choreReminderNotificationsOff": "Notifications are off. Turn them on in Settings.",
+  "stateOn": "On",
+  "stateOff": "Off",
+  "notifBlockedShort": "Blocked in Android settings",
+  "colorblindOn": "colorblind-friendly colors",
+  "settingsAboutSubtitle": "Privacy, license, version",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

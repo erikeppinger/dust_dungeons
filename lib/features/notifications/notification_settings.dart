@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/widgets/section_header.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'notification_planner.dart';
@@ -23,9 +22,9 @@ String formatMinutes(BuildContext context, int minutes) =>
       alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
     );
 
-/// Settings section for notifications.
-class NotificationSettingsSection extends ConsumerWidget {
-  const NotificationSettingsSection({super.key});
+/// Notification settings page content.
+class NotificationSettings extends ConsumerWidget {
+  const NotificationSettings({super.key});
 
   Future<void> _setEnabled(
     BuildContext context,
@@ -104,7 +103,6 @@ class NotificationSettingsSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionHeader(l10n.settingsNotifications),
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),
           title: Text(l10n.notifEnable),
