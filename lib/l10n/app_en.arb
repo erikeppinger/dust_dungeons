@@ -18,7 +18,6 @@
       }
     }
   },
-  "planPlaceholder": "Week and month overview of your chores.",
   "worldPlaceholder": "Spend your points to grow your world.",
   "statsPlaceholder": "Points, streaks and summaries.",
   "settingsAppearance": "Appearance",
@@ -109,5 +108,139 @@
   "choreWaterPlants": "Water the plants",
   "choreTidyUp": "Tidy up",
   "errorGeneric": "Something went wrong. Please try again.",
-  "startupError": "The app could not open its data. Your data has not been deleted. Please restart the app; if this keeps happening, report the error below."
+  "startupError": "The app could not open its data. Your data has not been deleted. Please restart the app; if this keeps happening, report the error below.",
+  "summaryAnytime": "Anytime, no schedule",
+  "summaryOnce": "Once on {date}",
+  "@summaryOnce": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryDays": "{n, plural, =1{Every day} other{Every {n} days}}",
+  "@summaryDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "summaryWeeks": "{n, plural, =1{Weekly on {days}} other{Every {n} weeks on {days}}}",
+  "@summaryWeeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryMonths": "{n, plural, =1{Monthly on day {day}} other{Every {n} months on day {day}}}",
+  "@summaryMonths": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "summaryAfterDone": "{n, plural, =1{1 day after it was last done} other{{n} days after it was last done}}",
+  "@summaryAfterDone": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statusOverdue": "{n, plural, =1{1 day overdue} other{{n} days overdue}}",
+  "@statusOverdue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statusDueToday": "Due today",
+  "statusTomorrow": "Due tomorrow",
+  "statusInDays": "Due in {n} days",
+  "@statusInDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statusAnytime": "Anytime",
+  "sectionOverdue": "Overdue",
+  "sectionDueToday": "Due today",
+  "sectionDoneToday": "Done today",
+  "sectionLater": "Later & anytime",
+  "allCaughtUp": "All caught up for today! 🎉",
+  "choreRepeat": "Repeat",
+  "repeatAnytime": "No schedule (anytime)",
+  "repeatOnce": "Once",
+  "repeatDaily": "Every few days",
+  "repeatWeekly": "Weekly on set days",
+  "repeatMonthly": "Monthly",
+  "repeatAfterDone": "Some days after last done",
+  "repeatEvery": "Every",
+  "unitDays": "{n, plural, =1{day} other{days}}",
+  "@unitDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "unitWeeks": "{n, plural, =1{week} other{weeks}}",
+  "@unitWeeks": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "unitMonths": "{n, plural, =1{month} other{months}}",
+  "@unitMonths": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "decrease": "Less",
+  "increase": "More",
+  "weekdaysRequired": "Pick at least one day",
+  "dayOfMonth": "Day of month",
+  "repeatDate": "Date",
+  "repeatStarts": "Starts",
+  "repeatFirstDue": "First due",
+  "planWeek": "Week",
+  "planMonth": "Month",
+  "planToday": "Today",
+  "planTomorrow": "Tomorrow",
+  "planNothing": "Nothing planned",
+  "planDone": "Done",
+  "planDueCount": "{n, plural, =0{nothing due} =1{1 due} other{{n} due}}",
+  "@planDueCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "planDoneCount": "{n, plural, =0{nothing done} =1{1 done} other{{n} done}}",
+  "@planDoneCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "previousMonth": "Previous month",
+  "nextMonth": "Next month"
 }

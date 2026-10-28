@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/app_database.dart';
+import '../../core/widgets/section_header.dart';
+import '../../data/models/scheduled_chore.dart';
 import '../../data/providers.dart';
 import '../../domain/points.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_edit_screen.dart';
 import 'chore_tile.dart';
 import 'chore_titles.dart';
+import 'schedule_text.dart';
 
-/// Grid of active chores. Tap to complete (with undo), long-press to edit.
-/// Becomes the "due today" list once scheduling exists (0.2.0).
+/// Active chores grouped into overdue, due today, done today and later.
+/// Tap to complete (with undo), long-press to edit.
 class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
@@ -28,59 +31,37 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final chores = ref.watch(activeChoresProvider);
-    final counts = ref.watch(todayCountsProvider).value ?? const {};
+    final scheduled = ref.watch(scheduledChoresProvider);
 
     return Scaffold(
-      body: chores.when(
+      body: scheduled.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) => Center(child: Text(l10n.errorGeneric)),
-        data: (list) => CustomScrollView(
-          slivers: [
-            const SliverToBoxAdapter(child: _BalanceHeader()),
-            if (list.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Text(
-                      l10n.noChores,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                ),
-              )
-            else
-              SliverPadding(
-                // Bottom padding keeps the last row clear of the FAB.
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 88),
-                sliver: SliverGrid.builder(
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    mainAxisExtent: 150,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                  ),
-                  itemCount: list.length,
-                  itemBuilder: (context, i) {
-                    final chore = list[i];
-                    return ChoreTile(
-                      key: ValueKey(chore.id),
-                      title: choreTitle(chore, l10n),
-                      iconKey: chore.iconKey,
-                      colorKey: chore.colorKey,
-                      points: pointsForCompletion(basePoints: chore.basePoints),
-                      doneToday: counts[chore.id] ?? 0,
-                      onTap: () => _complete(chore),
-                      onLongPress: () => ChoreEditScreen.open(context, chore),
-                    );
-                  },
-                ),
-              ),
-          ],
-        ),
+        data: (list) {
+          final sections = TodaySections(list);
+          final nothingDue =
+              sections.overdue.isEmpty && sections.dueToday.isEmpty;
+          return CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(child: _BalanceHeader()),
+              if (list.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: _Message(l10n.noChores),
+                )
+              else ...[
+                if (nothingDue)
+                  SliverToBoxAdapter(child: _Message(l10n.allCaughtUp)),
+                ..._section(l10n.sectionOverdue, sections.overdue),
+                ..._section(l10n.sectionDueToday, sections.dueToday),
+                ..._section(l10n.sectionDoneToday, sections.doneToday),
+                ..._section(l10n.sectionLater, sections.later),
+                // Keeps the last row clear of the FAB.
+                const SliverToBoxAdapter(child: SizedBox(height: 88)),
+              ],
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'addChore',
@@ -89,6 +70,42 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
         label: Text(l10n.addChore),
       ),
     );
+  }
+
+  /// Header plus tile grid; nothing for an empty section.
+  List<Widget> _section(String title, List<ScheduledChore> chores) {
+    if (chores.isEmpty) return const [];
+    final l10n = AppLocalizations.of(context);
+    return [
+      SliverToBoxAdapter(child: SectionHeader('$title (${chores.length})')),
+      SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        sliver: SliverGrid.builder(
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            mainAxisExtent: 168,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+          ),
+          itemCount: chores.length,
+          itemBuilder: (context, i) {
+            final s = chores[i];
+            return ChoreTile(
+              key: ValueKey(s.chore.id),
+              title: choreTitle(s.chore, l10n),
+              iconKey: s.chore.iconKey,
+              colorKey: s.chore.colorKey,
+              points: pointsForCompletion(basePoints: s.chore.basePoints),
+              doneToday: s.doneToday,
+              status: dueLabel(l10n, s.due, s.today),
+              overdue: s.isOverdue,
+              onTap: () => _complete(s.chore),
+              onLongPress: () => ChoreEditScreen.open(context, s.chore),
+            );
+          },
+        ),
+      ),
+    ];
   }
 
   Future<void> _complete(Chore chore) async {
@@ -149,4 +166,22 @@ class _BalanceHeader extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _Message extends StatelessWidget {
+  const _Message(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.all(24),
+    child: Center(
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+    ),
+  );
 }

@@ -11,108 +11,122 @@ import 'package:integration_test/integration_test.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('chores, points, undo, editing and settings work on device', (
-    tester,
-  ) async {
-    WidgetController.hitTestWarningShouldBeFatal = true;
-    tester.platformDispatcher.localesTestValue = [const Locale('en')];
-    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
-    // Real SQLite on the device, but in memory so the run starts clean.
-    final db = AppDatabase(NativeDatabase.memory());
-    addTearDown(db.close);
-    await tester.pumpWidget(await bootstrap(db));
-    await tester.pumpAndSettle();
-
-    // Complete a chore, then undo it.
-    expect(find.text('0 points'), findsOneWidget);
-    await tester.tap(find.text('Dusting'));
-    await tester.pumpAndSettle();
-    expect(find.text('15 points'), findsWidgets);
-    expect(find.byTooltip('1× today'), findsOneWidget);
-    await tester.tap(find.text('Undo'));
-    await tester.pumpAndSettle();
-    expect(find.text('0 points'), findsOneWidget);
-    // Let the snackbar leave so it cannot cover the next taps.
-    await tester.pumpAndSettle(const Duration(seconds: 5));
-
-    // Edit a built-in chore's points via long-press.
-    await tester.longPress(find.text('Dusting'));
-    await tester.pumpAndSettle();
-    expect(find.text('Edit chore'), findsOneWidget);
-    await tester.drag(find.byType(Slider), const Offset(400, 0));
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
-    expect(find.text('100 points'), findsOneWidget);
-
-    // Add a custom chore.
-    await tester.tap(find.text('Add chore'));
-    await tester.pumpAndSettle();
-    await tester.enterText(
-      find.byType(TextFormField),
-      'Wäsche größer ß é Ж 日本 🧺',
-    );
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('Wäsche größer ß é Ж 日本 🧺'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
-
-    // Every tab opens.
-    for (final tab in ['Plan', 'World', 'Stats', 'Settings']) {
-      await tester.tap(find.widgetWithText(NavigationDestination, tab));
+  testWidgets(
+    'chores, schedules, plan, undo, editing and settings work on device',
+    (tester) async {
+      WidgetController.hitTestWarningShouldBeFatal = true;
+      tester.platformDispatcher.localesTestValue = [const Locale('en')];
+      addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+      // Real SQLite on the device, but in memory so the run starts clean.
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await tester.pumpWidget(await bootstrap(db));
       await tester.pumpAndSettle();
-      expect(find.widgetWithText(AppBar, tab), findsOneWidget);
-    }
 
-    // Archive via Manage chores.
-    await tester.tap(find.text('Manage chores'));
-    await tester.pumpAndSettle();
-    await tester.tap(
-      find.descendant(
-        of: find.widgetWithText(ListTile, 'Dusting'),
-        matching: find.byTooltip('Archive'),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-
-    // Theme modes.
-    for (final (label, mode) in [
-      ('Dark', ThemeMode.dark),
-      ('Light', ThemeMode.light),
-      ('System', ThemeMode.system),
-    ]) {
-      await tester.tap(find.text(label));
+      // Complete a chore, then undo it.
+      expect(find.text('0 points'), findsOneWidget);
+      await tester.tap(find.text('Dusting'));
       await tester.pumpAndSettle();
-      expect(
-        tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
-        mode,
+      expect(find.text('15 points'), findsWidgets);
+      expect(find.byTooltip('1× today'), findsOneWidget);
+      await tester.tap(find.text('Undo'));
+      await tester.pumpAndSettle();
+      expect(find.text('0 points'), findsOneWidget);
+      // Let the snackbar leave so it cannot cover the next taps.
+      await tester.pumpAndSettle(const Duration(seconds: 5));
+
+      // Edit a built-in chore's points via long-press.
+      await tester.longPress(find.text('Dusting'));
+      await tester.pumpAndSettle();
+      expect(find.text('Edit chore'), findsOneWidget);
+      await tester.drag(find.byType(Slider), const Offset(400, 0));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      expect(find.text('100 points'), findsOneWidget);
+
+      // Add a custom chore.
+      await tester.tap(find.text('Add chore'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextFormField),
+        'Wäsche größer ß é Ж 日本 🧺',
       );
-    }
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Wäsche größer ß é Ж 日本 🧺'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
 
-    // Colorblind palette.
-    await tester.tap(find.text('Colorblind-friendly colors'));
-    await tester.pumpAndSettle();
-    final context = tester.element(find.text('Colorblind-friendly colors'));
-    expect(
-      Theme.of(context).extension<ChorePalette>()!.isColorblindSafe,
-      isTrue,
-    );
+      // Plan: week list and month calendar.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Plan'));
+      await tester.pumpAndSettle();
+      expect(find.text('Tomorrow'), findsOneWidget);
+      await tester.tap(find.text('Month'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Next month'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Previous month'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Week'));
+      await tester.pumpAndSettle();
 
-    // Language override to German and back.
-    await tester.scrollUntilVisible(find.text('Deutsch'), 200);
-    await tester.tap(find.text('Deutsch'));
-    await tester.pumpAndSettle();
-    expect(find.text('Einstellungen'), findsWidgets);
-    await tester.tap(find.text('English'));
-    await tester.pumpAndSettle();
+      // Every tab opens.
+      for (final tab in ['Plan', 'World', 'Stats', 'Settings']) {
+        await tester.tap(find.widgetWithText(NavigationDestination, tab));
+        await tester.pumpAndSettle();
+        expect(find.widgetWithText(AppBar, tab), findsOneWidget);
+      }
 
-    // Archived chore is gone from Today.
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
-    await tester.pumpAndSettle();
-    expect(find.text('Dusting'), findsNothing);
-  });
+      // Archive via Manage chores.
+      await tester.tap(find.text('Manage chores'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.descendant(
+          of: find.widgetWithText(ListTile, 'Dusting'),
+          matching: find.byTooltip('Archive'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      // Theme modes.
+      for (final (label, mode) in [
+        ('Dark', ThemeMode.dark),
+        ('Light', ThemeMode.light),
+        ('System', ThemeMode.system),
+      ]) {
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<MaterialApp>(find.byType(MaterialApp)).themeMode,
+          mode,
+        );
+      }
+
+      // Colorblind palette.
+      await tester.tap(find.text('Colorblind-friendly colors'));
+      await tester.pumpAndSettle();
+      final context = tester.element(find.text('Colorblind-friendly colors'));
+      expect(
+        Theme.of(context).extension<ChorePalette>()!.isColorblindSafe,
+        isTrue,
+      );
+
+      // Language override to German and back.
+      await tester.scrollUntilVisible(find.text('Deutsch'), 200);
+      await tester.tap(find.text('Deutsch'));
+      await tester.pumpAndSettle();
+      expect(find.text('Einstellungen'), findsWidgets);
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      // Archived chore is gone from Today.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+      await tester.pumpAndSettle();
+      expect(find.text('Dusting'), findsNothing);
+    },
+  );
 }

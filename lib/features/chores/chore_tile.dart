@@ -5,7 +5,7 @@ import '../../l10n/app_localizations.dart';
 import 'chore_icons.dart';
 
 /// Colorful card for one chore. Color is never the only signal: every tile
-/// also shows its icon, title and points.
+/// also shows its icon, title, due status and points.
 class ChoreTile extends StatelessWidget {
   const ChoreTile({
     super.key,
@@ -14,6 +14,8 @@ class ChoreTile extends StatelessWidget {
     required this.colorKey,
     required this.points,
     this.doneToday = 0,
+    this.status,
+    this.overdue = false,
     this.onTap,
     this.onLongPress,
   });
@@ -23,6 +25,12 @@ class ChoreTile extends StatelessWidget {
   final int colorKey;
   final int points;
   final int doneToday;
+
+  /// Due status line ("Due today", "2 days overdue"); hidden when `null`.
+  final String? status;
+
+  /// Highlights [status] as overdue (with an icon, not only color).
+  final bool overdue;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -70,7 +78,30 @@ class ChoreTile extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 2),
+              if (status case final status?)
+                Row(
+                  children: [
+                    if (overdue) ...[
+                      Icon(
+                        Icons.error_outline,
+                        size: 14,
+                        color: theme.colorScheme.error,
+                      ),
+                      const SizedBox(width: 3),
+                    ],
+                    Expanded(
+                      child: Text(
+                        status,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: overdue ? theme.colorScheme.error : null,
+                          fontWeight: overdue ? FontWeight.bold : null,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               Text(l10n.pointsValue(points), style: theme.textTheme.bodySmall),
             ],
           ),

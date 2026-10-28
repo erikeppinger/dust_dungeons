@@ -410,6 +410,73 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     defaultValue: currentDateAndTime,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<RepeatType, String> repeatType =
+      GeneratedColumn<String>(
+        'repeat_type',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('anytime'),
+      ).withConverter<RepeatType>($ChoresTable.$converterrepeatType);
+  static const VerificationMeta _repeatIntervalMeta = const VerificationMeta(
+    'repeatInterval',
+  );
+  @override
+  late final GeneratedColumn<int> repeatInterval = GeneratedColumn<int>(
+    'repeat_interval',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _repeatWeekdaysMeta = const VerificationMeta(
+    'repeatWeekdays',
+  );
+  @override
+  late final GeneratedColumn<int> repeatWeekdays = GeneratedColumn<int>(
+    'repeat_weekdays',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _repeatDayOfMonthMeta = const VerificationMeta(
+    'repeatDayOfMonth',
+  );
+  @override
+  late final GeneratedColumn<int> repeatDayOfMonth = GeneratedColumn<int>(
+    'repeat_day_of_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _repeatStartMeta = const VerificationMeta(
+    'repeatStart',
+  );
+  @override
+  late final GeneratedColumn<DateTime> repeatStart = GeneratedColumn<DateTime>(
+    'repeat_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _repeatSetAtMeta = const VerificationMeta(
+    'repeatSetAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> repeatSetAt = GeneratedColumn<DateTime>(
+    'repeat_set_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     seedKey,
@@ -420,6 +487,12 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     isArchived,
     sortOrder,
     createdAt,
+    repeatType,
+    repeatInterval,
+    repeatWeekdays,
+    repeatDayOfMonth,
+    repeatStart,
+    repeatSetAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -493,6 +566,51 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('repeat_interval')) {
+      context.handle(
+        _repeatIntervalMeta,
+        repeatInterval.isAcceptableOrUnknown(
+          data['repeat_interval']!,
+          _repeatIntervalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('repeat_weekdays')) {
+      context.handle(
+        _repeatWeekdaysMeta,
+        repeatWeekdays.isAcceptableOrUnknown(
+          data['repeat_weekdays']!,
+          _repeatWeekdaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('repeat_day_of_month')) {
+      context.handle(
+        _repeatDayOfMonthMeta,
+        repeatDayOfMonth.isAcceptableOrUnknown(
+          data['repeat_day_of_month']!,
+          _repeatDayOfMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('repeat_start')) {
+      context.handle(
+        _repeatStartMeta,
+        repeatStart.isAcceptableOrUnknown(
+          data['repeat_start']!,
+          _repeatStartMeta,
+        ),
+      );
+    }
+    if (data.containsKey('repeat_set_at')) {
+      context.handle(
+        _repeatSetAtMeta,
+        repeatSetAt.isAcceptableOrUnknown(
+          data['repeat_set_at']!,
+          _repeatSetAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -538,6 +656,32 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      repeatType: $ChoresTable.$converterrepeatType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}repeat_type'],
+        )!,
+      ),
+      repeatInterval: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repeat_interval'],
+      )!,
+      repeatWeekdays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repeat_weekdays'],
+      )!,
+      repeatDayOfMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repeat_day_of_month'],
+      ),
+      repeatStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}repeat_start'],
+      ),
+      repeatSetAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}repeat_set_at'],
+      ),
     );
   }
 
@@ -545,6 +689,9 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
   $ChoresTable createAlias(String alias) {
     return $ChoresTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<RepeatType, String, String> $converterrepeatType =
+      const EnumNameConverter<RepeatType>(RepeatType.values);
 }
 
 class Chore extends DataClass implements Insertable<Chore> {
@@ -557,6 +704,19 @@ class Chore extends DataClass implements Insertable<Chore> {
   final bool isArchived;
   final int sortOrder;
   final DateTime createdAt;
+  final RepeatType repeatType;
+  final int repeatInterval;
+
+  /// Bitmask of weekdays, bit 0 = Monday.
+  final int repeatWeekdays;
+  final int? repeatDayOfMonth;
+
+  /// First occurrence; `null` falls back to [createdAt].
+  final DateTime? repeatStart;
+
+  /// When the schedule was last changed. One-off chores only count
+  /// completions made after this.
+  final DateTime? repeatSetAt;
   const Chore({
     required this.id,
     this.seedKey,
@@ -567,6 +727,12 @@ class Chore extends DataClass implements Insertable<Chore> {
     required this.isArchived,
     required this.sortOrder,
     required this.createdAt,
+    required this.repeatType,
+    required this.repeatInterval,
+    required this.repeatWeekdays,
+    this.repeatDayOfMonth,
+    this.repeatStart,
+    this.repeatSetAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -584,6 +750,22 @@ class Chore extends DataClass implements Insertable<Chore> {
     map['is_archived'] = Variable<bool>(isArchived);
     map['sort_order'] = Variable<int>(sortOrder);
     map['created_at'] = Variable<DateTime>(createdAt);
+    {
+      map['repeat_type'] = Variable<String>(
+        $ChoresTable.$converterrepeatType.toSql(repeatType),
+      );
+    }
+    map['repeat_interval'] = Variable<int>(repeatInterval);
+    map['repeat_weekdays'] = Variable<int>(repeatWeekdays);
+    if (!nullToAbsent || repeatDayOfMonth != null) {
+      map['repeat_day_of_month'] = Variable<int>(repeatDayOfMonth);
+    }
+    if (!nullToAbsent || repeatStart != null) {
+      map['repeat_start'] = Variable<DateTime>(repeatStart);
+    }
+    if (!nullToAbsent || repeatSetAt != null) {
+      map['repeat_set_at'] = Variable<DateTime>(repeatSetAt);
+    }
     return map;
   }
 
@@ -602,6 +784,18 @@ class Chore extends DataClass implements Insertable<Chore> {
       isArchived: Value(isArchived),
       sortOrder: Value(sortOrder),
       createdAt: Value(createdAt),
+      repeatType: Value(repeatType),
+      repeatInterval: Value(repeatInterval),
+      repeatWeekdays: Value(repeatWeekdays),
+      repeatDayOfMonth: repeatDayOfMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatDayOfMonth),
+      repeatStart: repeatStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatStart),
+      repeatSetAt: repeatSetAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatSetAt),
     );
   }
 
@@ -620,6 +814,14 @@ class Chore extends DataClass implements Insertable<Chore> {
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      repeatType: $ChoresTable.$converterrepeatType.fromJson(
+        serializer.fromJson<String>(json['repeatType']),
+      ),
+      repeatInterval: serializer.fromJson<int>(json['repeatInterval']),
+      repeatWeekdays: serializer.fromJson<int>(json['repeatWeekdays']),
+      repeatDayOfMonth: serializer.fromJson<int?>(json['repeatDayOfMonth']),
+      repeatStart: serializer.fromJson<DateTime?>(json['repeatStart']),
+      repeatSetAt: serializer.fromJson<DateTime?>(json['repeatSetAt']),
     );
   }
   @override
@@ -635,6 +837,14 @@ class Chore extends DataClass implements Insertable<Chore> {
       'isArchived': serializer.toJson<bool>(isArchived),
       'sortOrder': serializer.toJson<int>(sortOrder),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'repeatType': serializer.toJson<String>(
+        $ChoresTable.$converterrepeatType.toJson(repeatType),
+      ),
+      'repeatInterval': serializer.toJson<int>(repeatInterval),
+      'repeatWeekdays': serializer.toJson<int>(repeatWeekdays),
+      'repeatDayOfMonth': serializer.toJson<int?>(repeatDayOfMonth),
+      'repeatStart': serializer.toJson<DateTime?>(repeatStart),
+      'repeatSetAt': serializer.toJson<DateTime?>(repeatSetAt),
     };
   }
 
@@ -648,6 +858,12 @@ class Chore extends DataClass implements Insertable<Chore> {
     bool? isArchived,
     int? sortOrder,
     DateTime? createdAt,
+    RepeatType? repeatType,
+    int? repeatInterval,
+    int? repeatWeekdays,
+    Value<int?> repeatDayOfMonth = const Value.absent(),
+    Value<DateTime?> repeatStart = const Value.absent(),
+    Value<DateTime?> repeatSetAt = const Value.absent(),
   }) => Chore(
     id: id ?? this.id,
     seedKey: seedKey.present ? seedKey.value : this.seedKey,
@@ -658,6 +874,14 @@ class Chore extends DataClass implements Insertable<Chore> {
     isArchived: isArchived ?? this.isArchived,
     sortOrder: sortOrder ?? this.sortOrder,
     createdAt: createdAt ?? this.createdAt,
+    repeatType: repeatType ?? this.repeatType,
+    repeatInterval: repeatInterval ?? this.repeatInterval,
+    repeatWeekdays: repeatWeekdays ?? this.repeatWeekdays,
+    repeatDayOfMonth: repeatDayOfMonth.present
+        ? repeatDayOfMonth.value
+        : this.repeatDayOfMonth,
+    repeatStart: repeatStart.present ? repeatStart.value : this.repeatStart,
+    repeatSetAt: repeatSetAt.present ? repeatSetAt.value : this.repeatSetAt,
   );
   Chore copyWithCompanion(ChoresCompanion data) {
     return Chore(
@@ -676,6 +900,24 @@ class Chore extends DataClass implements Insertable<Chore> {
           : this.isArchived,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      repeatType: data.repeatType.present
+          ? data.repeatType.value
+          : this.repeatType,
+      repeatInterval: data.repeatInterval.present
+          ? data.repeatInterval.value
+          : this.repeatInterval,
+      repeatWeekdays: data.repeatWeekdays.present
+          ? data.repeatWeekdays.value
+          : this.repeatWeekdays,
+      repeatDayOfMonth: data.repeatDayOfMonth.present
+          ? data.repeatDayOfMonth.value
+          : this.repeatDayOfMonth,
+      repeatStart: data.repeatStart.present
+          ? data.repeatStart.value
+          : this.repeatStart,
+      repeatSetAt: data.repeatSetAt.present
+          ? data.repeatSetAt.value
+          : this.repeatSetAt,
     );
   }
 
@@ -690,7 +932,13 @@ class Chore extends DataClass implements Insertable<Chore> {
           ..write('basePoints: $basePoints, ')
           ..write('isArchived: $isArchived, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('repeatType: $repeatType, ')
+          ..write('repeatInterval: $repeatInterval, ')
+          ..write('repeatWeekdays: $repeatWeekdays, ')
+          ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
+          ..write('repeatStart: $repeatStart, ')
+          ..write('repeatSetAt: $repeatSetAt')
           ..write(')'))
         .toString();
   }
@@ -706,6 +954,12 @@ class Chore extends DataClass implements Insertable<Chore> {
     isArchived,
     sortOrder,
     createdAt,
+    repeatType,
+    repeatInterval,
+    repeatWeekdays,
+    repeatDayOfMonth,
+    repeatStart,
+    repeatSetAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -719,7 +973,13 @@ class Chore extends DataClass implements Insertable<Chore> {
           other.basePoints == this.basePoints &&
           other.isArchived == this.isArchived &&
           other.sortOrder == this.sortOrder &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.repeatType == this.repeatType &&
+          other.repeatInterval == this.repeatInterval &&
+          other.repeatWeekdays == this.repeatWeekdays &&
+          other.repeatDayOfMonth == this.repeatDayOfMonth &&
+          other.repeatStart == this.repeatStart &&
+          other.repeatSetAt == this.repeatSetAt);
 }
 
 class ChoresCompanion extends UpdateCompanion<Chore> {
@@ -732,6 +992,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
   final Value<bool> isArchived;
   final Value<int> sortOrder;
   final Value<DateTime> createdAt;
+  final Value<RepeatType> repeatType;
+  final Value<int> repeatInterval;
+  final Value<int> repeatWeekdays;
+  final Value<int?> repeatDayOfMonth;
+  final Value<DateTime?> repeatStart;
+  final Value<DateTime?> repeatSetAt;
   const ChoresCompanion({
     this.id = const Value.absent(),
     this.seedKey = const Value.absent(),
@@ -742,6 +1008,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.isArchived = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.repeatType = const Value.absent(),
+    this.repeatInterval = const Value.absent(),
+    this.repeatWeekdays = const Value.absent(),
+    this.repeatDayOfMonth = const Value.absent(),
+    this.repeatStart = const Value.absent(),
+    this.repeatSetAt = const Value.absent(),
   });
   ChoresCompanion.insert({
     this.id = const Value.absent(),
@@ -753,6 +1025,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.isArchived = const Value.absent(),
     this.sortOrder = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.repeatType = const Value.absent(),
+    this.repeatInterval = const Value.absent(),
+    this.repeatWeekdays = const Value.absent(),
+    this.repeatDayOfMonth = const Value.absent(),
+    this.repeatStart = const Value.absent(),
+    this.repeatSetAt = const Value.absent(),
   }) : iconKey = Value(iconKey),
        colorKey = Value(colorKey),
        basePoints = Value(basePoints);
@@ -766,6 +1044,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Expression<bool>? isArchived,
     Expression<int>? sortOrder,
     Expression<DateTime>? createdAt,
+    Expression<String>? repeatType,
+    Expression<int>? repeatInterval,
+    Expression<int>? repeatWeekdays,
+    Expression<int>? repeatDayOfMonth,
+    Expression<DateTime>? repeatStart,
+    Expression<DateTime>? repeatSetAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -777,6 +1061,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       if (isArchived != null) 'is_archived': isArchived,
       if (sortOrder != null) 'sort_order': sortOrder,
       if (createdAt != null) 'created_at': createdAt,
+      if (repeatType != null) 'repeat_type': repeatType,
+      if (repeatInterval != null) 'repeat_interval': repeatInterval,
+      if (repeatWeekdays != null) 'repeat_weekdays': repeatWeekdays,
+      if (repeatDayOfMonth != null) 'repeat_day_of_month': repeatDayOfMonth,
+      if (repeatStart != null) 'repeat_start': repeatStart,
+      if (repeatSetAt != null) 'repeat_set_at': repeatSetAt,
     });
   }
 
@@ -790,6 +1080,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Value<bool>? isArchived,
     Value<int>? sortOrder,
     Value<DateTime>? createdAt,
+    Value<RepeatType>? repeatType,
+    Value<int>? repeatInterval,
+    Value<int>? repeatWeekdays,
+    Value<int?>? repeatDayOfMonth,
+    Value<DateTime?>? repeatStart,
+    Value<DateTime?>? repeatSetAt,
   }) {
     return ChoresCompanion(
       id: id ?? this.id,
@@ -801,6 +1097,12 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       isArchived: isArchived ?? this.isArchived,
       sortOrder: sortOrder ?? this.sortOrder,
       createdAt: createdAt ?? this.createdAt,
+      repeatType: repeatType ?? this.repeatType,
+      repeatInterval: repeatInterval ?? this.repeatInterval,
+      repeatWeekdays: repeatWeekdays ?? this.repeatWeekdays,
+      repeatDayOfMonth: repeatDayOfMonth ?? this.repeatDayOfMonth,
+      repeatStart: repeatStart ?? this.repeatStart,
+      repeatSetAt: repeatSetAt ?? this.repeatSetAt,
     );
   }
 
@@ -834,6 +1136,26 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (repeatType.present) {
+      map['repeat_type'] = Variable<String>(
+        $ChoresTable.$converterrepeatType.toSql(repeatType.value),
+      );
+    }
+    if (repeatInterval.present) {
+      map['repeat_interval'] = Variable<int>(repeatInterval.value);
+    }
+    if (repeatWeekdays.present) {
+      map['repeat_weekdays'] = Variable<int>(repeatWeekdays.value);
+    }
+    if (repeatDayOfMonth.present) {
+      map['repeat_day_of_month'] = Variable<int>(repeatDayOfMonth.value);
+    }
+    if (repeatStart.present) {
+      map['repeat_start'] = Variable<DateTime>(repeatStart.value);
+    }
+    if (repeatSetAt.present) {
+      map['repeat_set_at'] = Variable<DateTime>(repeatSetAt.value);
+    }
     return map;
   }
 
@@ -848,7 +1170,13 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
           ..write('basePoints: $basePoints, ')
           ..write('isArchived: $isArchived, ')
           ..write('sortOrder: $sortOrder, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('repeatType: $repeatType, ')
+          ..write('repeatInterval: $repeatInterval, ')
+          ..write('repeatWeekdays: $repeatWeekdays, ')
+          ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
+          ..write('repeatStart: $repeatStart, ')
+          ..write('repeatSetAt: $repeatSetAt')
           ..write(')'))
         .toString();
   }
@@ -2295,6 +2623,12 @@ typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<bool> isArchived,
   Value<int> sortOrder,
   Value<DateTime> createdAt,
+  Value<RepeatType> repeatType,
+  Value<int> repeatInterval,
+  Value<int> repeatWeekdays,
+  Value<int?> repeatDayOfMonth,
+  Value<DateTime?> repeatStart,
+  Value<DateTime?> repeatSetAt,
 });
 typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<int> id,
@@ -2306,6 +2640,12 @@ typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<bool> isArchived,
   Value<int> sortOrder,
   Value<DateTime> createdAt,
+  Value<RepeatType> repeatType,
+  Value<int> repeatInterval,
+  Value<int> repeatWeekdays,
+  Value<int?> repeatDayOfMonth,
+  Value<DateTime?> repeatStart,
+  Value<DateTime?> repeatSetAt,
 });
 
 final class $$ChoresTableReferences
@@ -2382,6 +2722,37 @@ class $$ChoresTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<RepeatType, RepeatType, String>
+  get repeatType => $composableBuilder(
+    column: $table.repeatType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get repeatInterval => $composableBuilder(
+    column: $table.repeatInterval,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repeatWeekdays => $composableBuilder(
+    column: $table.repeatWeekdays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repeatDayOfMonth => $composableBuilder(
+    column: $table.repeatDayOfMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get repeatStart => $composableBuilder(
+    column: $table.repeatStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get repeatSetAt => $composableBuilder(
+    column: $table.repeatSetAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2464,6 +2835,36 @@ class $$ChoresTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get repeatType => $composableBuilder(
+    column: $table.repeatType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repeatInterval => $composableBuilder(
+    column: $table.repeatInterval,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repeatWeekdays => $composableBuilder(
+    column: $table.repeatWeekdays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repeatDayOfMonth => $composableBuilder(
+    column: $table.repeatDayOfMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get repeatStart => $composableBuilder(
+    column: $table.repeatStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get repeatSetAt => $composableBuilder(
+    column: $table.repeatSetAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChoresTableAnnotationComposer
@@ -2507,6 +2908,37 @@ class $$ChoresTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<RepeatType, String> get repeatType =>
+      $composableBuilder(
+        column: $table.repeatType,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<int> get repeatInterval => $composableBuilder(
+    column: $table.repeatInterval,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repeatWeekdays => $composableBuilder(
+    column: $table.repeatWeekdays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get repeatDayOfMonth => $composableBuilder(
+    column: $table.repeatDayOfMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get repeatStart => $composableBuilder(
+    column: $table.repeatStart,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get repeatSetAt => $composableBuilder(
+    column: $table.repeatSetAt,
+    builder: (column) => column,
+  );
 
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
@@ -2571,6 +3003,12 @@ class $$ChoresTableTableManager
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<RepeatType> repeatType = const Value.absent(),
+                Value<int> repeatInterval = const Value.absent(),
+                Value<int> repeatWeekdays = const Value.absent(),
+                Value<int?> repeatDayOfMonth = const Value.absent(),
+                Value<DateTime?> repeatStart = const Value.absent(),
+                Value<DateTime?> repeatSetAt = const Value.absent(),
               }) => ChoresCompanion(
                 id: id,
                 seedKey: seedKey,
@@ -2581,6 +3019,12 @@ class $$ChoresTableTableManager
                 isArchived: isArchived,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
+                repeatType: repeatType,
+                repeatInterval: repeatInterval,
+                repeatWeekdays: repeatWeekdays,
+                repeatDayOfMonth: repeatDayOfMonth,
+                repeatStart: repeatStart,
+                repeatSetAt: repeatSetAt,
               ),
           createCompanionCallback:
               ({
@@ -2593,6 +3037,12 @@ class $$ChoresTableTableManager
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<RepeatType> repeatType = const Value.absent(),
+                Value<int> repeatInterval = const Value.absent(),
+                Value<int> repeatWeekdays = const Value.absent(),
+                Value<int?> repeatDayOfMonth = const Value.absent(),
+                Value<DateTime?> repeatStart = const Value.absent(),
+                Value<DateTime?> repeatSetAt = const Value.absent(),
               }) => ChoresCompanion.insert(
                 id: id,
                 seedKey: seedKey,
@@ -2603,6 +3053,12 @@ class $$ChoresTableTableManager
                 isArchived: isArchived,
                 sortOrder: sortOrder,
                 createdAt: createdAt,
+                repeatType: repeatType,
+                repeatInterval: repeatInterval,
+                repeatWeekdays: repeatWeekdays,
+                repeatDayOfMonth: repeatDayOfMonth,
+                repeatStart: repeatStart,
+                repeatSetAt: repeatSetAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(

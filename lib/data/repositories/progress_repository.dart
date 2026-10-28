@@ -86,6 +86,44 @@ class ProgressRepository {
     return query.watchSingle().map((row) => row.read(sum) ?? 0);
   }
 
+  /// Latest completion (not undone) per chore id.
+  Stream<Map<int, DateTime>> watchLastDone(int profileId) {
+    // Max over epoch seconds: comparing stored ISO strings with different UTC
+    // offsets (around DST changes) would not be chronological.
+    final last = _db.completions.completedAt.unixepoch.max();
+    final query = _db.selectOnly(_db.completions)
+      ..addColumns([_db.completions.choreId, last])
+      ..where(
+        _db.completions.profileId.equals(profileId) &
+            _db.completions.undoneAt.isNull(),
+      )
+      ..groupBy([_db.completions.choreId]);
+    return query.watch().map(
+      (rows) => {
+        for (final row in rows)
+          row.read(_db.completions.choreId)!:
+              DateTime.fromMillisecondsSinceEpoch(row.read(last)! * 1000),
+      },
+    );
+  }
+
+  /// Completions (not undone) with `from <= completedAt < to`, oldest first.
+  Stream<List<Completion>> watchCompletionsBetween(
+    int profileId,
+    DateTime from,
+    DateTime to,
+  ) =>
+      (_db.select(_db.completions)
+            ..where(
+              (c) =>
+                  c.profileId.equals(profileId) &
+                  c.undoneAt.isNull() &
+                  c.completedAt.isBiggerOrEqualValue(from) &
+                  c.completedAt.isSmallerThanValue(to),
+            )
+            ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
+          .watch();
+
   /// How often each chore was done (and not undone) since [since], by chore id.
   Stream<Map<int, int>> watchCompletionCounts(int profileId, DateTime since) {
     final count = _db.completions.id.count();

@@ -13,6 +13,15 @@ After changing Drift tables or queries, regenerate and commit `*.g.dart`:
 dart run build_runner build
 ```
 
+For a **schema change**, also bump `schemaVersion`, write the migration step, and then:
+
+```bash
+dart run drift_dev schema dump lib/data/db/app_database.dart drift_schemas/
+dart run drift_dev schema generate drift_schemas/ test/data/generated_migrations/
+```
+
+Then add a case to `test/data/migration_test.dart` that upgrades real old data.
+
 ## Before committing
 Nothing gets committed until the app has run on an Android emulator or device **and** the changes have been reviewed for bugs, open loops and loose ends (unfinished code paths, TODOs, unused strings or dependencies, docs or changelog out of date).
 

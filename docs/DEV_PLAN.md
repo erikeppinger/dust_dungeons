@@ -253,7 +253,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 |---|---|---|
 | **0.0.1** ✅ | Scaffolding | `flutter create --org io.github.changeme --project-name homework_and_chores --platforms=android`, Dropbox ignore, local Git (no remote yet), license, README, CHANGELOG, lint rules, l10n setup, theme skeleton (light/dark) |
 | **0.1.0** ✅ | Core chores | Drift DB, seed chores (`lib/domain/default_chores.dart`), chore list, add/edit/archive, icons & colors, complete + undo, settings saved |
-| **0.2.0** | Scheduling | Recurrence engine (with heavy unit tests), Today view, week/month overview, overdue logic |
+| **0.2.0** ✅ | Scheduling | Recurrence engine (with heavy unit tests), Today view, week/month overview, overdue logic |
 | **0.3.0** | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
 | **0.4.0** | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
 | **0.5.0** | Progression v1 | `ProgressionTheme` interface, one placeholder theme, goal graph, spend flow, optional real-life rewards |

@@ -12,6 +12,7 @@ import '../../l10n/app_localizations.dart';
 import 'chore_edit_screen.dart';
 import 'chore_icons.dart';
 import 'chore_titles.dart';
+import 'schedule_text.dart';
 
 /// All chores, active and archived, for editing and archiving.
 class ManageChoresScreen extends ConsumerWidget {
@@ -80,7 +81,8 @@ class _ChoreRow extends ConsumerWidget {
       ),
       title: Text(title),
       subtitle: Text(
-        l10n.pointsValue(pointsForCompletion(basePoints: chore.basePoints)),
+        '${l10n.pointsValue(pointsForCompletion(basePoints: chore.basePoints))}'
+        ' · ${recurrenceSummary(context, chore.recurrence)}',
       ),
       onTap: () => ChoreEditScreen.open(context, chore),
       trailing: IconButton(

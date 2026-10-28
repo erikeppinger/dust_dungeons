@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/chore_palette.dart';
 import '../../data/db/app_database.dart';
+import '../../core/day_clock.dart';
 import '../../data/providers.dart';
+import '../../domain/recurrence.dart';
 import '../../domain/points.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_icons.dart';
 import 'chore_tile.dart';
 import 'chore_titles.dart';
+import 'repeat_editor.dart';
 
 /// Add a new chore (`chore == null`) or edit/archive an existing one.
 class ChoreEditScreen extends ConsumerStatefulWidget {
@@ -33,6 +36,8 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   late String _iconKey;
   late int _colorKey;
   late int _points;
+  late Recurrence _recurrence;
+  bool _showErrors = false;
   bool _initialized = false;
   bool _saving = false;
 
@@ -49,6 +54,8 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     _iconKey = chore?.iconKey ?? defaultIconKey;
     _colorKey = chore?.colorKey ?? 0;
     _points = (chore?.basePoints ?? 10).clamp(minBasePoints, maxBasePoints);
+    _recurrence =
+        chore?.recurrence ?? Recurrence.anytime(ref.read(todayProvider));
     _title.addListener(() => setState(() {}));
   }
 
@@ -59,7 +66,12 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   }
 
   Future<void> _save() async {
-    if (_saving || !_formKey.currentState!.validate()) return;
+    if (_saving) return;
+    final formValid = _formKey.currentState!.validate();
+    if (!formValid || !RepeatEditor.isValid(_recurrence)) {
+      setState(() => _showErrors = true);
+      return;
+    }
     final repo = ref.read(choreRepositoryProvider);
     final title = _title.text.trim();
     final chore = widget.chore;
@@ -74,6 +86,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               iconKey: _iconKey,
               colorKey: _colorKey,
               basePoints: _points,
+              recurrence: _recurrence,
             )
           : repo.update(
               chore.id,
@@ -81,6 +94,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               iconKey: _iconKey,
               colorKey: _colorKey,
               basePoints: _points,
+              recurrence: _recurrence,
             ),
     );
   }
@@ -189,6 +203,13 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               ],
             ),
             const SizedBox(height: 16),
+            RepeatEditor(
+              value: _recurrence,
+              today: ref.watch(todayProvider),
+              showErrors: _showErrors,
+              onChanged: (r) => setState(() => _recurrence = r),
+            ),
+            const SizedBox(height: 24),
             Text(l10n.choreColor, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
             Wrap(

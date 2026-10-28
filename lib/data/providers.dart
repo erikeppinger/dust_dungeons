@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day_clock.dart';
 import 'db/app_database.dart';
+import 'models/scheduled_chore.dart';
 import 'repositories/chore_repository.dart';
 import 'repositories/progress_repository.dart';
 import 'repositories/settings_repository.dart';
@@ -53,3 +54,51 @@ final todayCountsProvider = StreamProvider<Map<int, int>>(
         ref.watch(todayProvider),
       ),
 );
+
+/// Latest counted completion per chore id.
+final lastDoneProvider = StreamProvider<Map<int, DateTime>>(
+  (ref) => ref
+      .watch(progressRepositoryProvider)
+      .watchLastDone(ref.watch(currentProfileIdProvider)),
+);
+
+/// Active chores with their due state for today.
+final scheduledChoresProvider = Provider<AsyncValue<List<ScheduledChore>>>((
+  ref,
+) {
+  final chores = ref.watch(activeChoresProvider);
+  final lastDone = ref.watch(lastDoneProvider);
+  final counts = ref.watch(todayCountsProvider);
+  final today = ref.watch(todayProvider);
+  if (chores.hasError) return AsyncError(chores.error!, chores.stackTrace!);
+  if (lastDone.hasError) {
+    return AsyncError(lastDone.error!, lastDone.stackTrace!);
+  }
+  if (counts.hasError) return AsyncError(counts.error!, counts.stackTrace!);
+  final list = chores.value, last = lastDone.value, done = counts.value;
+  if (list == null || last == null || done == null) {
+    return const AsyncLoading();
+  }
+  return AsyncData([
+    for (final chore in list)
+      ScheduledChore(
+        chore: chore,
+        lastDone: last[chore.id],
+        doneToday: done[chore.id] ?? 0,
+        today: today,
+      ),
+  ]);
+});
+
+/// Completions in `[from, to)`, e.g. one calendar month.
+/// Auto-disposed, so months that are no longer shown stop their query.
+final completionsBetweenProvider = StreamProvider.autoDispose
+    .family<List<Completion>, (DateTime, DateTime)>(
+      (ref, range) => ref
+          .watch(progressRepositoryProvider)
+          .watchCompletionsBetween(
+            ref.watch(currentProfileIdProvider),
+            range.$1,
+            range.$2,
+          ),
+    );

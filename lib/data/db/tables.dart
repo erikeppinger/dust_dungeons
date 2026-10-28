@@ -1,5 +1,9 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/recurrence.dart';
+
+export '../../domain/recurrence.dart' show RepeatType;
+
 /// A person using the app. 0.1 uses a single default profile; switching arrives in 0.8.
 class Profiles extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -21,6 +25,22 @@ class Chores extends Table {
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  // Schedule (schema v2), see `Recurrence`.
+  TextColumn get repeatType =>
+      textEnum<RepeatType>().withDefault(const Constant('anytime'))();
+  IntColumn get repeatInterval => integer().withDefault(const Constant(1))();
+
+  /// Bitmask of weekdays, bit 0 = Monday.
+  IntColumn get repeatWeekdays => integer().withDefault(const Constant(0))();
+  IntColumn get repeatDayOfMonth => integer().nullable()();
+
+  /// First occurrence; `null` falls back to [createdAt].
+  DateTimeColumn get repeatStart => dateTime().nullable()();
+
+  /// When the schedule was last changed. One-off chores only count
+  /// completions made after this.
+  DateTimeColumn get repeatSetAt => dateTime().nullable()();
 }
 
 /// One time a chore was done. Undo sets [undoneAt] instead of deleting the row.

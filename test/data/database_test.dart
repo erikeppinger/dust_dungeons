@@ -8,6 +8,7 @@ import 'package:homework_and_chores/data/repositories/chore_repository.dart';
 import 'package:homework_and_chores/data/repositories/progress_repository.dart';
 import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/domain/default_chores.dart';
+import 'package:homework_and_chores/domain/recurrence.dart';
 import 'package:homework_and_chores/data/models/app_settings.dart';
 
 import '../helpers.dart';
@@ -18,10 +19,12 @@ void main() {
   late ProgressRepository progress;
   late int profileId;
   var now = DateTime(2026, 10, 28, 9);
+  final anytime = Recurrence.anytime(DateTime(2026, 10, 28));
 
   setUp(() async {
+    now = DateTime(2026, 10, 28, 9);
     db = memoryDb();
-    chores = ChoreRepository(db);
+    chores = ChoreRepository(db, clock: () => now);
     progress = ProgressRepository(db, clock: () => now);
     profileId = await db.defaultProfileId();
   });
@@ -75,6 +78,7 @@ void main() {
           iconKey: 'star',
           colorKey: 0,
           basePoints: 10,
+          recurrence: anytime,
         );
         final stored = (await chores.watchAll().first).singleWhere(
           (c) => c.id == id,
@@ -89,6 +93,7 @@ void main() {
         iconKey: 'pets',
         colorKey: 2,
         basePoints: 10,
+        recurrence: anytime,
       );
       final active = await chores.watchActive().first;
       expect(active.last.id, id);
@@ -104,6 +109,7 @@ void main() {
         iconKey: 'star',
         colorKey: 3,
         basePoints: 50,
+        recurrence: anytime,
       );
       var updated = (await chores.watchActive().first).first;
       expect(updated.customTitle, 'Renamed');
@@ -115,6 +121,7 @@ void main() {
         iconKey: 'star',
         colorKey: 3,
         basePoints: 50,
+        recurrence: anytime,
       );
       updated = (await chores.watchActive().first).first;
       expect(updated.customTitle, isNull);
@@ -178,6 +185,130 @@ void main() {
           .first;
       expect(counts, {chore.id: 1});
     });
+  });
+
+  group('schedules', () {
+    final weekly = Recurrence(
+      type: RepeatType.weekly,
+      interval: 2,
+      weekdays: {DateTime.monday, DateTime.friday},
+      start: DateTime(2026, 10, 26),
+    );
+
+    Future<Chore> byId(int id) =>
+        (db.select(db.chores)..where((c) => c.id.equals(id))).getSingle();
+
+    test('a schedule is stored and read back unchanged', () async {
+      final id = await chores.add(
+        title: 'Bettwäsche',
+        iconKey: 'bed',
+        colorKey: 1,
+        basePoints: 20,
+        recurrence: weekly,
+      );
+      final chore = await byId(id);
+      expect(chore.recurrence, weekly);
+      expect(chore.repeatSetAt, now);
+    });
+
+    test('saving without schedule changes keeps "set at"', () async {
+      final id = await chores.add(
+        title: 'X',
+        iconKey: 'star',
+        colorKey: 0,
+        basePoints: 10,
+        recurrence: weekly,
+      );
+      now = DateTime(2026, 11, 1);
+      await chores.update(
+        id,
+        customTitle: 'Y',
+        iconKey: 'star',
+        colorKey: 0,
+        basePoints: 10,
+        recurrence: weekly,
+      );
+      expect((await byId(id)).repeatSetAt, DateTime(2026, 10, 28, 9));
+
+      final monthly = Recurrence(
+        type: RepeatType.monthly,
+        start: DateTime(2026, 11, 1),
+      );
+      await chores.update(
+        id,
+        customTitle: 'Y',
+        iconKey: 'star',
+        colorKey: 0,
+        basePoints: 10,
+        recurrence: monthly,
+      );
+      final updated = await byId(id);
+      expect(updated.recurrence, monthly);
+      expect(updated.repeatSetAt, DateTime(2026, 11, 1));
+    });
+
+    test('built-in chores start with their default rhythm', () async {
+      final all = await chores.watchAll().first;
+      final dishes = all.singleWhere((c) => c.seedKey == 'dishes');
+      expect(dishes.recurrence.type, RepeatType.daily);
+      final hang = all.singleWhere((c) => c.seedKey == 'hang_laundry');
+      expect(hang.recurrence.type, RepeatType.anytime);
+    });
+
+    test('last done and completions in a range', () async {
+      final chore = (await chores.watchActive().first).first;
+      now = DateTime(2026, 10, 20, 8);
+      await progress.complete(choreId: chore.id, profileId: profileId);
+      now = DateTime(2026, 10, 27, 21, 30);
+      await progress.complete(choreId: chore.id, profileId: profileId);
+      now = DateTime(2026, 10, 28, 9);
+      final undone = await progress.complete(
+        choreId: chore.id,
+        profileId: profileId,
+      );
+      await progress.undo(undone.completionId);
+
+      final last = await progress.watchLastDone(profileId).first;
+      expect(last, {chore.id: DateTime(2026, 10, 27, 21, 30)});
+
+      final october = await progress
+          .watchCompletionsBetween(
+            profileId,
+            DateTime(2026, 10, 21),
+            DateTime(2026, 11, 1),
+          )
+          .first;
+      expect(october.map((c) => c.completedAt), [
+        DateTime(2026, 10, 27, 21, 30),
+      ]);
+    });
+
+    test(
+      'one-off chores ignore completions from before the schedule',
+      () async {
+        final chore = (await chores.watchActive().first).first;
+        now = DateTime(2026, 10, 20);
+        await progress.complete(choreId: chore.id, profileId: profileId);
+        now = DateTime(2026, 10, 28, 9);
+        await chores.update(
+          chore.id,
+          customTitle: null,
+          iconKey: chore.iconKey,
+          colorKey: chore.colorKey,
+          basePoints: chore.basePoints,
+          recurrence: Recurrence(
+            type: RepeatType.once,
+            start: DateTime(2026, 10, 30),
+          ),
+        );
+        final updated = await byId(chore.id);
+        expect(updated.countedLastDone(DateTime(2026, 10, 20)), isNull);
+        expect(
+          updated.countedLastDone(DateTime(2026, 10, 29)),
+          DateTime(2026, 10, 29),
+        );
+      },
+    );
   });
 
   group('settings', () {

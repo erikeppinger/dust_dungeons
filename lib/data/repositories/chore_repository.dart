@@ -1,11 +1,14 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/recurrence.dart';
 import '../db/app_database.dart';
 
 class ChoreRepository {
-  ChoreRepository(this._db);
+  ChoreRepository(this._db, {DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   final AppDatabase _db;
+  final DateTime Function() _clock;
 
   /// All chores, active first, each group in display order.
   Stream<List<Chore>> watchAll() =>
@@ -32,6 +35,7 @@ class ChoreRepository {
     required String iconKey,
     required int colorKey,
     required int basePoints,
+    required Recurrence recurrence,
   }) => _db.transaction(() async {
     final maxOrder = _db.chores.sortOrder.max();
     final row = await (_db.selectOnly(
@@ -46,28 +50,37 @@ class ChoreRepository {
             colorKey: colorKey,
             basePoints: basePoints,
             sortOrder: Value((row.read(maxOrder) ?? -1) + 1),
-          ),
+          ).withSchedule(recurrence, _clock()),
         );
   });
 
   /// Updates a chore. A `null` [customTitle] means "use the built-in localized
-  /// title" and is only valid for chores with a seed key.
+  /// title" and is only valid for chores with a seed key. The schedule (and
+  /// its "set at" time) is only rewritten when [recurrence] changed.
   Future<void> update(
     int id, {
     required String? customTitle,
     required String iconKey,
     required int colorKey,
     required int basePoints,
-  }) async {
-    await (_db.update(_db.chores)..where((c) => c.id.equals(id))).write(
-      ChoresCompanion(
-        customTitle: Value(customTitle),
-        iconKey: Value(iconKey),
-        colorKey: Value(colorKey),
-        basePoints: Value(basePoints),
-      ),
+    required Recurrence recurrence,
+  }) => _db.transaction(() async {
+    final current = await (_db.select(
+      _db.chores,
+    )..where((c) => c.id.equals(id))).getSingle();
+    var changes = ChoresCompanion(
+      customTitle: Value(customTitle),
+      iconKey: Value(iconKey),
+      colorKey: Value(colorKey),
+      basePoints: Value(basePoints),
     );
-  }
+    if (current.recurrence != recurrence) {
+      changes = changes.withSchedule(recurrence, _clock());
+    }
+    await (_db.update(
+      _db.chores,
+    )..where((c) => c.id.equals(id))).write(changes);
+  });
 
   Future<void> setArchived(int id, {required bool archived}) async {
     await (_db.update(_db.chores)..where((c) => c.id.equals(id))).write(

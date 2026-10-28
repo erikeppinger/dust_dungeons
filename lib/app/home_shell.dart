@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/widgets/coming_soon.dart';
 import '../features/chores/today_screen.dart';
+import '../features/plan/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../l10n/app_localizations.dart';
 
@@ -33,11 +34,7 @@ class _HomeShellState extends State<HomeShell> {
         index: _index,
         children: [
           const TodayScreen(),
-          ComingSoon(
-            icon: Icons.calendar_month,
-            message: l10n.planPlaceholder,
-            version: '0.2.0',
-          ),
+          const PlanScreen(),
           ComingSoon(
             icon: Icons.public,
             message: l10n.worldPlaceholder,

@@ -8,6 +8,16 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-28
+### Added
+- Schedules for chores: once, every N days, weekly on chosen weekdays (every N weeks), monthly on a day
+  (clamped to short months), N days after last done, or no schedule. Edited in the chore editor.
+- Built-in chores come with sensible default rhythms, staggered so not everything is due on day one.
+- Today screen sections: Overdue, Due today, Done today, Later & anytime, with a due/overdue line on every tile.
+- Plan tab: week list (today + 6 days) and month calendar with done/due counts per day; tap a day for details.
+- "Manage chores" shows each chore's schedule.
+- Database schema v2 with a tested migration from 0.1 (existing chores, history and points are kept).
+
 ## [0.1.0] - 2026-10-28
 ### Added
 - Local SQLite database (Drift) with profiles, chores, completions, a point ledger and settings.
@@ -37,5 +47,6 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.2.0]: #
 [0.1.0]: #
 [0.0.1]: #
