@@ -16,6 +16,8 @@ class AppSettings {
     this.fightSound = true,
     this.fightHaptics = true,
     this.fightStoryMode = false,
+    this.fightSlowMode = false,
+    this.fightLatencyMs = 0,
     this.avatarSkin = 0,
     this.avatarHair = 0,
     this.avatarCape = 0,
@@ -47,6 +49,12 @@ class AppSettings {
   /// Story mode: fights cannot be lost, wider timing.
   final bool fightStoryMode;
 
+  /// Slow mode: fights play at 70 % tempo.
+  final bool fightSlowMode;
+
+  /// Calibrated tap delay in ms, subtracted from every tap in fights.
+  final int fightLatencyMs;
+
   /// Avatar choices, as indexes into the avatar palettes.
   final int avatarSkin;
   final int avatarHair;
@@ -68,6 +76,8 @@ class AppSettings {
     bool? fightSound,
     bool? fightHaptics,
     bool? fightStoryMode,
+    bool? fightSlowMode,
+    int? fightLatencyMs,
     int? avatarSkin,
     int? avatarHair,
     int? avatarCape,
@@ -85,6 +95,8 @@ class AppSettings {
     fightSound: fightSound ?? this.fightSound,
     fightHaptics: fightHaptics ?? this.fightHaptics,
     fightStoryMode: fightStoryMode ?? this.fightStoryMode,
+    fightSlowMode: fightSlowMode ?? this.fightSlowMode,
+    fightLatencyMs: fightLatencyMs ?? this.fightLatencyMs,
     avatarSkin: avatarSkin ?? this.avatarSkin,
     avatarHair: avatarHair ?? this.avatarHair,
     avatarCape: avatarCape ?? this.avatarCape,
@@ -106,6 +118,8 @@ class AppSettings {
       other.fightSound == fightSound &&
       other.fightHaptics == fightHaptics &&
       other.fightStoryMode == fightStoryMode &&
+      other.fightSlowMode == fightSlowMode &&
+      other.fightLatencyMs == fightLatencyMs &&
       other.avatarSkin == avatarSkin &&
       other.avatarHair == avatarHair &&
       other.avatarCape == avatarCape &&
@@ -125,6 +139,8 @@ class AppSettings {
     fightSound,
     fightHaptics,
     fightStoryMode,
+    fightSlowMode,
+    fightLatencyMs,
     avatarSkin,
     avatarHair,
     avatarCape,

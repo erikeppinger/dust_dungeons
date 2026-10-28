@@ -493,13 +493,16 @@
       }
     }
   },
-  "fightTierPhase": "Tier {tier} · phase {phase} of 2",
+  "fightTierPhase": "Tier {tier} · phase {phase} of {total}",
   "@fightTierPhase": {
     "placeholders": {
       "tier": {
         "type": "int"
       },
       "phase": {
+        "type": "int"
+      },
+      "total": {
         "type": "int"
       }
     }
@@ -745,5 +748,69 @@
       }
     }
   },
-  "fightShieldReady": "Sponge Shield ready"
+  "fightShieldReady": "Sponge Shield ready",
+  "bossOverlord": "Chore Overlord",
+  "bossSourceOverlord": "5 wins in one week",
+  "trophyOverlord": "Crown of the Week",
+  "fightLanes": "Tap each note on the line",
+  "fightLaneLabel": "Lane {n}",
+  "@fightLaneLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fightLeaveBodyOverlord": "The Overlord stays until Sunday, so you can try again.",
+  "fightAbandonedOverlord": "The fight was stopped because the app left the screen. The Overlord stays until Sunday.",
+  "fightLostHintOverlord": "The Overlord stays until Sunday: try again any time, no token needed.",
+  "worldWeeklyBoss": "Weekly boss",
+  "worldOverlordProgress": "{n} of {total} wins this week",
+  "@worldOverlordProgress": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "worldOverlordLocked": "Appears after 5 won fights in one week (Mon–Sun).",
+  "worldOverlordReady": "It has appeared! Beat it for the Crown of the Week. Fighting it needs no token.",
+  "worldOverlordBeaten": "Beaten this week. It returns next week.",
+  "fightSettingSlow": "Slow mode",
+  "fightSettingSlowSubtitle": "Fights play at 70 % tempo",
+  "fightSettingCalibrate": "Timing calibration",
+  "fightSettingCalibrateSubtitle": "Offset {ms} ms",
+  "@fightSettingCalibrateSubtitle": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "calibrateIntro": "Tap the pad along with the 8 beats you hear, see and feel. This corrects delays from Bluetooth headphones or a slow screen.",
+  "calibrateStart": "Start",
+  "calibrateTapAlong": "Tap along",
+  "calibrateResult": "Your offset: {ms} ms",
+  "@calibrateResult": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "calibrateTooFew": "Too few taps were near the beats. Try again.",
+  "calibrateAgain": "Try again",
+  "calibrateReset": "Reset to 0 ms",
+  "calibrateCurrent": "Current offset: {ms} ms",
+  "@calibrateCurrent": {
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "fightRetry": "Try again"
 }

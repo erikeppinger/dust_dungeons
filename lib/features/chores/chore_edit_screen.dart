@@ -240,7 +240,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                 border: const OutlineInputBorder(),
               ),
               items: [
-                for (final f in BossFamily.values)
+                for (final f in choreFamilies)
                   DropdownMenuItem(
                     value: f,
                     child: Row(

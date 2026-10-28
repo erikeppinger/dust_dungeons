@@ -17,6 +17,7 @@ String bossName(AppLocalizations l10n, BossFamily family) => switch (family) {
   BossFamily.bedroom => l10n.bossBedroom,
   BossFamily.outside => l10n.bossOutside,
   BossFamily.clutter => l10n.bossClutter,
+  BossFamily.overlord => l10n.bossOverlord,
 };
 
 /// Which chores feed a family's tokens, in a few words.
@@ -29,11 +30,13 @@ String bossSource(AppLocalizations l10n, BossFamily family) => switch (family) {
   BossFamily.bedroom => l10n.bossSourceBedroom,
   BossFamily.outside => l10n.bossSourceOutside,
   BossFamily.clutter => l10n.bossSourceClutter,
+  BossFamily.overlord => l10n.bossSourceOverlord,
 };
 
 String trophyName(AppLocalizations l10n, BossFamily family) => switch (family) {
   BossFamily.dust => l10n.trophyDust,
   BossFamily.clutter => l10n.trophyClutter,
+  BossFamily.overlord => l10n.trophyOverlord,
   _ => l10n.trophyGeneric(bossName(l10n, family)),
 };
 
@@ -48,6 +51,7 @@ String trophyName(AppLocalizations l10n, BossFamily family) => switch (family) {
   BossFamily.bedroom => (const Color(0xFF9FA8DA), const Color(0xFFC5CAE9)),
   BossFamily.outside => (const Color(0xFF81D4FA), const Color(0xFFB3E5FC)),
   BossFamily.clutter => (const Color(0xFF78909C), const Color(0xFFB0BEC5)),
+  BossFamily.overlord => (const Color(0xFF5E35B1), const Color(0xFFB39DDB)),
 };
 
 /// A boss drawn from simple shapes (no image assets).
@@ -111,6 +115,8 @@ class _BossPainter extends CustomPainter {
         _phantom(canvas, fill, lightFill);
       case BossFamily.outside:
         _wraith(canvas, fill, lightFill);
+      case BossFamily.overlord:
+        _overlord(canvas, fill, lightFill);
     }
     _face(canvas);
   }
@@ -406,6 +412,67 @@ class _BossPainter extends CustomPainter {
         const Radius.circular(8),
       ),
       frame,
+    );
+  }
+
+  /// Chore Overlord: a robed ruler with a big crown and a plunger sceptre.
+  void _overlord(Canvas c, Paint fill, Paint light) {
+    // Sceptre behind the robe.
+    c.drawLine(
+      const Offset(104, 44),
+      const Offset(104, 114),
+      _stroke(const Color(0xFF8D6E63), 5),
+    );
+    c.drawArc(
+      Rect.fromCenter(center: const Offset(104, 46), width: 22, height: 20),
+      pi,
+      pi,
+      true,
+      Paint()..color = const Color(0xFFE53935),
+    );
+    c.drawPath(
+      Path()
+        ..moveTo(34, 62)
+        ..lineTo(86, 62)
+        ..lineTo(106, 116)
+        ..lineTo(14, 116)
+        ..close(),
+      fill,
+    );
+    c.drawCircle(const Offset(60, 72), 26, light);
+    // A high-collared cape.
+    c.drawPath(
+      Path()
+        ..moveTo(26, 64)
+        ..lineTo(34, 92)
+        ..lineTo(40, 66)
+        ..close(),
+      fill,
+    );
+    c.drawPath(
+      Path()
+        ..moveTo(94, 64)
+        ..lineTo(86, 92)
+        ..lineTo(80, 66)
+        ..close(),
+      fill,
+    );
+    final crown = Path()
+      ..moveTo(34, 52)
+      ..lineTo(36, 22)
+      ..lineTo(46, 36)
+      ..lineTo(53, 14)
+      ..lineTo(60, 32)
+      ..lineTo(67, 14)
+      ..lineTo(74, 36)
+      ..lineTo(84, 22)
+      ..lineTo(86, 52)
+      ..close();
+    c.drawPath(crown, Paint()..color = const Color(0xFFE6C463));
+    c.drawCircle(
+      const Offset(60, 44),
+      4,
+      Paint()..color = const Color(0xFFE53935),
     );
   }
 

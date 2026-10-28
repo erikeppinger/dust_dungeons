@@ -8,6 +8,20 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-10-28
+### Added
+- **Weekly Chore Overlord:** appears after 5 won boss fights in a week (Mon–Sun) and stays until beaten or
+  the week ends. Its fights need no token.
+  - Phases 1 and 2 are echo phases that borrow the rhythms of the bosses you beat that week.
+  - Phase 3 is a new lane phase: notes fall down three lanes, each with its own shape.
+  - Beating it gives the Crown of the Week.
+- **Timing calibration** (Boss fights settings): tap along to 8 beats. The measured delay is taken off
+  every tap, so Bluetooth headphones or a slow screen don't spoil the timing.
+- **Slow mode:** fights play at 70 % tempo.
+
+### Fixed
+- "Fight again" kept the boss but dropped your gear.
+
 ## [0.5.1] - 2026-10-28
 ### Added
 - **All eight bosses are playable:** Laundry Hydra, Sink Kraken, Porcelain Golem, Trash Titan, Pillow
@@ -123,6 +137,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.5.2]: #
 [0.5.1]: #
 [0.5.0]: #
 [0.4.1]: #

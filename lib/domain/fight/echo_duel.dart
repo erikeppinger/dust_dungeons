@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'boss.dart';
+import 'lanes.dart';
 import 'shop.dart';
 
 /// Result of one expected beat in the player's echo.
@@ -38,14 +39,21 @@ class Pattern {
 /// Builds the boss's patterns: deterministic for a seed, so fights can be
 /// replayed in tests.
 class PatternGenerator {
-  PatternGenerator(this.style, {required this.tier, int seed = 0})
-    : _random = Random(seed);
+  PatternGenerator(
+    this.style, {
+    required this.tier,
+    this.tempo = 1,
+    int seed = 0,
+  }) : _random = Random(seed);
 
   final BossStyle style;
   final int tier;
+
+  /// Tempo factor: 1 normally, [EchoDuel.slowTempo] in slow mode.
+  final double tempo;
   final Random _random;
 
-  int get beatMs => (60000 / (style.baseBpm + 8 * (tier - 1))).round();
+  int get beatMs => beatMsFor(style, tier, tempo);
 
   /// Number of beats grows with tier and the fight's [phase] (0 or 1).
   Pattern next({required int phase}) {
@@ -65,6 +73,10 @@ class PatternGenerator {
     return Pattern(beats, beatMs: beatMs);
   }
 }
+
+/// Length of one pulse in ms: faster with each tier, slower in slow mode.
+int beatMsFor(BossStyle style, int tier, double tempo) =>
+    (60000 / (style.baseBpm + 8 * (tier - 1)) / tempo).round();
 
 /// Judges taps (ms from the echo start) against [pattern]. Each beat takes
 /// the nearest unused tap inside the good window; taps that match no beat
@@ -107,18 +119,18 @@ class EchoDuel {
     required HeroStats hero,
     this.loadout = Loadout.none,
     this.storyMode = false,
-    int seed = 0,
+    this.slowMode = false,
+    this.seed = 0,
+    int? maxHp,
   }) : hero = loadout.gloves
            ? HeroStats(maxHp: hero.maxHp + 1, damage: hero.damage)
            : hero,
-       bossMaxHp = bossHpForTier(tier),
-       bossHp = bossHpForTier(tier),
-       heroHp = hero.maxHp + (loadout.gloves ? 1 : 0),
-       _generator = PatternGenerator(
-         bossStyles[family]!,
-         tier: tier,
-         seed: seed,
-       );
+       bossMaxHp = maxHp ?? bossHpForTier(tier),
+       bossHp = maxHp ?? bossHpForTier(tier),
+       heroHp = hero.maxHp + (loadout.gloves ? 1 : 0);
+
+  /// Tempo factor in slow mode.
+  static const slowTempo = 0.7;
 
   final BossFamily family;
   final int tier;
@@ -127,7 +139,15 @@ class EchoDuel {
   final HeroStats hero;
   final Loadout loadout;
   final bool storyMode;
-  final PatternGenerator _generator;
+
+  /// Slow mode: everything plays at [slowTempo].
+  final bool slowMode;
+
+  /// Seeds the rhythms, so a fight can be replayed in tests.
+  final int seed;
+  final _generators = <BossFamily, PatternGenerator>{};
+
+  double get tempo => slowMode ? slowTempo : 1;
 
   final int bossMaxHp;
   int bossHp;
@@ -146,6 +166,14 @@ class EchoDuel {
   /// Phase 1 below half the boss's health: longer, syncopated patterns.
   int get phase => bossHp * 2 <= bossMaxHp ? 1 : 0;
 
+  int get phaseCount => 2;
+
+  /// Whether the fight is in the Overlord's lane phase.
+  bool get lanePhase => false;
+
+  /// Writes the lane notes; only the Overlord has a lane phase.
+  LaneGenerator? get lanes => null;
+
   DuelOutcome get outcome => bossHp <= 0
       ? DuelOutcome.won
       : (heroHp <= 0 ? DuelOutcome.lost : DuelOutcome.ongoing);
@@ -156,12 +184,32 @@ class EchoDuel {
     return total == 0 ? 0 : (perfect + good * 0.5) / total;
   }
 
-  Pattern nextPattern() => _generator.next(phase: phase);
+  /// The pattern generator for one boss style, created on first use.
+  PatternGenerator _generatorFor(BossFamily style) => _generators.putIfAbsent(
+    style,
+    () => PatternGenerator(
+      bossStyles[style]!,
+      tier: tier,
+      tempo: tempo,
+      seed: seed + style.index,
+    ),
+  );
+
+  Pattern nextPattern() => _generatorFor(family).next(phase: phase);
 
   /// Applies one judged echo and returns the hits (for display).
   List<Hit> applyEcho(Pattern pattern, List<int> tapsMs) {
-    assert(outcome == DuelOutcome.ongoing);
     final hits = judgeEcho(pattern, tapsMs, windows: windows);
+    applyHits(hits);
+    return hits;
+  }
+
+  /// A tap that hit nothing (lane phase): breaks the combo, costs no heart.
+  void breakCombo() => combo = 0;
+
+  /// Applies judged hits to boss and hero.
+  void applyHits(List<Hit> hits) {
+    assert(outcome == DuelOutcome.ongoing);
     for (final hit in hits) {
       switch (hit) {
         case Hit.perfect:
@@ -188,7 +236,6 @@ class EchoDuel {
     // break the combo and slow the cleaning meter.
     bossHp = max(bossHp, 0);
     heroHp = max(heroHp, 0);
-    return hits;
   }
 
   /// Second Wind: continue a lost fight with half the hearts.
@@ -197,4 +244,47 @@ class EchoDuel {
     heroHp = (hero.maxHp + 1) ~/ 2;
     combo = 0;
   }
+}
+
+/// The weekly Chore Overlord: two echo phases that borrow the rhythms of
+/// [motifs] (the bosses beaten that week), then a lane phase.
+class OverlordDuel extends EchoDuel {
+  OverlordDuel({
+    required super.tier,
+    required super.hero,
+    required List<BossFamily> motifs,
+    super.loadout,
+    super.storyMode,
+    super.slowMode,
+    super.seed,
+  }) : motifs = motifs.isEmpty ? const [BossFamily.clutter] : motifs,
+       super(family: BossFamily.overlord, maxHp: overlordHpForTier(tier));
+
+  final List<BossFamily> motifs;
+  int _round = 0;
+  LaneGenerator? _lanes;
+
+  /// Phases by thirds of the health: echo, echo, lanes.
+  @override
+  int get phase =>
+      bossHp * 3 > bossMaxHp * 2 ? 0 : (bossHp * 3 > bossMaxHp ? 1 : 2);
+
+  @override
+  int get phaseCount => 3;
+
+  @override
+  bool get lanePhase => phase == 2;
+
+  /// Each round borrows the next beaten boss's rhythm.
+  @override
+  Pattern nextPattern() =>
+      _generatorFor(motifs[_round++ % motifs.length]).next(phase: phase);
+
+  /// Writes the lane notes, at the Overlord's own tempo.
+  @override
+  LaneGenerator get lanes => _lanes ??= LaneGenerator(
+    beatMs: beatMsFor(bossStyles[BossFamily.overlord]!, tier, tempo),
+    tier: tier,
+    seed: seed,
+  );
 }

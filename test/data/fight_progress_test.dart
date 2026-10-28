@@ -32,13 +32,14 @@ Fight fight(
   int perfect = 0,
   int good = 0,
   int miss = 0,
+  DateTime? at,
 }) => Fight(
   id: ++_id,
   profileId: 1,
   family: family,
   tier: 1,
   storyMode: false,
-  startedAt: DateTime(2026, 10, 28),
+  startedAt: at ?? DateTime(2026, 10, 28),
   result: result,
   perfect: perfect,
   good: good,
@@ -119,5 +120,80 @@ void main() {
     expect(p.canFight(BossFamily.laundry), isTrue);
     expect(p.canFight(BossFamily.kitchen), isFalse, reason: 'no tokens');
     expect(p.totalWins, 3);
+  });
+
+  group('weekly Overlord', () {
+    // Wednesday; the week runs Mon 26 Oct – Sun 1 Nov 2026.
+    final today = DateTime(2026, 10, 28);
+    Fight won(BossFamily f, DateTime at) =>
+        fight(f, result: FightResult.won, at: at);
+
+    test('counts chore-boss wins from Monday to Sunday only', () {
+      final p = FightProgress(
+        completions: [],
+        chores: chores,
+        fights: [
+          won(BossFamily.dust, DateTime(2026, 10, 25, 23, 59)), // last week
+          won(BossFamily.dust, DateTime(2026, 10, 26)), // Monday
+          won(BossFamily.bath, DateTime(2026, 11, 1, 23, 59)), // Sunday
+          won(BossFamily.dust, DateTime(2026, 11, 2)), // next week
+          fight(BossFamily.trash, result: FightResult.lost, at: today),
+        ],
+      );
+      expect(p.weekWins(today), 2);
+      expect(p.weekBeaten(today), [BossFamily.dust, BossFamily.bath]);
+      expect(p.overlordReady(today), isFalse);
+    });
+
+    test('appears after five wins and is gone for the week once beaten', () {
+      final fights = [
+        for (final f in [
+          BossFamily.dust,
+          BossFamily.kitchen,
+          BossFamily.dust,
+          BossFamily.trash,
+          BossFamily.clutter,
+        ])
+          won(f, today),
+      ];
+      var p = FightProgress(completions: [], chores: chores, fights: fights);
+      expect(p.overlordReady(today), isTrue);
+      expect(p.weekBeaten(today), [
+        BossFamily.dust,
+        BossFamily.kitchen,
+        BossFamily.trash,
+        BossFamily.clutter,
+      ]);
+      expect(p.tier(BossFamily.overlord), 1);
+
+      // A lost Overlord fight changes nothing; it stays until beaten.
+      fights.add(
+        fight(BossFamily.overlord, result: FightResult.lost, at: today),
+      );
+      p = FightProgress(completions: [], chores: chores, fights: fights);
+      expect(p.overlordReady(today), isTrue);
+
+      fights.add(won(BossFamily.overlord, today));
+      p = FightProgress(completions: [], chores: chores, fights: fights);
+      expect(p.overlordBeaten(today), isTrue);
+      expect(p.overlordReady(today), isFalse);
+      expect(p.weekWins(today), 5, reason: 'its own win does not count');
+      expect(p.wins(BossFamily.overlord), 1);
+      expect(
+        p.overlordReady(DateTime(2026, 11, 2)),
+        isFalse,
+        reason: 'a new week starts from zero',
+      );
+    });
+
+    test('Overlord fights spend no chore tokens', () {
+      final p = FightProgress(
+        completions: [done(1)],
+        chores: chores,
+        fights: [fight(BossFamily.overlord, result: FightResult.lost)],
+      );
+      expect(p.tokens(BossFamily.dust), 1);
+      expect(p.totalTokens, 1);
+    });
   });
 }

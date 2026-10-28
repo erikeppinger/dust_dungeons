@@ -9,7 +9,26 @@ enum BossFamily {
   bedroom,
   outside,
   clutter,
+
+  /// The weekly boss: appears after [overlordWinsNeeded] wins in a week and
+  /// is fed by no chore.
+  overlord,
 }
+
+/// The bosses fed by chores (all but the weekly Overlord).
+const choreFamilies = [
+  BossFamily.dust,
+  BossFamily.laundry,
+  BossFamily.kitchen,
+  BossFamily.bath,
+  BossFamily.trash,
+  BossFamily.bedroom,
+  BossFamily.outside,
+  BossFamily.clutter,
+];
+
+/// Wins against chore bosses in one week (Mon–Sun) that call the Overlord.
+const overlordWinsNeeded = 5;
 
 /// Default family of each built-in chore; user chores are [BossFamily.clutter].
 const seedFamilies = <String, BossFamily>{
@@ -95,6 +114,13 @@ const bossStyles = <BossFamily, BossStyle>{
     offbeatChance: 0.1,
     eighthChance: 0.5,
   ),
+  // Only its lane phase uses this tempo; its echo phases borrow the styles
+  // of the bosses beaten that week.
+  BossFamily.overlord: BossStyle(
+    baseBpm: 100,
+    offbeatChance: 0.2,
+    eighthChance: 0.3,
+  ),
 };
 
 /// Boss tier grows with how often you have beaten it: 1, 2 or 3.
@@ -102,6 +128,9 @@ int tierForWins(int wins) => wins >= 8 ? 3 : (wins >= 3 ? 2 : 1);
 
 /// Cleaning points needed to win, by tier.
 int bossHpForTier(int tier) => 10 + 6 * tier;
+
+/// The Overlord has three phases and twice the health.
+int overlordHpForTier(int tier) => 2 * bossHpForTier(tier);
 
 /// Hero strength from the player's level (XP from chores).
 class HeroStats {

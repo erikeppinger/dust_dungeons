@@ -6,6 +6,7 @@ import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/chores/chore_edit_screen.dart';
 import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/domain/fight/calibration.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/features/world/world_screen.dart';
 import 'package:homework_and_chores/main.dart';
@@ -380,6 +381,23 @@ void main() {
     return db;
   }
 
+  /// Adds one more dust token (a second dusting completion).
+  Future<void> richDbAddToken(AppDatabase db) async {
+    final dusting = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.seedKey == 'dusting',
+    );
+    await db
+        .into(db.completions)
+        .insert(
+          CompletionsCompanion.insert(
+            choreId: dusting.id,
+            profileId: await db.defaultProfileId(),
+            completedAt: DateTime.now(),
+            pointsAwarded: 0,
+          ),
+        );
+  }
+
   testWidgets('the shop sells hats that the hero can wear', (tester) async {
     final db = await tester.runAsync(() => richDb(300));
     await pumpApp(tester, db: db);
@@ -525,6 +543,187 @@ void main() {
     await tester.pumpAndSettle();
     final fights = await tester.runAsync(() => db!.select(db.fights).get());
     expect(fights!.single.result, FightResult.abandoned);
+  });
+
+  Future<void> openFightSettings(WidgetTester tester) async {
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Boss fights'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(WorldScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(find.text('Boss fights'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Boss fights'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('the weekly Overlord waits for five wins', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    final card = find.byKey(const ValueKey('boss-overlord'));
+    expect(
+      find.descendant(of: card, matching: find.text('Chore Overlord')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: card, matching: find.text('0 of 5 wins this week')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: card, matching: find.text('Fight')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('after five wins the Overlord can be fought without a token', (
+    tester,
+  ) async {
+    final db = await tester.runAsync(() async {
+      final db = memoryDb();
+      final profile = await db.defaultProfileId();
+      for (final f in [
+        BossFamily.dust,
+        BossFamily.kitchen,
+        BossFamily.dust,
+        BossFamily.bath,
+        BossFamily.trash,
+      ]) {
+        await db
+            .into(db.fights)
+            .insert(
+              FightsCompanion.insert(
+                profileId: profile,
+                family: f,
+                tier: 1,
+                startedAt: DateTime.now(),
+                result: const Value(FightResult.won),
+              ),
+            );
+      }
+      return db;
+    });
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    final fight = find.descendant(
+      of: find.byKey(const ValueKey('boss-overlord')),
+      matching: find.text('Fight'),
+    );
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(fight);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Tier 1 · phase 1 of 3'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(
+      find.text('The Overlord stays until Sunday, so you can try again.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.widgetWithText(TextButton, 'Leave'));
+    await tester.pumpAndSettle();
+    final fights = await tester.runAsync(() => db!.select(db.fights).get());
+    expect(fights!.last.family, BossFamily.overlord);
+    expect(fights.last.result, FightResult.abandoned);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('boss-overlord')),
+        matching: find.text('Fight'),
+      ),
+      findsOneWidget,
+      reason: 'it stays until beaten',
+    );
+  });
+
+  testWidgets('"Fight again" keeps the gear', (tester) async {
+    final db = await tester.runAsync(() async {
+      final db = await richDb(10);
+      await richDbAddToken(db);
+      await db
+          .into(db.inventory)
+          .insert(
+            InventoryCompanion.insert(
+              profileId: 1,
+              itemKey: 'rubber_gloves',
+              count: 1,
+            ),
+          );
+      return db;
+    });
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    final fight = find.descendant(
+      of: find.byKey(const ValueKey('boss-dust')),
+      matching: find.text('Fight'),
+    );
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(fight);
+    // Never tap: the fight is lost after a few rounds.
+    for (
+      var i = 0;
+      i < 900 && find.textContaining('got away').evaluate().isEmpty;
+      i++
+    ) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.ensureVisible(find.text('Fight again · 1 token left'));
+    await tester.pump();
+    await tester.tap(find.text('Fight again · 1 token left'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.bySemanticsLabel('Health 6 of 6'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Leave'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('timing calibration measures and saves the delay', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await openFightSettings(tester);
+    await tester.tap(find.text('Slow mode'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Timing calibration'));
+    await tester.pumpAndSettle();
+    expect(find.text('Current offset: 0 ms'), findsOneWidget);
+
+    await tester.tap(find.text('Start'));
+    await tester.pump();
+    var now = 0;
+    for (var i = 0; i < calibrationBeats; i++) {
+      final at = 1200 + i * calibrationBeatMs + 40;
+      await tester.pump(Duration(milliseconds: at - now));
+      now = at;
+      await tester.tap(find.byKey(const ValueKey('calibrate-pad')));
+    }
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.text('Your offset: 40 ms'), findsOneWidget);
+    await tester.ensureVisible(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('Offset 40 ms'), findsOneWidget);
+
+    final saved = await tester.runAsync(() => SettingsRepository(db).load());
+    expect(saved!.fightLatencyMs, 40);
+    expect(saved.fightSlowMode, isTrue);
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

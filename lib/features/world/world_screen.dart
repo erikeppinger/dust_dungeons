@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/day_clock.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/fight_progress.dart';
 import '../../data/providers.dart';
@@ -16,7 +17,8 @@ import '../settings/settings_pages.dart';
 import 'avatar_editor.dart';
 import 'shop_screen.dart';
 
-/// The hub: your hero, the bosses with their tokens, and the trophy shelf.
+/// The hub: your hero, the weekly Overlord, the bosses with their tokens,
+/// and the trophy shelf.
 class WorldScreen extends ConsumerWidget {
   const WorldScreen({super.key});
 
@@ -25,19 +27,22 @@ class WorldScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     // Watched here so it is loaded before any fight reads the gear.
     final inventory = ref.watch(inventoryProvider).value ?? const {};
+    final today = ref.watch(todayProvider);
     return ref
         .watch(fightProgressProvider)
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(child: Text(l10n.errorGeneric)),
-          data: (progress) => _list(context, progress, inventory),
+          data: (progress) =>
+              _list(context, progress, Loadout.fromInventory(inventory), today),
         );
   }
 
   Widget _list(
     BuildContext context,
     FightProgress progress,
-    Map<String, int> inventory,
+    Loadout loadout,
+    DateTime today,
   ) {
     final l10n = AppLocalizations.of(context);
     return ListView(
@@ -49,6 +54,8 @@ class WorldScreen extends ConsumerWidget {
       ),
       children: [
         const _HeroCard(),
+        SectionHeader(l10n.worldWeeklyBoss),
+        _OverlordCard(progress: progress, loadout: loadout, today: today),
         SectionHeader(
           '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
         ),
@@ -60,12 +67,8 @@ class WorldScreen extends ConsumerWidget {
           crossAxisSpacing: 8,
           childAspectRatio: 0.78,
           children: [
-            for (final family in BossFamily.values)
-              _BossCard(
-                family: family,
-                progress: progress,
-                loadout: Loadout.fromInventory(inventory),
-              ),
+            for (final family in choreFamilies)
+              _BossCard(family: family, progress: progress, loadout: loadout),
           ],
         ),
         SectionHeader(l10n.worldTrophies),
@@ -233,6 +236,106 @@ class _BossCard extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The weekly Chore Overlord: how close it is, ready to fight, or beaten.
+class _OverlordCard extends StatelessWidget {
+  const _OverlordCard({
+    required this.progress,
+    required this.loadout,
+    required this.today,
+  });
+
+  final FightProgress progress;
+  final Loadout loadout;
+  final DateTime today;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    const family = BossFamily.overlord;
+    final wins = progress.weekWins(today);
+    final ready = progress.overlordReady(today);
+    final beaten = progress.overlordBeaten(today);
+    final (_, light) = bossColors(family);
+    return Card(
+      key: const ValueKey('boss-overlord'),
+      color: ready
+          ? Color.alphaBlend(
+              light.withValues(alpha: 0.35),
+              theme.colorScheme.surfaceContainerLow,
+            )
+          : null,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BossArt(
+              family: family,
+              size: 72,
+              mood: beaten ? BossMood.defeated : BossMood.idle,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    bossName(l10n, family),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  Text(
+                    l10n.worldTier(progress.tier(family)),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    beaten
+                        ? l10n.worldOverlordBeaten
+                        : (ready
+                              ? l10n.worldOverlordReady
+                              : l10n.worldOverlordLocked),
+                  ),
+                  if (!ready && !beaten) ...[
+                    const SizedBox(height: 8),
+                    LinearProgressIndicator(
+                      value: wins / overlordWinsNeeded,
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(4),
+                      semanticsLabel: l10n.worldOverlordProgress(
+                        wins,
+                        overlordWinsNeeded,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.worldOverlordProgress(wins, overlordWinsNeeded),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                  if (ready) ...[
+                    const SizedBox(height: 8),
+                    FilledButton(
+                      onPressed: () => FightScreen.open(
+                        context,
+                        family,
+                        progress.tier(family),
+                        loadout,
+                        motifs: progress.weekBeaten(today),
+                      ),
+                      child: Text(l10n.worldFight),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ],
         ),

@@ -17,15 +17,17 @@ import '../settings/settings_controller.dart';
 import 'boss_art.dart';
 import 'fight_controller.dart';
 import 'fight_sounds.dart';
+import 'lane_field.dart';
 
-/// One boss fight. Starting it spends a token; leaving early or putting the
-/// app in the background abandons it (the token stays spent).
+/// One boss fight. Starting it spends a token (the Overlord needs none);
+/// leaving early or putting the app in the background abandons it.
 class FightScreen extends ConsumerStatefulWidget {
   const FightScreen({
     super.key,
     required this.family,
     required this.tier,
     this.loadout = Loadout.none,
+    this.motifs = const [],
   });
 
   final BossFamily family;
@@ -33,6 +35,11 @@ class FightScreen extends ConsumerStatefulWidget {
 
   /// The gear owned when the fight starts.
   final Loadout loadout;
+
+  /// For the Overlord: the bosses beaten this week, whose rhythms it plays.
+  final List<BossFamily> motifs;
+
+  bool get overlord => family == BossFamily.overlord;
 
   static bool _opening = false;
 
@@ -42,15 +49,20 @@ class FightScreen extends ConsumerStatefulWidget {
     BuildContext context,
     BossFamily family,
     int tier,
-    Loadout loadout,
-  ) async {
+    Loadout loadout, {
+    List<BossFamily> motifs = const [],
+  }) async {
     if (_opening) return;
     _opening = true;
     try {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) =>
-              FightScreen(family: family, tier: tier, loadout: loadout),
+          builder: (_) => FightScreen(
+            family: family,
+            tier: tier,
+            loadout: loadout,
+            motifs: motifs,
+          ),
         ),
       );
     } finally {
@@ -92,18 +104,32 @@ class _FightScreenState extends ConsumerState<FightScreen> {
       tier: widget.tier,
       storyMode: settings.fightStoryMode,
     );
+    final hero = HeroStats.forLevel(level);
+    final seed = DateTime.now().microsecondsSinceEpoch;
     _controller = FightController(
-      duel: EchoDuel(
-        family: widget.family,
-        tier: widget.tier,
-        hero: HeroStats.forLevel(level),
-        loadout: widget.loadout,
-        storyMode: settings.fightStoryMode,
-        seed: DateTime.now().microsecondsSinceEpoch,
-      ),
+      duel: widget.overlord
+          ? OverlordDuel(
+              tier: widget.tier,
+              hero: hero,
+              motifs: widget.motifs,
+              loadout: widget.loadout,
+              storyMode: settings.fightStoryMode,
+              slowMode: settings.fightSlowMode,
+              seed: seed,
+            )
+          : EchoDuel(
+              family: widget.family,
+              tier: widget.tier,
+              hero: hero,
+              loadout: widget.loadout,
+              storyMode: settings.fightStoryMode,
+              slowMode: settings.fightSlowMode,
+              seed: seed,
+            ),
       sounds: sounds,
       sound: settings.fightSound,
       haptics: settings.fightHaptics,
+      latencyMs: settings.fightLatencyMs,
       // A loss is recorded only when the player moves on: Second Wind can
       // still turn it around.
       onFinished: (outcome) {
@@ -168,7 +194,9 @@ class _FightScreenState extends ConsumerState<FightScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.fightLeaveTitle),
-        content: Text(l10n.fightLeaveBody),
+        content: Text(
+          widget.overlord ? l10n.fightLeaveBodyOverlord : l10n.fightLeaveBody,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -225,11 +253,15 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               child: ListenableBuilder(
                 listenable: _controller,
                 builder: (context, _) => _abandoned
-                    ? _Abandoned(onBack: () => Navigator.of(context).pop())
+                    ? _Abandoned(
+                        overlord: widget.overlord,
+                        onBack: () => Navigator.of(context).pop(),
+                      )
                     : _controller.stage == FightStage.finished
                     ? _Result(
                         family: widget.family,
                         duel: _controller.duel,
+                        motifs: widget.motifs,
                         onSecondWind: _useSecondWind,
                       )
                     : _Duel(controller: _controller, onLeave: _confirmLeave),
@@ -256,8 +288,10 @@ class _Duel extends StatelessWidget {
     final c = controller;
     final duel = c.duel;
     final cleaned = 1 - duel.bossHp / duel.bossMaxHp;
-    final hitNow =
-        c.stage == FightStage.judged && c.lastHits.any((h) => h != Hit.miss);
+    final lanes = c.stage == FightStage.lanes;
+    final hitNow = lanes
+        ? c.lastLaneHit != null && c.lastLaneHit != Hit.miss
+        : c.stage == FightStage.judged && c.lastHits.any((h) => h != Hit.miss);
     final status = switch (c.stage) {
       FightStage.intro => l10n.fightGetReady,
       FightStage.call => l10n.fightListen(c.pattern!.beatsMs.length),
@@ -267,6 +301,12 @@ class _Duel extends StatelessWidget {
         c.lastHits.where((h) => h == Hit.good).length,
         c.lastHits.where((h) => h == Hit.miss).length,
       ),
+      FightStage.lanes => switch (c.lastLaneHit) {
+        null => l10n.fightLanes,
+        Hit.perfect => l10n.hitPerfect,
+        Hit.good => l10n.hitGood,
+        Hit.miss => l10n.hitMiss,
+      },
       FightStage.finished => '',
     };
 
@@ -291,7 +331,11 @@ class _Duel extends StatelessWidget {
                       style: theme.textTheme.titleMedium,
                     ),
                     Text(
-                      l10n.fightTierPhase(duel.tier, duel.phase + 1),
+                      l10n.fightTierPhase(
+                        duel.tier,
+                        duel.phase + 1,
+                        duel.phaseCount,
+                      ),
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
@@ -304,7 +348,7 @@ class _Duel extends StatelessWidget {
           const SizedBox(height: 8),
           BossArt(
             family: duel.family,
-            size: 170,
+            size: lanes ? 96 : 170,
             mood: hitNow ? BossMood.hit : BossMood.idle,
           ),
           const SizedBox(height: 8),
@@ -329,7 +373,7 @@ class _Duel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             decoration: BoxDecoration(
-              color: c.stage == FightStage.echo
+              color: c.stage == FightStage.echo || lanes
                   ? scheme.primaryContainer
                   : scheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(18),
@@ -341,12 +385,17 @@ class _Duel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          _BeatRow(controller: c),
-          Expanded(
-            child: Center(
-              child: _Pad(enabled: c.stage == FightStage.echo, onTap: c.tap),
+          if (lanes)
+            Expanded(child: LaneField(controller: c))
+          else ...[
+            _BeatRow(controller: c),
+            Expanded(
+              child: Center(
+                child: _Pad(enabled: c.stage == FightStage.echo, onTap: c.tap),
+              ),
             ),
-          ),
+          ],
+          const SizedBox(height: 8),
           Row(
             children: [
               Semantics(
@@ -504,11 +553,13 @@ class _Result extends ConsumerWidget {
   const _Result({
     required this.family,
     required this.duel,
+    required this.motifs,
     required this.onSecondWind,
   });
 
   final BossFamily family;
   final EchoDuel duel;
+  final List<BossFamily> motifs;
   final VoidCallback onSecondWind;
 
   @override
@@ -519,6 +570,9 @@ class _Result extends ConsumerWidget {
     final progress = ref.watch(fightProgressProvider).value;
     final wins = progress?.wins(family) ?? 0;
     final tokensLeft = progress?.tokens(family) ?? 0;
+    final overlord = family == BossFamily.overlord;
+    // The Overlord needs no token: a lost fight can simply be retried.
+    final canRetry = overlord ? !won : tokensLeft > 0;
     final secondWinds =
         ref.watch(inventoryProvider).value?[secondWindItem.key] ?? 0;
     final boss = bossName(l10n, family);
@@ -562,7 +616,7 @@ class _Result extends ConsumerWidget {
               ? (wins <= 1
                     ? l10n.fightNewTrophy(trophyName(l10n, family))
                     : l10n.fightTrophyAgain(trophyName(l10n, family), wins))
-              : l10n.fightLostHint,
+              : (overlord ? l10n.fightLostHintOverlord : l10n.fightLostHint),
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium,
         ),
@@ -608,16 +662,22 @@ class _Result extends ConsumerWidget {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.fightBack),
         ),
-        if (tokensLeft > 0) ...[
+        if (canRetry && progress != null) ...[
           const SizedBox(height: 8),
           OutlinedButton(
             onPressed: () => Navigator.of(context).pushReplacement(
               MaterialPageRoute<void>(
-                builder: (_) =>
-                    FightScreen(family: family, tier: progress!.tier(family)),
+                builder: (_) => FightScreen(
+                  family: family,
+                  tier: progress.tier(family),
+                  loadout: duel.loadout,
+                  motifs: motifs,
+                ),
               ),
             ),
-            child: Text(l10n.fightAgain(tokensLeft)),
+            child: Text(
+              overlord ? l10n.fightRetry : l10n.fightAgain(tokensLeft),
+            ),
           ),
         ],
       ],
@@ -626,8 +686,9 @@ class _Result extends ConsumerWidget {
 }
 
 class _Abandoned extends StatelessWidget {
-  const _Abandoned({required this.onBack});
+  const _Abandoned({required this.overlord, required this.onBack});
 
+  final bool overlord;
   final VoidCallback onBack;
 
   @override
@@ -640,7 +701,7 @@ class _Abandoned extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              l10n.fightAbandoned,
+              overlord ? l10n.fightAbandonedOverlord : l10n.fightAbandoned,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),

@@ -21,6 +21,8 @@ class SettingsRepository {
   static const _fightSound = 'fightSound';
   static const _fightHaptics = 'fightHaptics';
   static const _fightStoryMode = 'fightStoryMode';
+  static const _fightSlowMode = 'fightSlowMode';
+  static const _fightLatencyMs = 'fightLatencyMs';
   static const _avatarSkin = 'avatarSkin';
   static const _avatarHair = 'avatarHair';
   static const _avatarCape = 'avatarCape';
@@ -54,6 +56,9 @@ class SettingsRepository {
       fightSound: flag(_fightSound, defaults.fightSound),
       fightHaptics: flag(_fightHaptics, defaults.fightHaptics),
       fightStoryMode: flag(_fightStoryMode, defaults.fightStoryMode),
+      fightSlowMode: flag(_fightSlowMode, defaults.fightSlowMode),
+      fightLatencyMs:
+          int.tryParse(map[_fightLatencyMs] ?? '') ?? defaults.fightLatencyMs,
       avatarSkin: int.tryParse(map[_avatarSkin] ?? '') ?? defaults.avatarSkin,
       avatarHair: int.tryParse(map[_avatarHair] ?? '') ?? defaults.avatarHair,
       avatarCape: int.tryParse(map[_avatarCape] ?? '') ?? defaults.avatarCape,
@@ -81,6 +86,8 @@ class SettingsRepository {
     await _put(_fightSound, '${settings.fightSound}');
     await _put(_fightHaptics, '${settings.fightHaptics}');
     await _put(_fightStoryMode, '${settings.fightStoryMode}');
+    await _put(_fightSlowMode, '${settings.fightSlowMode}');
+    await _put(_fightLatencyMs, '${settings.fightLatencyMs}');
     await _put(_avatarSkin, '${settings.avatarSkin}');
     await _put(_avatarHair, '${settings.avatarHair}');
     await _put(_avatarCape, '${settings.avatarCape}');
