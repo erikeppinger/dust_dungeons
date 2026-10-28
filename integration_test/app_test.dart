@@ -12,7 +12,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets(
-    'chores, schedules, plan, undo, editing and settings work on device',
+    'chores, schedules, plan, stats, undo, editing and settings work on device',
     (tester) async {
       WidgetController.hitTestWarningShouldBeFatal = true;
       tester.platformDispatcher.localesTestValue = [const Locale('en')];
@@ -27,7 +27,8 @@ void main() {
       expect(find.text('0 points'), findsOneWidget);
       await tester.tap(find.text('Dusting'));
       await tester.pumpAndSettle();
-      expect(find.text('15 points'), findsWidgets);
+      // Due today: 15 base + 2 on-time bonus.
+      expect(find.text('17 points'), findsWidgets);
       expect(find.byTooltip('1× today'), findsOneWidget);
       await tester.tap(find.text('Undo'));
       await tester.pumpAndSettle();
@@ -42,7 +43,8 @@ void main() {
       await tester.drag(find.byType(Slider), const Offset(400, 0));
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
-      expect(find.text('100 points'), findsOneWidget);
+      // 100 base + 10 on-time bonus, shown on the tile.
+      expect(find.text('110 points · +10 bonus'), findsOneWidget);
 
       // Add a custom chore.
       await tester.tap(find.text('Add chore'));
@@ -71,6 +73,12 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Week'));
       await tester.pumpAndSettle();
+
+      // Stats: level card and points explanation.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Stats'));
+      await tester.pumpAndSettle();
+      expect(find.text('Level 1'), findsOneWidget);
+      await tester.scrollUntilVisible(find.text('How points work'), 300);
 
       // Every tab opens.
       for (final tab in ['Plan', 'World', 'Stats', 'Settings']) {

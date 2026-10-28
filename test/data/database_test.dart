@@ -149,7 +149,7 @@ void main() {
         choreId: chore.id,
         profileId: profileId,
       );
-      expect(result.points, chore.basePoints);
+      expect(result.points.total, chore.basePoints);
       expect(await progress.watchBalance(profileId).first, chore.basePoints);
 
       expect(await progress.undo(result.completionId), isTrue);
@@ -164,6 +164,34 @@ void main() {
         LedgerReason.completion,
         LedgerReason.undo,
       ]);
+    });
+
+    test('on-time and streak bonuses are awarded and undone fully', () async {
+      final chore = (await chores.watchAll().first).singleWhere(
+        (c) => c.seedKey == 'clean_bathroom', // 30 base points
+      );
+      // Streak: something done on each of the 3 days before today.
+      for (final day in [25, 26, 27]) {
+        now = DateTime(2026, 10, day, 10);
+        final r = await progress.complete(
+          choreId: chore.id,
+          profileId: profileId,
+        );
+        expect(r.points.onTimeBonus, 0);
+      }
+      now = DateTime(2026, 10, 28, 9);
+      final result = await progress.complete(
+        choreId: chore.id,
+        profileId: profileId,
+        onTime: true,
+      );
+      expect(result.points.onTimeBonus, 3); // 10 % of 30
+      expect(result.points.streakBonus, 2); // 3 days * 2 % of 30 = 1.8
+      expect(result.points.total, 35);
+
+      final before = await progress.watchBalance(profileId).first;
+      await progress.undo(result.completionId);
+      expect(await progress.watchBalance(profileId).first, before - 35);
     });
 
     test('today counts exclude undone and earlier completions', () async {

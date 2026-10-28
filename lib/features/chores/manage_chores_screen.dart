@@ -81,7 +81,7 @@ class _ChoreRow extends ConsumerWidget {
       ),
       title: Text(title),
       subtitle: Text(
-        '${l10n.pointsValue(pointsForCompletion(basePoints: chore.basePoints))}'
+        '${l10n.pointsValue(basePointsOf(chore.basePoints))}'
         ' · ${recurrenceSummary(context, chore.recurrence)}',
       ),
       onTap: () => ChoreEditScreen.open(context, chore),

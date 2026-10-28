@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/dates.dart';
 import '../../domain/points.dart';
+import '../../domain/progress.dart';
 import '../db/app_database.dart';
 
 /// Result of completing a chore, needed to offer an undo.
@@ -8,7 +10,7 @@ class CompletionResult {
   const CompletionResult({required this.completionId, required this.points});
 
   final int completionId;
-  final int points;
+  final PointsBreakdown points;
 }
 
 /// Completions and the point ledger.
@@ -19,16 +21,23 @@ class ProgressRepository {
   final AppDatabase _db;
   final DateTime Function() _clock;
 
-  /// Records a completion and awards its points in one transaction.
+  /// Records a completion and awards its points (with bonuses) in one
+  /// transaction. [onTime]: the chore was due today and not overdue.
   Future<CompletionResult> complete({
     required int choreId,
     required int profileId,
+    bool onTime = false,
   }) => _db.transaction(() async {
     final chore = await (_db.select(
       _db.chores,
     )..where((c) => c.id.equals(choreId))).getSingle();
-    final points = pointsForCompletion(basePoints: chore.basePoints);
     final now = _clock();
+    final breakdown = pointsFor(
+      basePoints: chore.basePoints,
+      onTime: onTime,
+      streakDays: await _streakBefore(profileId, now),
+    );
+    final points = breakdown.total;
     final completionId = await _db
         .into(_db.completions)
         .insert(
@@ -50,8 +59,25 @@ class ProgressRepository {
             createdAt: now,
           ),
         );
-    return CompletionResult(completionId: completionId, points: points);
+    return CompletionResult(completionId: completionId, points: breakdown);
   });
+
+  /// Streak ending yesterday, looking back only as far as the bonus cap.
+  Future<int> _streakBefore(int profileId, DateTime now) async {
+    final today = dayOf(now);
+    final rows =
+        await (_db.select(_db.completions)..where(
+              (c) =>
+                  c.profileId.equals(profileId) &
+                  c.undoneAt.isNull() &
+                  c.completedAt.isBiggerOrEqualValue(
+                    addDays(today, -maxStreakBonusDays - 1),
+                  ) &
+                  c.completedAt.isSmallerThanValue(today),
+            ))
+            .get();
+    return streakBefore({for (final c in rows) dayOf(c.completedAt)}, today);
+  }
 
   /// Reverts a completion: marks it undone and books the points back.
   /// Returns `false` if it was already undone, so double taps are harmless.
@@ -106,6 +132,13 @@ class ProgressRepository {
       },
     );
   }
+
+  /// All completions (not undone), oldest first.
+  Stream<List<Completion>> watchAllCompletions(int profileId) =>
+      (_db.select(_db.completions)
+            ..where((c) => c.profileId.equals(profileId) & c.undoneAt.isNull())
+            ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
+          .watch();
 
   /// Completions (not undone) with `from <= completedAt < to`, oldest first.
   Stream<List<Completion>> watchCompletionsBetween(

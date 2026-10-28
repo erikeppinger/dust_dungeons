@@ -42,8 +42,8 @@ void main() {
   });
 
   test('points are clamped to the allowed range', () {
-    expect(pointsForCompletion(basePoints: 15), 15);
-    expect(pointsForCompletion(basePoints: 0), minBasePoints);
-    expect(pointsForCompletion(basePoints: 1000), maxBasePoints);
+    expect(basePointsOf(15), 15);
+    expect(basePointsOf(0), minBasePoints);
+    expect(basePointsOf(1000), maxBasePoints);
   });
 }

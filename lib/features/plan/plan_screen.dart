@@ -411,9 +411,7 @@ class _ChoreRow extends StatelessWidget {
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,
       ),
-      subtitle: Text(
-        l10n.pointsValue(pointsForCompletion(basePoints: chore.basePoints)),
-      ),
+      subtitle: Text(l10n.pointsValue(basePointsOf(chore.basePoints))),
       trailing: done
           ? Tooltip(
               message: l10n.planDone,

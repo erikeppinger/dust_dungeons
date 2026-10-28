@@ -13,6 +13,7 @@ class ChoreTile extends StatelessWidget {
     required this.iconKey,
     required this.colorKey,
     required this.points,
+    this.bonus = 0,
     this.doneToday = 0,
     this.status,
     this.overdue = false,
@@ -23,7 +24,10 @@ class ChoreTile extends StatelessWidget {
   final String title;
   final String iconKey;
   final int colorKey;
+
+  /// Total [points] including this many bonus points (shown separately).
   final int points;
+  final int bonus;
   final int doneToday;
 
   /// Due status line ("Due today", "2 days overdue"); hidden when `null`.
@@ -102,7 +106,14 @@ class ChoreTile extends StatelessWidget {
                     ),
                   ],
                 ),
-              Text(l10n.pointsValue(points), style: theme.textTheme.bodySmall),
+              Text(
+                bonus > 0
+                    ? l10n.pointsWithBonus(points, bonus)
+                    : l10n.pointsValue(points),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall,
+              ),
             ],
           ),
         ),

@@ -1,7 +1,7 @@
 # Development Plan: Household Chores Gamification App
 
 > Working title: **"Homework & Chores"** (placeholder, final name TBD)
-> Status: Planning · Plan version 0.2 · 2026-10-28 (core decisions recorded, see §15)
+> Status: Planning · Plan version 0.2 · 2026-10-28 (core decisions recorded, see §16)
 > Target: Android APK first, then macOS/iOS later. Built with Flutter 3.47 / Dart 3.13.
 
 ---
@@ -48,17 +48,22 @@ You asked "anything missing?" These are the gaps I'd close up front, because sev
 ## 3. Dropbox + Flutter + Git setup (do this first)
 
 Dropbox syncing Flutter build output causes file-lock errors, sync conflicts and gigabytes of useless uploads.
-**Mark generated folders as Dropbox-ignored** after they exist (run `flutter pub get` / first build, then):
+"Ignoring" folders is not enough on Windows: every file under the Dropbox folder is a cloud-files placeholder
+(a reparse point), and Gradle sometimes cannot read those ("Cannot snapshot …: not a regular file").
+This made two release builds fail (0.1.0, 0.3.0).
+
+**Fix (since 0.3.0):** `tool/dropbox_ignore.ps1` moves `build/`, `.dart_tool/`, `android/.gradle`, `android/.kotlin`
+and `android/app/.cxx` to `%LOCALAPPDATA%\HomeworkAndChores\generated\` and leaves Dropbox-ignored **directory
+junctions** in their place. Paths inside the project stay the same.
 
 ```powershell
-$p = "C:\Users\Erik\Dropbox\Homework-and-Chores"
-foreach ($d in "build", ".dart_tool", "android\.gradle", "android\app\.cxx", ".idea") {
-  if (Test-Path "$p\$d") { Set-Content -Path "$p\$d" -Stream com.dropbox.ignored -Value 1 }
-}
+powershell -ExecutionPolicy Bypass -File tool\dropbox_ignore.ps1
+flutter pub get
 ```
 
 Notes:
-- Re-run this script if you ever delete and recreate one of those folders (e.g. after `flutter clean`), because the ignore flag is stored on the folder itself. A `tool/dropbox_ignore.ps1` script will live in the repo for this.
+- Re-run it after `flutter clean` (which deletes the `build` junction) and on every new machine.
+- Always check the installed version (`adb shell dumpsys package … | findstr versionName`) after installing a build: a failed build silently leaves the old APK in place.
 - `.git` inside Dropbox works but can corrupt if two machines edit at once. Safest: **GitHub/Codeberg is the source of truth** and Dropbox is only a convenience copy. Never work on the repo from two PCs at the same time.
 - `.gitignore` uses the standard Flutter template plus `*.jks`, `*.keystore`, `key.properties`, `*.apk`, `*.aab`.
 
@@ -254,7 +259,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.0.1** ✅ | Scaffolding | `flutter create --org io.github.changeme --project-name homework_and_chores --platforms=android`, Dropbox ignore, local Git (no remote yet), license, README, CHANGELOG, lint rules, l10n setup, theme skeleton (light/dark) |
 | **0.1.0** ✅ | Core chores | Drift DB, seed chores (`lib/domain/default_chores.dart`), chore list, add/edit/archive, icons & colors, complete + undo, settings saved |
 | **0.2.0** ✅ | Scheduling | Recurrence engine (with heavy unit tests), Today view, week/month overview, overdue logic |
-| **0.3.0** | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
+| **0.3.0** ✅ | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
 | **0.4.0** | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
 | **0.5.0** | Progression v1 | `ProgressionTheme` interface, one placeholder theme, goal graph, spend flow, optional real-life rewards |
 | **0.6.0** | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
@@ -291,7 +296,13 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 
 ---
 
-## 14. Definition of done (every feature)
+## 14. Known limits (revisit later)
+
+- **Stats performance:** `ProgressStats` aggregates the whole completion history in Dart on every change. That is fine for the first year (a few thousand rows). If it gets slow, move the sums into SQL. Group by local day carefully: stored timestamps carry UTC offsets.
+
+---
+
+## 15. Definition of done (every feature)
 
 - [ ] Works in light **and** dark mode, and with the colorblind palette
 - [ ] Strings in ARB (de + en), with no hard-coded UI text
@@ -303,7 +314,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 
 ---
 
-## 15. Decisions
+## 16. Decisions
 
 ### Decided (2026-10-28)
 | Topic | Decision | Consequence |

@@ -28,8 +28,9 @@ flutter build apk --release
 ```
 
 ### Working inside Dropbox
-Generated folders (`build/`, `.dart_tool/`, Gradle caches …) must not be synced. After cloning, and after every
-`flutter clean`, run:
+Generated folders (`build/`, `.dart_tool/`, Gradle caches …) must live outside Dropbox: Dropbox placeholder files
+break Gradle builds. The script moves them to `%LOCALAPPDATA%` and leaves ignored junctions in their place.
+After cloning, and after every `flutter clean`, run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tool\dropbox_ignore.ps1

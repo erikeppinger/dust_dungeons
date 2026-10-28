@@ -57,10 +57,12 @@ void main() {
   ) async {
     await pumpApp(tester);
 
+    // Dusting is due today: 15 base + 10 % on-time bonus, shown on the tile.
+    expect(find.text('17 points · +2 bonus'), findsWidgets);
     await tester.tap(find.text('Dusting'));
     await tester.pumpAndSettle();
-    expect(find.text('Dusting done · +15'), findsOneWidget);
-    expect(find.text('15 points'), findsWidgets);
+    expect(find.text('Dusting done · +17 (incl. 2 bonus)'), findsOneWidget);
+    expect(find.text('17 points'), findsWidgets);
     expect(find.byTooltip('1× today'), findsOneWidget);
 
     await tester.tap(find.text('Undo'));
@@ -69,16 +71,74 @@ void main() {
     expect(find.byTooltip('1× today'), findsNothing);
   });
 
-  testWidgets('a quick double tap counts as one completion', (tester) async {
+  testWidgets('the undo snackbar disappears by itself', (tester) async {
+    await pumpApp(tester);
+    await tester.tap(find.text('Dusting'));
+    await tester.pumpAndSettle();
+    expect(find.text('Undo'), findsOneWidget);
+
+    await tester.pumpAndSettle(const Duration(seconds: 6));
+    expect(find.text('Undo'), findsNothing);
+  });
+
+  testWidgets('a quick double tap completes only one chore', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('Dusting'));
+    // Both taps hit the same spot; after the first, another tile moves there.
+    final spot = tester.getCenter(find.text('Dusting'));
+    await tester.tapAt(spot);
     await tester.pump(const Duration(milliseconds: 100));
+    await tester.tapAt(spot);
+    await tester.pumpAndSettle();
+
+    expect(find.text('17 points'), findsWidgets);
+    expect(find.byTooltip('1× today'), findsOneWidget);
+  });
+
+  testWidgets('Stats shows level, streak and points', (tester) async {
+    await pumpApp(tester);
     await tester.tap(find.text('Dusting'));
     await tester.pumpAndSettle();
 
-    expect(find.text('15 points'), findsWidgets);
-    expect(find.byTooltip('1× today'), findsOneWidget);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Stats'));
+    await tester.pumpAndSettle();
+    expect(find.text('Level 1'), findsOneWidget);
+    expect(find.text('83 XP to level 2'), findsOneWidget);
+    expect(find.text('1-day streak'), findsOneWidget);
+    expect(find.text('17 points'), findsWidgets);
+
+    await tester.scrollUntilVisible(find.text('Most done (30 days)'), 200);
+    await tester.scrollUntilVisible(find.text('1×'), 200);
+    expect(find.text('1×'), findsOneWidget);
+  });
+
+  testWidgets('reaching a new level is celebrated', (tester) async {
+    final db = memoryDb();
+    await db.defaultProfileId(); // seed
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    await db
+        .into(db.completions)
+        .insert(
+          CompletionsCompanion.insert(
+            choreId: 8, // "Hang up laundry" (anytime), so Dusting stays due
+            profileId: 1,
+            completedAt: yesterday,
+            pointsAwarded: 95,
+          ),
+        );
+    await pumpApp(tester, db: db);
+    expect(find.text('Level 1'), findsOneWidget);
+    expect(find.text('1-day streak'), findsOneWidget);
+
+    // 15 base + 2 on time + 1 streak = 18 -> 113 XP.
+    await tester.tap(find.text('Dusting'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Level 2 reached! 🎉\nDusting done · +18 (incl. 3 bonus)'),
+      findsOneWidget,
+    );
+    expect(find.text('Level 2'), findsOneWidget);
+    expect(find.text('2-day streak'), findsOneWidget);
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

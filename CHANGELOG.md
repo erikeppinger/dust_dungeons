@@ -8,6 +8,23 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-28
+### Added
+- Point bonuses: +10% for doing a scheduled chore on its due day, +2% per streak day (up to +20%).
+  Tiles show the points you would get now, including the bonus.
+- XP and levels (each level needs 100 XP more than the last); level and streak chips on Today;
+  a "Level N reached!" message on level-up.
+- Day streaks: current and best; a streak survives until a whole day passes without chores.
+- Stats tab: level progress, streaks, chores done, points today / 7 days / 30 days / all time,
+  a 7-day bar chart, the most done chores of the last 30 days and how points work.
+
+### Fixed
+- The Undo snackbar stayed on screen until dismissed; it now disappears after 5 seconds.
+- Intermittent release build failures inside Dropbox: generated folders now live outside Dropbox
+  behind junctions (`tool/dropbox_ignore.ps1`).
+- A quick double tap can no longer complete a second chore that moves under your finger
+  (the tap guard now applies to all tiles, not per chore).
+
 ## [0.2.0] - 2026-10-28
 ### Added
 - Schedules for chores: once, every N days, weekly on chosen weekdays (every N weeks), monthly on a day
@@ -47,6 +64,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.3.0]: #
 [0.2.0]: #
 [0.1.0]: #
 [0.0.1]: #

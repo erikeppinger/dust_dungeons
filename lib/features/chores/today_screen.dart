@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/db/app_database.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/scheduled_chore.dart';
 import '../../data/providers.dart';
 import '../../domain/points.dart';
+import '../../domain/progress.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_edit_screen.dart';
 import 'chore_tile.dart';
@@ -24,9 +24,11 @@ class TodayScreen extends ConsumerStatefulWidget {
 }
 
 class _TodayScreenState extends ConsumerState<TodayScreen> {
-  /// Taps on the same chore within this window count as one (double taps).
-  static const _tapCooldown = Duration(seconds: 1);
-  final _lastTap = <int, DateTime>{};
+  /// Taps within this window after a completion are ignored. Global, not per
+  /// chore: a completed tile moves to another section, so the second tap of
+  /// a double tap would otherwise land on whichever tile took its place.
+  static const _tapCooldown = Duration(milliseconds: 700);
+  DateTime? _lastCompletion;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +78,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
   List<Widget> _section(String title, List<ScheduledChore> chores) {
     if (chores.isEmpty) return const [];
     final l10n = AppLocalizations.of(context);
+    final streakBeforeToday =
+        ref.watch(progressStatsProvider).value?.streakBefore ?? 0;
     return [
       SliverToBoxAdapter(child: SectionHeader('$title (${chores.length})')),
       SliverPadding(
@@ -90,16 +94,23 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
           itemCount: chores.length,
           itemBuilder: (context, i) {
             final s = chores[i];
+            // The points this tap would earn right now, bonuses included.
+            final points = pointsFor(
+              basePoints: s.chore.basePoints,
+              onTime: s.isDueToday,
+              streakDays: streakBeforeToday,
+            );
             return ChoreTile(
               key: ValueKey(s.chore.id),
               title: choreTitle(s.chore, l10n),
               iconKey: s.chore.iconKey,
               colorKey: s.chore.colorKey,
-              points: pointsForCompletion(basePoints: s.chore.basePoints),
+              points: points.total,
+              bonus: points.bonus,
               doneToday: s.doneToday,
               status: dueLabel(l10n, s.due, s.today),
               overdue: s.isOverdue,
-              onTap: () => _complete(s.chore),
+              onTap: () => _complete(s),
               onLongPress: () => ChoreEditScreen.open(context, s.chore),
             );
           },
@@ -108,30 +119,42 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     ];
   }
 
-  Future<void> _complete(Chore chore) async {
+  Future<void> _complete(ScheduledChore scheduled) async {
+    final chore = scheduled.chore;
     final now = DateTime.now();
-    final last = _lastTap[chore.id];
+    final last = _lastCompletion;
     if (last != null && now.difference(last) < _tapCooldown) return;
-    _lastTap[chore.id] = now;
+    _lastCompletion = now;
 
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final progress = ref.read(progressRepositoryProvider);
+    final xpBefore = ref.read(progressStatsProvider).value?.xp;
     final result = await progress.complete(
       choreId: chore.id,
       profileId: ref.read(currentProfileIdProvider),
+      onTime: scheduled.isDueToday,
     );
+    final points = result.points;
+    final title = choreTitle(chore, l10n);
+    final done = points.bonus > 0
+        ? l10n.choreCompletedBonus(title, points.total, points.bonus)
+        : l10n.choreCompleted(title, points.total);
+    final newLevel = levelForXp((xpBefore ?? 0) + points.total);
+    final leveledUp = xpBefore != null && newLevel > levelForXp(xpBefore);
     messenger
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(
-            l10n.choreCompleted(choreTitle(chore, l10n), result.points),
-          ),
+          content: Text(leveledUp ? '${l10n.levelUp(newLevel)}\n$done' : done),
           action: SnackBarAction(
             label: l10n.undo,
             onPressed: () => unawaited(progress.undo(result.completionId)),
           ),
+          // Snackbars with an action stay forever by default; Undo is only
+          // offered for a few seconds.
+          persist: false,
+          duration: const Duration(seconds: 5),
         ),
       );
   }
@@ -145,6 +168,7 @@ class _BalanceHeader extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final balance = ref.watch(balanceProvider).value ?? 0;
+    final stats = ref.watch(progressStatsProvider).value;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Column(
@@ -160,6 +184,26 @@ class _BalanceHeader extends ConsumerWidget {
               ),
             ],
           ),
+          if (stats != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  Chip(
+                    avatar: const Icon(Icons.military_tech, size: 18),
+                    label: Text(l10n.levelValue(stats.level)),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  Chip(
+                    avatar: const Icon(Icons.local_fire_department, size: 18),
+                    label: Text(l10n.streakDays(stats.currentStreak)),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: 4),
           Text(l10n.tapToComplete, style: theme.textTheme.bodyMedium),
         ],

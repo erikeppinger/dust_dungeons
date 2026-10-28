@@ -19,7 +19,6 @@
     }
   },
   "worldPlaceholder": "Spend your points to grow your world.",
-  "statsPlaceholder": "Points, streaks and summaries.",
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",
   "themeSystem": "System",
@@ -242,5 +241,104 @@
     }
   },
   "previousMonth": "Previous month",
-  "nextMonth": "Next month"
+  "nextMonth": "Next month",
+  "levelValue": "Level {level}",
+  "@levelValue": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpToNextLevel": "{xp} XP to level {level}",
+  "@xpToNextLevel": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "levelUp": "Level {level} reached! 🎉",
+  "@levelUp": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "streakDays": "{n, plural, =0{No streak} =1{1-day streak} other{{n}-day streak}}",
+  "@streakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statsBestStreak": "{n, plural, =1{Best: 1 day} other{Best: {n} days}}",
+  "@statsBestStreak": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statsChoresDone": "Chores done",
+  "statsPoints": "Points",
+  "statsToday": "Today",
+  "statsLast7Days": "Last 7 days",
+  "statsLast30Days": "Last 30 days",
+  "statsAllTime": "All time",
+  "statsTopChores": "Most done (30 days)",
+  "statsNothingYet": "Nothing done yet. Complete a chore to get started!",
+  "timesDone": "{n}×",
+  "@timesDone": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "statsHowPointsWork": "How points work",
+  "statsPointsExplanation": "Every chore earns its base points. Doing a scheduled chore on its due day adds {onTime}%. Each day of your streak adds {perDay}% more, up to {max}%. All points you ever earn count as XP for your level.",
+  "@statsPointsExplanation": {
+    "placeholders": {
+      "onTime": {
+        "type": "int"
+      },
+      "perDay": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "choreCompletedBonus": "{chore} done · +{points} (incl. {bonus} bonus)",
+  "@choreCompletedBonus": {
+    "placeholders": {
+      "chore": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      },
+      "bonus": {
+        "type": "int"
+      }
+    }
+  },
+  "pointsWithBonus": "{total} points · +{bonus} bonus",
+  "@pointsWithBonus": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "bonus": {
+        "type": "int"
+      }
+    }
+  }
 }

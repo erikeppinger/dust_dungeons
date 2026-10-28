@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day_clock.dart';
 import 'db/app_database.dart';
+import 'models/progress_stats.dart';
 import 'models/scheduled_chore.dart';
 import 'repositories/chore_repository.dart';
 import 'repositories/progress_repository.dart';
@@ -102,3 +103,17 @@ final completionsBetweenProvider = StreamProvider.autoDispose
             range.$2,
           ),
     );
+
+/// XP, level, streaks and point totals from the whole completion history.
+final progressStatsProvider = Provider<AsyncValue<ProgressStats>>((ref) {
+  final today = ref.watch(todayProvider);
+  return ref
+      .watch(_allCompletionsProvider)
+      .whenData((list) => ProgressStats(list, today: today));
+});
+
+final _allCompletionsProvider = StreamProvider<List<Completion>>(
+  (ref) => ref
+      .watch(progressRepositoryProvider)
+      .watchAllCompletions(ref.watch(currentProfileIdProvider)),
+);

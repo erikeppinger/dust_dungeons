@@ -161,7 +161,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                   title: _title.text.trim().isEmpty ? '…' : _title.text.trim(),
                   iconKey: _iconKey,
                   colorKey: _colorKey,
-                  points: pointsForCompletion(basePoints: _points),
+                  points: basePointsOf(_points),
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import '../core/widgets/coming_soon.dart';
 import '../features/chores/today_screen.dart';
 import '../features/plan/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/stats/stats_screen.dart';
 import '../l10n/app_localizations.dart';
 
 /// Main scaffold with bottom navigation between the top-level screens.
@@ -40,11 +41,7 @@ class _HomeShellState extends State<HomeShell> {
             message: l10n.worldPlaceholder,
             version: '0.5.0',
           ),
-          ComingSoon(
-            icon: Icons.insights,
-            message: l10n.statsPlaceholder,
-            version: '0.3.0',
-          ),
+          const StatsScreen(),
           const SettingsScreen(),
         ],
       ),
