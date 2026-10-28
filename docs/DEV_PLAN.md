@@ -265,9 +265,10 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.5.1** ✅ | Bosses & shop | All 8 bosses, gear and avatar shop (spending points) |
 | **0.5.2** ✅ | Overlord | Weekly Chore Overlord with lane phase, latency calibration, slow mode |
 | **0.6.0** ✅ | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
-| **0.7.0** | Data safety | Export/import, auto-backup folder, DB migration tests |
-| **0.8.0** | Profiles | Multiple people on one device, per-profile stats, chore assignment |
-| **0.9.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) |
+| **0.7.0** | Screen time | Soft screen-time budget: chores earn minutes, vouchers in the Armory, reminders, Tired in the Arena ([design](design/screen-time.md)) |
+| **0.8.0** | Data safety | Export/import, auto-backup folder, DB migration tests |
+| **0.9.0** | Profiles | Multiple people on one device, per-profile stats, chore assignment |
+| **0.10.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) |
 | **1.0.0** | Release | Final name, icon, store/F-Droid listing, chosen genre theme |
 | later | | macOS/iOS, home screen widget, more themes, device-to-device sync without a server |
 
@@ -338,8 +339,9 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
   Level sets hero strength, and points buy abilities, gear and retries.
 - **Fight tokens (decided):** every completed chore grants a token. Fights are optional and can be played whenever
   you like, so logging a chore never requires playing.
-- **Screen-time reward (idea):** start with a "soft" version (usage access only: budget, earned minutes and a
-  notification when over). Hard blocking (accessibility service + overlay) is risky for Google Play and is deferred.
+- **Screen-time reward (decided, 0.7.0):** the "soft" version (usage access only: budget, earned minutes,
+  vouchers and reminders), see [design](design/screen-time.md). Hard blocking (accessibility service +
+  overlay) is risky for Google Play and stays deferred.
 
 ### Still open
 1. **GitHub username**: replaces the `changeme` placeholder in the app ID before the first push
