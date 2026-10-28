@@ -22,32 +22,34 @@ String formatMinutes(BuildContext context, int minutes) =>
       alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
     );
 
+/// Turns notifications on (asking Android for permission) or off; shows a
+/// hint if the permission is blocked.
+Future<void> setNotificationsEnabled(
+  BuildContext context,
+  WidgetRef ref,
+  bool enabled,
+) async {
+  final controller = ref.read(settingsProvider.notifier);
+  if (!enabled) {
+    controller.update((s) => s.copyWith(notificationsEnabled: false));
+    return;
+  }
+  final messenger = ScaffoldMessenger.of(context);
+  final blocked = AppLocalizations.of(context).notifBlocked;
+  final granted = await ref
+      .read(notificationServiceProvider)
+      .requestPermission();
+  ref.invalidate(notificationPermissionProvider);
+  if (granted) {
+    controller.update((s) => s.copyWith(notificationsEnabled: true));
+  } else {
+    messenger.showSnackBar(SnackBar(content: Text(blocked)));
+  }
+}
+
 /// Notification settings page content.
 class NotificationSettings extends ConsumerWidget {
   const NotificationSettings({super.key});
-
-  Future<void> _setEnabled(
-    BuildContext context,
-    WidgetRef ref,
-    bool enabled,
-  ) async {
-    final controller = ref.read(settingsProvider.notifier);
-    if (!enabled) {
-      controller.update((s) => s.copyWith(notificationsEnabled: false));
-      return;
-    }
-    final messenger = ScaffoldMessenger.of(context);
-    final blocked = AppLocalizations.of(context).notifBlocked;
-    final granted = await ref
-        .read(notificationServiceProvider)
-        .requestPermission();
-    ref.invalidate(notificationPermissionProvider);
-    if (granted) {
-      controller.update((s) => s.copyWith(notificationsEnabled: true));
-    } else {
-      messenger.showSnackBar(SnackBar(content: Text(blocked)));
-    }
-  }
 
   Future<void> _pickSummaryTime(BuildContext context, WidgetRef ref) async {
     final minutes = ref.read(settingsProvider).dailySummaryMinutes;
@@ -108,7 +110,7 @@ class NotificationSettings extends ConsumerWidget {
           title: Text(l10n.notifEnable),
           subtitle: Text(l10n.notifEnableSubtitle),
           value: on,
-          onChanged: (v) => unawaited(_setEnabled(context, ref, v)),
+          onChanged: (v) => unawaited(setNotificationsEnabled(context, ref, v)),
         ),
         if (on && !permitted)
           ListTile(

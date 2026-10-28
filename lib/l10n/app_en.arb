@@ -4,10 +4,10 @@
   "@appTitle": {
     "description": "Working title of the app; final name TBD."
   },
-  "navToday": "Today",
-  "navPlan": "Plan",
-  "navWorld": "World",
-  "navStats": "Stats",
+  "navToday": "Quests",
+  "navPlan": "Quest Log",
+  "navWorld": "Arena",
+  "navStats": "Hall of Fame",
   "navSettings": "Settings",
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",
@@ -30,7 +30,7 @@
       }
     }
   },
-  "tapToComplete": "Tap a chore when it's done. Long-press to edit.",
+  "tapToComplete": "Tap a quest when it's done. Long-press to edit.",
   "doneTodayCount": "{count}× today",
   "@doneTodayCount": {
     "placeholders": {
@@ -163,11 +163,11 @@
     }
   },
   "statusAnytime": "Anytime",
-  "sectionOverdue": "Overdue",
-  "sectionDueToday": "Due today",
-  "sectionDoneToday": "Done today",
-  "sectionLater": "Later & anytime",
-  "allCaughtUp": "All caught up for today! 🎉",
+  "sectionOverdue": "Overdue quests",
+  "sectionDueToday": "Today's quests",
+  "sectionDoneToday": "Completed today",
+  "sectionLater": "Side quests",
+  "allCaughtUp": "All quests done for today! 🎉",
   "choreRepeat": "Repeat",
   "repeatAnytime": "No schedule (anytime)",
   "repeatOnce": "Once",
@@ -211,7 +211,7 @@
   "planMonth": "Month",
   "planToday": "Today",
   "planTomorrow": "Tomorrow",
-  "planNothing": "Nothing planned",
+  "planNothing": "No quests planned",
   "planDone": "Done",
   "planDueCount": "{n, plural, =0{nothing due} =1{1 due} other{{n} due}}",
   "@planDueCount": {
@@ -274,14 +274,14 @@
       }
     }
   },
-  "statsChoresDone": "Chores done",
+  "statsChoresDone": "Quests completed",
   "statsPoints": "Points",
   "statsToday": "Today",
   "statsLast7Days": "Last 7 days",
   "statsLast30Days": "Last 30 days",
   "statsAllTime": "All time",
-  "statsTopChores": "Most done (30 days)",
-  "statsNothingYet": "Nothing done yet. Complete a chore to get started!",
+  "statsTopChores": "Favorite quests (30 days)",
+  "statsNothingYet": "No quests completed yet. Finish one to start your legend!",
   "timesDone": "{n}×",
   "@timesDone": {
     "placeholders": {
@@ -576,7 +576,7 @@
   "hitGood": "Good",
   "hitMiss": "Miss",
   "fightNoPoints": "Fights never give points: those come from chores only.",
-  "fightBack": "Back to World",
+  "fightBack": "Back to the Arena",
   "fightAgain": "{n, plural, =1{Fight again · 1 token left} other{Fight again · {n} tokens left}}",
   "@fightAgain": {
     "placeholders": {
@@ -585,7 +585,7 @@
       }
     }
   },
-  "worldTokens": "{n, plural, =1{1 token} other{{n} tokens}}",
+  "worldTokens": "{n, plural, =1{1 fight token} other{{n} fight tokens}}",
   "@worldTokens": {
     "placeholders": {
       "n": {
@@ -620,10 +620,10 @@
       }
     }
   },
-  "worldCustomize": "Customize",
-  "worldBosses": "Bosses",
+  "worldCustomize": "Wardrobe",
+  "worldBosses": "The Lair",
   "worldFight": "Fight",
-  "worldNoTokens": "Do a chore for a token",
+  "worldNoTokens": "Finish a quest for a fight token",
   "worldTier": "Tier {tier}",
   "@worldTier": {
     "placeholders": {
@@ -632,8 +632,8 @@
       }
     }
   },
-  "worldTrophies": "Trophy shelf",
-  "worldNoTrophies": "No trophies yet. Win a fight to get the first one!",
+  "worldTrophies": "Hall of Trophies",
+  "worldNoTrophies": "No trophies yet. Win your first fight in the Arena!",
   "worldTrophyWins": "Won {n}× · best accuracy {accuracy} %",
   "@worldTrophyWins": {
     "placeholders": {
@@ -645,7 +645,7 @@
       }
     }
   },
-  "avatarTitle": "Customize hero",
+  "avatarTitle": "Wardrobe",
   "avatarSkin": "Skin",
   "avatarHair": "Hair",
   "avatarCape": "Cape",
@@ -679,7 +679,7 @@
   "hatWizard": "Wizard hat",
   "hatCrown": "Crown",
   "hatDesc": "For your hero",
-  "shopTitle": "Shop",
+  "shopTitle": "Armory",
   "shopBalance": "You have {points} points",
   "@shopBalance": {
     "placeholders": {
@@ -736,10 +736,10 @@
     }
   },
   "shopNotEnough": "Not enough points yet",
-  "worldShop": "Shop",
+  "worldShop": "Armory",
   "avatarHat": "Hat",
   "avatarNoHat": "No hat",
-  "avatarMoreHats": "Locked hats can be bought in the shop.",
+  "avatarMoreHats": "Locked hats are sold in the Armory.",
   "fightSecondWind": "{n, plural, =1{Use Second Wind · 1 left} other{Use Second Wind · {n} left}}",
   "@fightSecondWind": {
     "placeholders": {
@@ -764,7 +764,7 @@
   "fightLeaveBodyOverlord": "The Overlord stays until Sunday, so you can try again.",
   "fightAbandonedOverlord": "The fight was stopped because the app left the screen. The Overlord stays until Sunday.",
   "fightLostHintOverlord": "The Overlord stays until Sunday: try again any time, no token needed.",
-  "worldWeeklyBoss": "Weekly boss",
+  "worldWeeklyBoss": "Boss of the Week",
   "worldOverlordProgress": "{n} of {total} wins this week",
   "@worldOverlordProgress": {
     "placeholders": {
@@ -812,5 +812,28 @@
       }
     }
   },
-  "fightRetry": "Try again"
+  "fightRetry": "Try again",
+  "onboardingWelcomeTitle": "Welcome!",
+  "onboardingWelcomeBody": "Complete quests (your chores), collect points and level up. Every quest also earns a fight token for the Arena.",
+  "onboardingPrivacy": "Everything stays on this phone: no account, no ads, no tracking.",
+  "onboardingChoresTitle": "Which quests apply to you?",
+  "onboardingChoresBody": "Unticked ones are archived. Add your own or change them any time under Settings → Manage chores.",
+  "onboardingSetupTitle": "Last touches",
+  "onboardingNotifications": "Reminders and a daily summary",
+  "onboardingNotificationsSubtitle": "You can fine-tune them in the settings.",
+  "onboardingNext": "Next",
+  "onboardingSkip": "Skip",
+  "onboardingDone": "Let's go",
+  "onboardingStep": "Step {n} of {total}",
+  "@onboardingStep": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutReplayIntro": "Show the introduction again"
 }

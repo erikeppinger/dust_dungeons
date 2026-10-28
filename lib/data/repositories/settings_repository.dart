@@ -27,6 +27,7 @@ class SettingsRepository {
   static const _avatarHair = 'avatarHair';
   static const _avatarCape = 'avatarCape';
   static const _avatarHat = 'avatarHat';
+  static const _onboardingDone = 'onboardingDone';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -35,6 +36,12 @@ class SettingsRepository {
     bool flag(String key, bool fallback) =>
         map[key] == null ? fallback : map[key] == 'true';
     final languageCode = map[_locale];
+    // Installs from before the introduction existed skip it once they have
+    // completed a chore.
+    final onboardingDone = map[_onboardingDone] == null
+        ? await (_db.select(_db.completions)..limit(1)).getSingleOrNull() !=
+              null
+        : map[_onboardingDone] == 'true';
     return AppSettings(
       themeMode: ThemeMode.values.firstWhere(
         (m) => m.name == map[_themeMode],
@@ -63,6 +70,7 @@ class SettingsRepository {
       avatarHair: int.tryParse(map[_avatarHair] ?? '') ?? defaults.avatarHair,
       avatarCape: int.tryParse(map[_avatarCape] ?? '') ?? defaults.avatarCape,
       avatarHat: int.tryParse(map[_avatarHat] ?? '') ?? defaults.avatarHat,
+      onboardingDone: onboardingDone,
     );
   }
 
@@ -92,6 +100,7 @@ class SettingsRepository {
     await _put(_avatarHair, '${settings.avatarHair}');
     await _put(_avatarCape, '${settings.avatarCape}');
     await _put(_avatarHat, '${settings.avatarHat}');
+    await _put(_onboardingDone, '${settings.onboardingDone}');
   });
 
   Future<void> _put(String key, String value) => _db

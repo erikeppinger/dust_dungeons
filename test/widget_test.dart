@@ -8,6 +8,8 @@ import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/domain/fight/calibration.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
+import 'package:homework_and_chores/features/fight/boss_art.dart';
+import 'package:homework_and_chores/features/world/quest_map.dart';
 import 'package:homework_and_chores/features/world/world_screen.dart';
 import 'package:homework_and_chores/main.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -43,12 +45,35 @@ Future<void> _openSettings(WidgetTester tester) async {
 }
 
 void main() {
+  /// Scrolls the Arena until [finder] is built and on screen: the boss
+  /// cards sit below the hero and the quest map.
+  Future<void> showInArena(WidgetTester tester, Finder finder) async {
+    await tester.scrollUntilVisible(
+      finder,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(WorldScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(finder);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('starts on Today with built-in chores and 0 points', (
     tester,
   ) async {
     await pumpApp(tester);
 
-    for (final label in ['Today', 'Plan', 'World', 'Stats', 'Settings']) {
+    for (final label in [
+      'Quests',
+      'Quest Log',
+      'Arena',
+      'Hall of Fame',
+      'Settings',
+    ]) {
       expect(find.widgetWithText(NavigationDestination, label), findsOneWidget);
     }
     expect(find.text('0 points'), findsOneWidget);
@@ -58,7 +83,7 @@ void main() {
   testWidgets('uses German on a German device', (tester) async {
     await pumpApp(tester, locale: const Locale('de'));
 
-    expect(find.text('Heute'), findsWidgets);
+    expect(find.text('Quests'), findsWidgets);
     expect(find.text('Staub wischen'), findsOneWidget);
     expect(find.text('0 Punkte'), findsOneWidget);
   });
@@ -111,14 +136,19 @@ void main() {
     await tester.tap(find.text('Dusting'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Stats'));
+    await tester.tap(
+      find.widgetWithText(NavigationDestination, 'Hall of Fame'),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Level 1'), findsOneWidget);
     expect(find.text('83 XP to level 2'), findsOneWidget);
     expect(find.text('1-day streak'), findsOneWidget);
     expect(find.text('17 points'), findsWidgets);
 
-    await tester.scrollUntilVisible(find.text('Most done (30 days)'), 200);
+    await tester.scrollUntilVisible(
+      find.text('Favorite quests (30 days)'),
+      200,
+    );
     await tester.scrollUntilVisible(find.text('1×'), 200);
     expect(find.text('1×'), findsOneWidget);
   });
@@ -233,7 +263,7 @@ void main() {
     await pumpApp(tester, notifications: notifications);
     notifications.onTap!(NotificationTarget.stats);
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(AppBar, 'Stats'), findsOneWidget);
+    expect(find.widgetWithText(AppBar, 'Hall of Fame'), findsOneWidget);
   });
 
   testWidgets('a chore earns a token; leaving a fight uses it up', (
@@ -242,32 +272,34 @@ void main() {
     final db = await pumpApp(tester);
     Finder dustCard() => find.byKey(const ValueKey('boss-dust'));
 
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
+    await showInArena(tester, dustCard());
     expect(find.text('Dust Bunny King'), findsOneWidget);
     expect(
       find.descendant(
         of: dustCard(),
-        matching: find.text('Do a chore for a token'),
+        matching: find.text('Finish a quest for a fight token'),
       ),
       findsOneWidget,
     );
     expect(find.text('Laundry Hydra'), findsOneWidget);
 
     // Dusting belongs to the dust family: one token.
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Quests'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Dusting'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
+    await showInArena(tester, dustCard());
     expect(
       find.descendant(of: dustCard(), matching: find.text('× 1')),
       findsOneWidget,
     );
 
     final fight = find.descendant(of: dustCard(), matching: find.text('Fight'));
-    await tester.ensureVisible(fight);
+    await showInArena(tester, fight);
     await tester.pumpAndSettle();
     // A double tap must start only one fight.
     await tester.tap(fight);
@@ -294,7 +326,7 @@ void main() {
     expect(
       find.descendant(
         of: dustCard(),
-        matching: find.text('Do a chore for a token'),
+        matching: find.text('Finish a quest for a fight token'),
       ),
       findsOneWidget,
     );
@@ -307,11 +339,11 @@ void main() {
     tester,
   ) async {
     final db = await pumpApp(tester);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Customize'));
+    await tester.tap(find.text('Wardrobe'));
     await tester.pumpAndSettle();
-    expect(find.text('Customize hero'), findsOneWidget);
+    expect(find.text('Wardrobe'), findsOneWidget);
 
     await tester.ensureVisible(find.byKey(const ValueKey('cape-2')));
     await tester.pumpAndSettle();
@@ -326,7 +358,7 @@ void main() {
     tester,
   ) async {
     final db = await pumpApp(tester);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Boss fights'),
@@ -401,9 +433,9 @@ void main() {
   testWidgets('the shop sells hats that the hero can wear', (tester) async {
     final db = await tester.runAsync(() => richDb(300));
     await pumpApp(tester, db: db);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Shop'));
+    await tester.tap(find.text('Armory'));
     await tester.pumpAndSettle();
     expect(find.text('You have 300 points'), findsOneWidget);
 
@@ -441,7 +473,7 @@ void main() {
     // Wear it.
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Customize'));
+    await tester.tap(find.text('Wardrobe'));
     await tester.pumpAndSettle();
     final hat = find.byKey(const ValueKey('hat-4'));
     await tester.scrollUntilVisible(hat, 200);
@@ -470,7 +502,7 @@ void main() {
       return db;
     });
     await pumpApp(tester, db: db);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     expect(find.text('HP 6 · damage 1'), findsOneWidget);
 
@@ -478,7 +510,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await tester.ensureVisible(fight);
+    await showInArena(tester, fight);
     await tester.pumpAndSettle();
     await tester.tap(fight);
     await tester.pump();
@@ -495,9 +527,9 @@ void main() {
   testWidgets('Second Wind continues a lost fight', (tester) async {
     final db = await tester.runAsync(() => richDb(100));
     await pumpApp(tester, db: db);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Shop'));
+    await tester.tap(find.text('Armory'));
     await tester.pumpAndSettle();
     final wind = find.byKey(const ValueKey('shop-second_wind'));
     await tester.scrollUntilVisible(wind, 200);
@@ -514,7 +546,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await tester.ensureVisible(fight);
+    await showInArena(tester, fight);
     await tester.pumpAndSettle();
     await tester.tap(fight);
     // Never tap: the fight is lost after a few rounds.
@@ -546,7 +578,7 @@ void main() {
   });
 
   Future<void> openFightSettings(WidgetTester tester) async {
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(
       find.text('Boss fights'),
@@ -566,7 +598,7 @@ void main() {
 
   testWidgets('the weekly Overlord waits for five wins', (tester) async {
     await pumpApp(tester);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     final card = find.byKey(const ValueKey('boss-overlord'));
     expect(
@@ -581,6 +613,45 @@ void main() {
       find.descendant(of: card, matching: find.text('Fight')),
       findsNothing,
     );
+  });
+
+  testWidgets('the quest map shows each win on the road to the Overlord', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    final db = await tester.runAsync(() async {
+      final db = memoryDb();
+      final profile = await db.defaultProfileId();
+      for (final f in [BossFamily.trash, BossFamily.dust, BossFamily.trash]) {
+        await db
+            .into(db.fights)
+            .insert(
+              FightsCompanion.insert(
+                profileId: profile,
+                family: f,
+                tier: 1,
+                startedAt: DateTime.now(),
+                result: const Value(FightResult.won),
+              ),
+            );
+      }
+      return db;
+    });
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
+    await tester.pumpAndSettle();
+    final map = find.byType(QuestMap);
+    expect(find.bySemanticsLabel('3 of 5 wins this week'), findsOneWidget);
+    final bosses = tester
+        .widgetList<BossArt>(
+          find.descendant(of: map, matching: find.byType(BossArt)),
+        )
+        .map((b) => b.family)
+        .toList();
+    // One portrait per win, in order (repeats included); the lairs ahead
+    // are still unexplored.
+    expect(bosses, [BossFamily.trash, BossFamily.dust, BossFamily.trash]);
+    handle.dispose();
   });
 
   testWidgets('after five wins the Overlord can be fought without a token', (
@@ -611,13 +682,13 @@ void main() {
       return db;
     });
     await pumpApp(tester, db: db);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     final fight = find.descendant(
       of: find.byKey(const ValueKey('boss-overlord')),
       matching: find.text('Fight'),
     );
-    await tester.ensureVisible(fight);
+    await showInArena(tester, fight);
     await tester.pumpAndSettle();
     await tester.tap(fight);
     await tester.pump();
@@ -662,13 +733,13 @@ void main() {
       return db;
     });
     await pumpApp(tester, db: db);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
     await tester.pumpAndSettle();
     final fight = find.descendant(
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await tester.ensureVisible(fight);
+    await showInArena(tester, fight);
     await tester.pumpAndSettle();
     await tester.tap(fight);
     // Never tap: the fight is lost after a few rounds.
@@ -775,21 +846,22 @@ void main() {
     expect(saved!.iconKey, 'pets');
   });
 
-  testWidgets('Today groups chores; completing moves one to "done today"', (
-    tester,
-  ) async {
-    await pumpApp(tester);
+  testWidgets(
+    'Today groups chores; completing moves one to "completed today"',
+    (tester) async {
+      await pumpApp(tester);
 
-    // Daily built-ins are due on the first day.
-    expect(find.textContaining('Due today ('), findsOneWidget);
-    expect(find.text('Wash the dishes'), findsOneWidget);
-    expect(find.textContaining('Done today ('), findsNothing);
+      // Daily built-ins are due on the first day.
+      expect(find.textContaining("Today's quests ("), findsOneWidget);
+      expect(find.text('Wash the dishes'), findsOneWidget);
+      expect(find.textContaining('Completed today ('), findsNothing);
 
-    await tester.tap(find.text('Wash the dishes'));
-    await tester.pumpAndSettle();
-    expect(find.text('Done today (1)'), findsOneWidget);
-    expect(find.text('Due tomorrow'), findsWidgets);
-  });
+      await tester.tap(find.text('Wash the dishes'));
+      await tester.pumpAndSettle();
+      expect(find.text('Completed today (1)'), findsOneWidget);
+      expect(find.text('Due tomorrow'), findsWidgets);
+    },
+  );
 
   testWidgets('a weekly schedule can be set in the editor', (tester) async {
     final db = await pumpApp(tester);
@@ -865,10 +937,10 @@ void main() {
 
   testWidgets('Plan shows the week and the month calendar', (tester) async {
     await pumpApp(tester);
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Plan'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Quest Log'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Today'), findsWidgets);
+    expect(find.text('Quests'), findsWidgets);
     expect(find.text('Tomorrow'), findsOneWidget);
     expect(find.text('Wash the dishes'), findsWidgets);
 
@@ -912,7 +984,7 @@ void main() {
 
     await tester.pageBack();
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Quests'));
     await tester.pumpAndSettle();
     expect(find.text('Dusting'), findsNothing);
   });

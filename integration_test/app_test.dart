@@ -23,6 +23,25 @@ void main() {
       await tester.pumpWidget(await bootstrap(db));
       await tester.pumpAndSettle();
 
+      // First start: the introduction, keeping every chore.
+      // Each page change is awaited on screen: on a device the next tap can
+      // otherwise land before the page has moved.
+      Future<void> waitFor(Finder finder) async {
+        for (var i = 0; i < 50 && finder.evaluate().isEmpty; i++) {
+          await tester.pump(const Duration(milliseconds: 100));
+        }
+        await tester.pumpAndSettle();
+        expect(finder, findsOneWidget);
+      }
+
+      await waitFor(find.text('Welcome!'));
+      await tester.tap(find.text('Next'));
+      await waitFor(find.text('Which quests apply to you?'));
+      await tester.tap(find.text('Next'));
+      await waitFor(find.text("Let's go"));
+      await tester.tap(find.text("Let's go"));
+      await waitFor(find.text('Dusting'));
+
       // Complete a chore, then undo it.
       expect(find.text('0 points'), findsOneWidget);
       await tester.tap(find.text('Dusting'));
@@ -62,7 +81,7 @@ void main() {
       );
 
       // Plan: week list and month calendar.
-      await tester.tap(find.widgetWithText(NavigationDestination, 'Plan'));
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Quest Log'));
       await tester.pumpAndSettle();
       expect(find.text('Tomorrow'), findsOneWidget);
       await tester.tap(find.text('Month'));
@@ -75,19 +94,21 @@ void main() {
       await tester.pumpAndSettle();
 
       // World: the bosses and the hero.
-      await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
       await tester.pumpAndSettle();
       expect(find.text('Dust Bunny King'), findsOneWidget);
-      expect(find.text('Customize'), findsOneWidget);
+      expect(find.text('Wardrobe'), findsOneWidget);
 
       // Stats: level card and points explanation.
-      await tester.tap(find.widgetWithText(NavigationDestination, 'Stats'));
+      await tester.tap(
+        find.widgetWithText(NavigationDestination, 'Hall of Fame'),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Level 1'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('How points work'), 300);
 
       // Every tab opens.
-      for (final tab in ['Plan', 'World', 'Stats', 'Settings']) {
+      for (final tab in ['Quest Log', 'Arena', 'Hall of Fame', 'Settings']) {
         await tester.tap(find.widgetWithText(NavigationDestination, tab));
         await tester.pumpAndSettle();
         expect(find.widgetWithText(AppBar, tab), findsOneWidget);
@@ -146,7 +167,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Archived chore is gone from Today.
-      await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+      await tester.tap(find.widgetWithText(NavigationDestination, 'Quests'));
       await tester.pumpAndSettle();
       expect(find.text('Dusting'), findsNothing);
     },

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/core/day_clock.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/fight/fight_sounds.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/features/notifications/notification_service.dart';
@@ -72,12 +73,22 @@ Future<AppDatabase> pumpApp(
   Locale locale = const Locale('en'),
   AppDatabase? db,
   FakeNotificationService? notifications,
+  bool onboarding = false,
 }) async {
   // A tap that misses its widget means the test checks nothing: fail loudly.
   WidgetController.hitTestWarningShouldBeFatal = true;
   tester.platformDispatcher.localesTestValue = [locale];
   addTearDown(tester.platformDispatcher.clearLocalesTestValue);
   final database = db ?? memoryDb();
+  if (!onboarding) {
+    await tester.runAsync(() async {
+      final repo = SettingsRepository(database);
+      final settings = await repo.load();
+      if (!settings.onboardingDone) {
+        await repo.save(settings.copyWith(onboardingDone: true));
+      }
+    });
+  }
   final app = await tester.runAsync(
     () => bootstrap(
       database,

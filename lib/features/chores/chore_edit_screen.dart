@@ -177,7 +177,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
             Center(
               child: SizedBox(
                 width: 180,
-                height: 150,
+                height: ChoreTile.heightFor(context),
                 child: ChoreTile(
                   title: _title.text.trim().isEmpty ? '…' : _title.text.trim(),
                   iconKey: _iconKey,
@@ -234,6 +234,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
             DropdownButtonFormField<BossFamily>(
               key: const ValueKey('boss-family'),
               initialValue: _family,
+              isExpanded: true,
               decoration: InputDecoration(
                 labelText: l10n.choreBoss,
                 helperText: l10n.choreBossHelp,
@@ -247,7 +248,12 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                       children: [
                         BossArt(family: f, size: 28),
                         const SizedBox(width: 10),
-                        Text(bossName(l10n, f)),
+                        Expanded(
+                          child: Text(
+                            bossName(l10n, f),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -278,12 +284,12 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                       customBorder: const CircleBorder(),
                       onTap: () => setState(() => _colorKey = i),
                       child: CircleAvatar(
-                        radius: 22,
+                        radius: 24,
                         backgroundColor: i == _colorKey
                             ? theme.colorScheme.onSurface
                             : Colors.transparent,
                         child: CircleAvatar(
-                          radius: 19,
+                          radius: 21,
                           backgroundColor: palette.colorFor(i),
                           child: i == _colorKey
                               ? Icon(Icons.check, color: palette.onColorFor(i))

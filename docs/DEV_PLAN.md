@@ -185,10 +185,10 @@ Chores ──complete──▶ Points (ledger) ──spend──▶ Goals ──
 ## 8. UI / UX
 
 **Main screens (bottom nav):**
-1. **Today:** due and overdue chores as large colorful tiles, tap to complete, with an undo snackbar
-2. **Plan:** week view and month calendar with due chores and completed markers
-3. **World / Goals:** the progression screen where you spend points
-4. **Stats:** points per day/week/month, top chores, streaks
+1. **Quests** (was Today): due and overdue chores as large colorful tiles, tap to complete, with an undo snackbar
+2. **Quest Log** (was Plan): week view and month calendar with due chores and completed markers
+3. **Arena** (was World): hero, quest map to the weekly Overlord, bosses, Armory (shop), Wardrobe, Hall of Trophies
+4. **Hall of Fame** (was Stats): points per day/week/month, top chores, streaks
 5. **Settings:** theme (light/dark/system), colorblind palette, language, notifications, backup/restore, manage chores, about/licenses
 
 **Colors and accessibility**
@@ -264,7 +264,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.5.0** ✅ | Boss fights v1 | Fight tokens, echo duel, 2 playable bosses, World hub, trophy shelf, avatar, story mode, sound + haptics ([design](design/0.5-boss-fights.md)) |
 | **0.5.1** ✅ | Bosses & shop | All 8 bosses, gear and avatar shop (spending points) |
 | **0.5.2** ✅ | Overlord | Weekly Chore Overlord with lane phase, latency calibration, slow mode |
-| **0.6.0** | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
+| **0.6.0** ✅ | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
 | **0.7.0** | Data safety | Export/import, auto-backup folder, DB migration tests |
 | **0.8.0** | Profiles | Multiple people on one device, per-profile stats, chore assignment |
 | **0.9.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) |

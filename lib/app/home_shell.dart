@@ -48,18 +48,18 @@ class HomeShell extends ConsumerWidget {
             label: titles[0],
           ),
           NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
+            icon: const Icon(Icons.menu_book_outlined),
+            selectedIcon: const Icon(Icons.menu_book),
             label: titles[1],
           ),
           NavigationDestination(
-            icon: const Icon(Icons.public_outlined),
-            selectedIcon: const Icon(Icons.public),
+            icon: const Icon(Icons.shield_outlined),
+            selectedIcon: const Icon(Icons.shield),
             label: titles[2],
           ),
           NavigationDestination(
-            icon: const Icon(Icons.insights_outlined),
-            selectedIcon: const Icon(Icons.insights),
+            icon: const Icon(Icons.emoji_events_outlined),
+            selectedIcon: const Icon(Icons.emoji_events),
             label: titles[3],
           ),
           NavigationDestination(

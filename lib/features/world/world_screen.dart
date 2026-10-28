@@ -15,6 +15,7 @@ import '../fight/hero_art.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
 import 'avatar_editor.dart';
+import 'quest_map.dart';
 import 'shop_screen.dart';
 
 /// The hub: your hero, the weekly Overlord, the bosses with their tokens,
@@ -59,18 +60,24 @@ class WorldScreen extends ConsumerWidget {
         SectionHeader(
           '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
         ),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.78,
-          children: [
-            for (final family in choreFamilies)
-              _BossCard(family: family, progress: progress, loadout: loadout),
-          ],
-        ),
+        // Two cards per row, each row as tall as its fuller card: names and
+        // buttons wrap differently by language and font size.
+        for (var i = 0; i < choreFamilies.length; i += 2)
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final family in choreFamilies.skip(i).take(2))
+                  Expanded(
+                    child: _BossCard(
+                      family: family,
+                      progress: progress,
+                      loadout: loadout,
+                    ),
+                  ),
+              ],
+            ),
+          ),
         SectionHeader(l10n.worldTrophies),
         _TrophyShelf(progress: progress),
         const SizedBox(height: 8),
@@ -203,6 +210,7 @@ class _BossCard extends StatelessWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 8),
             const Spacer(),
             Text(
               bossName(l10n, family),
@@ -261,7 +269,7 @@ class _OverlordCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     const family = BossFamily.overlord;
-    final wins = progress.weekWins(today);
+    final wins = progress.weekWinFamilies(today);
     final ready = progress.overlordReady(today);
     final beaten = progress.overlordBeaten(today);
     final (_, light) = bossColors(family);
@@ -275,68 +283,51 @@ class _OverlordCard extends StatelessWidget {
           : null,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BossArt(
-              family: family,
-              size: 72,
-              mood: beaten ? BossMood.defeated : BossMood.idle,
+            Text(bossName(l10n, family), style: theme.textTheme.titleMedium),
+            Text(
+              l10n.worldTier(progress.tier(family)),
+              style: theme.textTheme.bodySmall,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    bossName(l10n, family),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                  Text(
-                    l10n.worldTier(progress.tier(family)),
-                    style: theme.textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    beaten
-                        ? l10n.worldOverlordBeaten
-                        : (ready
-                              ? l10n.worldOverlordReady
-                              : l10n.worldOverlordLocked),
-                  ),
-                  if (!ready && !beaten) ...[
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(
-                      value: wins / overlordWinsNeeded,
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(4),
-                      semanticsLabel: l10n.worldOverlordProgress(
-                        wins,
-                        overlordWinsNeeded,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.worldOverlordProgress(wins, overlordWinsNeeded),
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
-                  if (ready) ...[
-                    const SizedBox(height: 8),
-                    FilledButton(
-                      onPressed: () => FightScreen.open(
-                        context,
-                        family,
-                        progress.tier(family),
-                        loadout,
-                        motifs: progress.weekBeaten(today),
-                      ),
-                      child: Text(l10n.worldFight),
-                    ),
-                  ],
-                ],
+            const SizedBox(height: 12),
+            QuestMap(
+              wins: wins,
+              beaten: beaten,
+              semanticLabel: l10n.worldOverlordProgress(
+                wins.length.clamp(0, overlordWinsNeeded),
+                overlordWinsNeeded,
               ),
             ),
+            const SizedBox(height: 12),
+            Text(
+              beaten
+                  ? l10n.worldOverlordBeaten
+                  : (ready
+                        ? l10n.worldOverlordReady
+                        : l10n.worldOverlordLocked),
+            ),
+            if (!ready && !beaten) ...[
+              const SizedBox(height: 4),
+              Text(
+                l10n.worldOverlordProgress(wins.length, overlordWinsNeeded),
+                style: theme.textTheme.bodySmall,
+              ),
+            ],
+            if (ready) ...[
+              const SizedBox(height: 8),
+              FilledButton(
+                onPressed: () => FightScreen.open(
+                  context,
+                  family,
+                  progress.tier(family),
+                  loadout,
+                  motifs: progress.weekBeaten(today),
+                ),
+                child: Text(l10n.worldFight),
+              ),
+            ],
           ],
         ),
       ),

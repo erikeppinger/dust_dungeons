@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/section_header.dart';
@@ -85,9 +86,9 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       SliverPadding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         sliver: SliverGrid.builder(
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
             maxCrossAxisExtent: 200,
-            mainAxisExtent: 168,
+            mainAxisExtent: ChoreTile.heightFor(context),
             mainAxisSpacing: 4,
             crossAxisSpacing: 4,
           ),
@@ -135,6 +136,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       profileId: ref.read(currentProfileIdProvider),
       onTime: scheduled.isDueToday,
     );
+    unawaited(HapticFeedback.lightImpact());
     final points = result.points;
     final title = choreTitle(chore, l10n);
     final done = points.bonus > 0
@@ -167,7 +169,7 @@ class _BalanceHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final balance = ref.watch(balanceProvider).value ?? 0;
+    final balance = ref.watch(balanceProvider).value;
     final stats = ref.watch(progressStatsProvider).value;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
@@ -178,9 +180,23 @@ class _BalanceHeader extends ConsumerWidget {
             children: [
               Icon(Icons.stars, color: theme.colorScheme.primary, size: 32),
               const SizedBox(width: 8),
-              Text(
-                l10n.pointsValue(balance),
-                style: theme.textTheme.headlineSmall,
+              Flexible(
+                // Counts up to a new balance (instantly with reduced motion).
+                // Built only once the balance is known, so opening the app
+                // does not count up from zero.
+                child: balance == null
+                    ? const SizedBox.shrink()
+                    : TweenAnimationBuilder<double>(
+                        tween: Tween(end: balance.toDouble()),
+                        duration: MediaQuery.disableAnimationsOf(context)
+                            ? Duration.zero
+                            : const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        builder: (context, value, _) => Text(
+                          l10n.pointsValue(value.round()),
+                          style: theme.textTheme.headlineSmall,
+                        ),
+                      ),
               ),
             ],
           ),

@@ -38,6 +38,14 @@ class ChoreTile extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
+  /// Grid cell height that fits a tile at the device's font size: card
+  /// margin, padding and icon are fixed, the four text lines (two for the
+  /// title, status and points) grow with the text.
+  static double heightFor(BuildContext context) {
+    final textFactor = MediaQuery.textScalerOf(context).scale(14) / 14;
+    return 96 + 72 * textFactor;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -51,70 +59,76 @@ class ChoreTile extends StatelessWidget {
         color.withValues(alpha: 0.18),
         theme.colorScheme.surfaceContainerLow,
       ),
-      child: InkWell(
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      // One TalkBack node per tile: "Dusting, Due today, 17 points".
+      child: MergeSemantics(
+        child: Semantics(
+          onLongPressHint: onLongPress == null ? null : l10n.editChore,
+          child: InkWell(
+            onTap: onTap,
+            onLongPress: onLongPress,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: color,
-                    child: Icon(
-                      choreIcon(iconKey),
-                      color: palette.onColorFor(colorKey),
-                      size: 26,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (doneToday > 0) _DoneBadge(count: doneToday),
-                ],
-              ),
-              const Spacer(),
-              Text(
-                title,
-                style: theme.textTheme.titleSmall,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              if (status case final status?)
-                Row(
-                  children: [
-                    if (overdue) ...[
-                      Icon(
-                        Icons.error_outline,
-                        size: 14,
-                        color: theme.colorScheme.error,
-                      ),
-                      const SizedBox(width: 3),
-                    ],
-                    Expanded(
-                      child: Text(
-                        status,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: overdue ? theme.colorScheme.error : null,
-                          fontWeight: overdue ? FontWeight.bold : null,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: color,
+                        child: Icon(
+                          choreIcon(iconKey),
+                          color: palette.onColorFor(colorKey),
+                          size: 26,
                         ),
                       ),
+                      const Spacer(),
+                      if (doneToday > 0) _DoneBadge(count: doneToday),
+                    ],
+                  ),
+                  const Spacer(),
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (status case final status?)
+                    Row(
+                      children: [
+                        if (overdue) ...[
+                          Icon(
+                            Icons.error_outline,
+                            size: 14,
+                            color: theme.colorScheme.error,
+                          ),
+                          const SizedBox(width: 3),
+                        ],
+                        Expanded(
+                          child: Text(
+                            status,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: overdue ? theme.colorScheme.error : null,
+                              fontWeight: overdue ? FontWeight.bold : null,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              Text(
-                bonus > 0
-                    ? l10n.pointsWithBonus(points, bonus)
-                    : l10n.pointsValue(points),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall,
+                  Text(
+                    bonus > 0
+                        ? l10n.pointsWithBonus(points, bonus)
+                        : l10n.pointsValue(points),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -81,16 +81,17 @@ class FightProgress {
   }
 
   /// Wins against chore bosses in the week (Mon–Sun) of [today].
-  int weekWins(DateTime today) =>
-      _wonInWeekOf(today).where((f) => f != BossFamily.overlord).length;
+  int weekWins(DateTime today) => weekWinFamilies(today).length;
+
+  /// The chore bosses won against in that week, one entry per win, in order
+  /// (the road on the quest map).
+  List<BossFamily> weekWinFamilies(DateTime today) =>
+      _wonInWeekOf(today).where((f) => f != BossFamily.overlord).toList();
 
   /// The chore bosses beaten in that week, in the order first beaten: the
   /// Overlord borrows their rhythms.
   List<BossFamily> weekBeaten(DateTime today) =>
-      _wonInWeekOf(today)
-          .where((f) => f != BossFamily.overlord)
-          .toSet()
-          .toList();
+      weekWinFamilies(today).toSet().toList();
 
   /// Whether the Overlord was beaten in the week of [today].
   bool overlordBeaten(DateTime today) =>

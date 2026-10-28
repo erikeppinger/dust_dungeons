@@ -110,9 +110,11 @@ class LevelCard extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.levelValue(stats.level),
-                  style: theme.textTheme.headlineSmall,
+                Flexible(
+                  child: Text(
+                    l10n.levelValue(stats.level),
+                    style: theme.textTheme.headlineSmall,
+                  ),
                 ),
               ],
             ),

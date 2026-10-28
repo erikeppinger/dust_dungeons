@@ -22,6 +22,7 @@ class AppSettings {
     this.avatarHair = 0,
     this.avatarCape = 0,
     this.avatarHat = 0,
+    this.onboardingDone = false,
   });
 
   final ThemeMode themeMode;
@@ -63,6 +64,9 @@ class AppSettings {
   /// 0 = no hat, otherwise 1 + the index in `hats` (shop).
   final int avatarHat;
 
+  /// Whether the first-start introduction was finished or skipped.
+  final bool onboardingDone;
+
   AppSettings copyWith({
     ThemeMode? themeMode,
     bool? colorblindSafe,
@@ -82,6 +86,7 @@ class AppSettings {
     int? avatarHair,
     int? avatarCape,
     int? avatarHat,
+    bool? onboardingDone,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     colorblindSafe: colorblindSafe ?? this.colorblindSafe,
@@ -101,6 +106,7 @@ class AppSettings {
     avatarHair: avatarHair ?? this.avatarHair,
     avatarCape: avatarCape ?? this.avatarCape,
     avatarHat: avatarHat ?? this.avatarHat,
+    onboardingDone: onboardingDone ?? this.onboardingDone,
   );
 
   @override
@@ -123,7 +129,8 @@ class AppSettings {
       other.avatarSkin == avatarSkin &&
       other.avatarHair == avatarHair &&
       other.avatarCape == avatarCape &&
-      other.avatarHat == avatarHat;
+      other.avatarHat == avatarHat &&
+      other.onboardingDone == onboardingDone;
 
   @override
   int get hashCode => Object.hashAll([
@@ -145,5 +152,6 @@ class AppSettings {
     avatarHair,
     avatarCape,
     avatarHat,
+    onboardingDone,
   ]);
 }

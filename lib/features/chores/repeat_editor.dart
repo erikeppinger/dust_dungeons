@@ -77,10 +77,14 @@ class RepeatEditor extends StatelessWidget {
         DropdownButtonFormField<RepeatType>(
           key: const ValueKey('repeat-type'),
           initialValue: value.type,
+          isExpanded: true,
           decoration: const InputDecoration(border: OutlineInputBorder()),
           items: [
             for (final type in RepeatType.values)
-              DropdownMenuItem(value: type, child: Text(labels[type]!)),
+              DropdownMenuItem(
+                value: type,
+                child: Text(labels[type]!, overflow: TextOverflow.ellipsis),
+              ),
           ],
           onChanged: (type) {
             if (type != null) _setType(type);
@@ -134,6 +138,7 @@ class RepeatEditor extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8),
             child: DropdownButtonFormField<int>(
               initialValue: value.dayOfMonth ?? value.start.day,
+              isExpanded: true,
               decoration: InputDecoration(
                 labelText: l10n.dayOfMonth,
                 border: const OutlineInputBorder(),

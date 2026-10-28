@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/onboarding/onboarding_screen.dart';
 import '../features/settings/settings_controller.dart';
 import '../l10n/app_localizations.dart';
 import 'home_shell.dart';
@@ -28,7 +29,9 @@ class ChoresApp extends ConsumerWidget {
       locale: settings.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const HomeShell(),
+      home: settings.onboardingDone
+          ? const HomeShell()
+          : const OnboardingScreen(),
     );
   }
 }

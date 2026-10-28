@@ -156,6 +156,16 @@ class AboutSettings extends ConsumerWidget {
             leading: const Icon(Icons.tag),
             title: Text(l10n.aboutVersion(version)),
           ),
+        ListTile(
+          leading: const Icon(Icons.school_outlined),
+          title: Text(l10n.aboutReplayIntro),
+          onTap: () {
+            ref
+                .read(settingsProvider.notifier)
+                .update((s) => s.copyWith(onboardingDone: false));
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
+        ),
       ],
     );
   }

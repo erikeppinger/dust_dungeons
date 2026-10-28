@@ -8,6 +8,40 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-28
+### Changed
+- **Game-themed names, like a pen-and-paper adventure:**
+  - Tabs: Quests, Quest Log, Arena, Hall of Fame (Settings stays). In German: Quests, Questbuch, Arena,
+    Ruhmeshalle.
+  - Quest sections: Today's quests, Overdue quests, Side quests, Completed today.
+  - In the Arena: Boss of the Week, The Lair, Hall of Trophies, Armory (shop) and Wardrobe (customize).
+- German texts now consistently say "Kampfmarke"/"Marke" for fight tokens.
+
+### Added
+- **Quest map:** the Boss of the Week card shows the week's road to the Overlord as a 16-bit style
+  overworld: grass, forests, hills, lakes and desert, all drawn pixel by pixel in code.
+  - Fog hides what lies ahead. Each win clears the way to the next lair and shows the boss you beat there.
+  - The Overlord's castle appears with the fifth win, and its banner turns green once it's beaten.
+  - Your hero walks the road as a small sprite in your Wardrobe colors and hat.
+  - TalkBack reads it as "3 of 5 wins this week".
+- **Introduction on first start:** welcome with language choice and the privacy promise, pick the chores
+  that apply (unticked ones are archived), then the colorblind palette and reminders. Skippable, and it can
+  be shown again under Settings → About. Installs that already have history skip it.
+- Points count up when they change (instantly with the system's "remove animations"), and completing a
+  chore gives a short vibration.
+- TalkBack reads each chore tile as one item ("Dusting, due today, 17 points") with a hint that
+  long-press edits it.
+- An automated accessibility audit covers 15 screens, checking:
+  - Android tap-target size, labeled buttons and text contrast, in light and dark mode with both palettes
+  - layout at 200 % font size in English and German
+
+### Fixed
+- Boss cards on the World tab overflowed on phones about 390 dp wide. Each pair of cards now grows with
+  its content.
+- The repeat and boss menus in the chore editor ran off the screen.
+- Chore tiles, the points header and the level card overflowed with large system fonts.
+- Color swatches in the editor are now 48 dp tap targets.
+
 ## [0.5.2] - 2026-10-28
 ### Added
 - **Weekly Chore Overlord:** appears after 5 won boss fights in a week (Mon–Sun) and stays until beaten or
@@ -137,6 +171,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.6.0]: #
 [0.5.2]: #
 [0.5.1]: #
 [0.5.0]: #
