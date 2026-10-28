@@ -488,6 +488,15 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     requiredDuringInsert: false,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<BossFamily?, String> bossFamily =
+      GeneratedColumn<String>(
+        'boss_family',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<BossFamily?>($ChoresTable.$converterbossFamilyn);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     seedKey,
@@ -505,6 +514,7 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     repeatStart,
     repeatSetAt,
     reminderMinutes,
+    bossFamily,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -707,6 +717,12 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         DriftSqlType.int,
         data['${effectivePrefix}reminder_minutes'],
       ),
+      bossFamily: $ChoresTable.$converterbossFamilyn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}boss_family'],
+        ),
+      ),
     );
   }
 
@@ -717,6 +733,10 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
 
   static JsonTypeConverter2<RepeatType, String, String> $converterrepeatType =
       const EnumNameConverter<RepeatType>(RepeatType.values);
+  static JsonTypeConverter2<BossFamily, String, String> $converterbossFamily =
+      const EnumNameConverter<BossFamily>(BossFamily.values);
+  static JsonTypeConverter2<BossFamily?, String?, String?>
+  $converterbossFamilyn = JsonTypeConverter2.asNullable($converterbossFamily);
 }
 
 class Chore extends DataClass implements Insertable<Chore> {
@@ -745,6 +765,10 @@ class Chore extends DataClass implements Insertable<Chore> {
 
   /// Reminder on due days, as minutes after midnight (schema v3); `null` = off.
   final int? reminderMinutes;
+
+  /// Boss family for fight tokens (schema v4); `null` = the default for the
+  /// built-in chore, or the Clutter Imp for user chores.
+  final BossFamily? bossFamily;
   const Chore({
     required this.id,
     this.seedKey,
@@ -762,6 +786,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     this.repeatStart,
     this.repeatSetAt,
     this.reminderMinutes,
+    this.bossFamily,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -798,6 +823,11 @@ class Chore extends DataClass implements Insertable<Chore> {
     if (!nullToAbsent || reminderMinutes != null) {
       map['reminder_minutes'] = Variable<int>(reminderMinutes);
     }
+    if (!nullToAbsent || bossFamily != null) {
+      map['boss_family'] = Variable<String>(
+        $ChoresTable.$converterbossFamilyn.toSql(bossFamily),
+      );
+    }
     return map;
   }
 
@@ -831,6 +861,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       reminderMinutes: reminderMinutes == null && nullToAbsent
           ? const Value.absent()
           : Value(reminderMinutes),
+      bossFamily: bossFamily == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bossFamily),
     );
   }
 
@@ -858,6 +891,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       repeatStart: serializer.fromJson<DateTime?>(json['repeatStart']),
       repeatSetAt: serializer.fromJson<DateTime?>(json['repeatSetAt']),
       reminderMinutes: serializer.fromJson<int?>(json['reminderMinutes']),
+      bossFamily: $ChoresTable.$converterbossFamilyn.fromJson(
+        serializer.fromJson<String?>(json['bossFamily']),
+      ),
     );
   }
   @override
@@ -882,6 +918,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       'repeatStart': serializer.toJson<DateTime?>(repeatStart),
       'repeatSetAt': serializer.toJson<DateTime?>(repeatSetAt),
       'reminderMinutes': serializer.toJson<int?>(reminderMinutes),
+      'bossFamily': serializer.toJson<String?>(
+        $ChoresTable.$converterbossFamilyn.toJson(bossFamily),
+      ),
     };
   }
 
@@ -902,6 +941,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     Value<DateTime?> repeatStart = const Value.absent(),
     Value<DateTime?> repeatSetAt = const Value.absent(),
     Value<int?> reminderMinutes = const Value.absent(),
+    Value<BossFamily?> bossFamily = const Value.absent(),
   }) => Chore(
     id: id ?? this.id,
     seedKey: seedKey.present ? seedKey.value : this.seedKey,
@@ -923,6 +963,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     reminderMinutes: reminderMinutes.present
         ? reminderMinutes.value
         : this.reminderMinutes,
+    bossFamily: bossFamily.present ? bossFamily.value : this.bossFamily,
   );
   Chore copyWithCompanion(ChoresCompanion data) {
     return Chore(
@@ -962,6 +1003,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       reminderMinutes: data.reminderMinutes.present
           ? data.reminderMinutes.value
           : this.reminderMinutes,
+      bossFamily: data.bossFamily.present
+          ? data.bossFamily.value
+          : this.bossFamily,
     );
   }
 
@@ -983,7 +1027,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
           ..write('repeatStart: $repeatStart, ')
           ..write('repeatSetAt: $repeatSetAt, ')
-          ..write('reminderMinutes: $reminderMinutes')
+          ..write('reminderMinutes: $reminderMinutes, ')
+          ..write('bossFamily: $bossFamily')
           ..write(')'))
         .toString();
   }
@@ -1006,6 +1051,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     repeatStart,
     repeatSetAt,
     reminderMinutes,
+    bossFamily,
   );
   @override
   bool operator ==(Object other) =>
@@ -1026,7 +1072,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           other.repeatDayOfMonth == this.repeatDayOfMonth &&
           other.repeatStart == this.repeatStart &&
           other.repeatSetAt == this.repeatSetAt &&
-          other.reminderMinutes == this.reminderMinutes);
+          other.reminderMinutes == this.reminderMinutes &&
+          other.bossFamily == this.bossFamily);
 }
 
 class ChoresCompanion extends UpdateCompanion<Chore> {
@@ -1046,6 +1093,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
   final Value<DateTime?> repeatStart;
   final Value<DateTime?> repeatSetAt;
   final Value<int?> reminderMinutes;
+  final Value<BossFamily?> bossFamily;
   const ChoresCompanion({
     this.id = const Value.absent(),
     this.seedKey = const Value.absent(),
@@ -1063,6 +1111,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatStart = const Value.absent(),
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
+    this.bossFamily = const Value.absent(),
   });
   ChoresCompanion.insert({
     this.id = const Value.absent(),
@@ -1081,6 +1130,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatStart = const Value.absent(),
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
+    this.bossFamily = const Value.absent(),
   }) : iconKey = Value(iconKey),
        colorKey = Value(colorKey),
        basePoints = Value(basePoints);
@@ -1101,6 +1151,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Expression<DateTime>? repeatStart,
     Expression<DateTime>? repeatSetAt,
     Expression<int>? reminderMinutes,
+    Expression<String>? bossFamily,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1119,6 +1170,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       if (repeatStart != null) 'repeat_start': repeatStart,
       if (repeatSetAt != null) 'repeat_set_at': repeatSetAt,
       if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
+      if (bossFamily != null) 'boss_family': bossFamily,
     });
   }
 
@@ -1139,6 +1191,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Value<DateTime?>? repeatStart,
     Value<DateTime?>? repeatSetAt,
     Value<int?>? reminderMinutes,
+    Value<BossFamily?>? bossFamily,
   }) {
     return ChoresCompanion(
       id: id ?? this.id,
@@ -1157,6 +1210,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       repeatStart: repeatStart ?? this.repeatStart,
       repeatSetAt: repeatSetAt ?? this.repeatSetAt,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
+      bossFamily: bossFamily ?? this.bossFamily,
     );
   }
 
@@ -1213,6 +1267,11 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     if (reminderMinutes.present) {
       map['reminder_minutes'] = Variable<int>(reminderMinutes.value);
     }
+    if (bossFamily.present) {
+      map['boss_family'] = Variable<String>(
+        $ChoresTable.$converterbossFamilyn.toSql(bossFamily.value),
+      );
+    }
     return map;
   }
 
@@ -1234,7 +1293,8 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
           ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
           ..write('repeatStart: $repeatStart, ')
           ..write('repeatSetAt: $repeatSetAt, ')
-          ..write('reminderMinutes: $reminderMinutes')
+          ..write('reminderMinutes: $reminderMinutes, ')
+          ..write('bossFamily: $bossFamily')
           ..write(')'))
         .toString();
   }
@@ -2280,6 +2340,656 @@ class SettingsCompanion extends UpdateCompanion<SettingEntry> {
   }
 }
 
+class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FightsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BossFamily, String> family =
+      GeneratedColumn<String>(
+        'family',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<BossFamily>($FightsTable.$converterfamily);
+  static const VerificationMeta _tierMeta = const VerificationMeta('tier');
+  @override
+  late final GeneratedColumn<int> tier = GeneratedColumn<int>(
+    'tier',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _storyModeMeta = const VerificationMeta(
+    'storyMode',
+  );
+  @override
+  late final GeneratedColumn<bool> storyMode = GeneratedColumn<bool>(
+    'story_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("story_mode" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _startedAtMeta = const VerificationMeta(
+    'startedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+    'started_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endedAtMeta = const VerificationMeta(
+    'endedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endedAt = GeneratedColumn<DateTime>(
+    'ended_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<FightResult?, String> result =
+      GeneratedColumn<String>(
+        'result',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<FightResult?>($FightsTable.$converterresultn);
+  static const VerificationMeta _perfectMeta = const VerificationMeta(
+    'perfect',
+  );
+  @override
+  late final GeneratedColumn<int> perfect = GeneratedColumn<int>(
+    'perfect',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _goodMeta = const VerificationMeta('good');
+  @override
+  late final GeneratedColumn<int> good = GeneratedColumn<int>(
+    'good',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _missMeta = const VerificationMeta('miss');
+  @override
+  late final GeneratedColumn<int> miss = GeneratedColumn<int>(
+    'miss',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    family,
+    tier,
+    storyMode,
+    startedAt,
+    endedAt,
+    result,
+    perfect,
+    good,
+    miss,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'fights';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Fight> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('tier')) {
+      context.handle(
+        _tierMeta,
+        tier.isAcceptableOrUnknown(data['tier']!, _tierMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tierMeta);
+    }
+    if (data.containsKey('story_mode')) {
+      context.handle(
+        _storyModeMeta,
+        storyMode.isAcceptableOrUnknown(data['story_mode']!, _storyModeMeta),
+      );
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(
+        _startedAtMeta,
+        startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startedAtMeta);
+    }
+    if (data.containsKey('ended_at')) {
+      context.handle(
+        _endedAtMeta,
+        endedAt.isAcceptableOrUnknown(data['ended_at']!, _endedAtMeta),
+      );
+    }
+    if (data.containsKey('perfect')) {
+      context.handle(
+        _perfectMeta,
+        perfect.isAcceptableOrUnknown(data['perfect']!, _perfectMeta),
+      );
+    }
+    if (data.containsKey('good')) {
+      context.handle(
+        _goodMeta,
+        good.isAcceptableOrUnknown(data['good']!, _goodMeta),
+      );
+    }
+    if (data.containsKey('miss')) {
+      context.handle(
+        _missMeta,
+        miss.isAcceptableOrUnknown(data['miss']!, _missMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Fight map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Fight(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      family: $FightsTable.$converterfamily.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}family'],
+        )!,
+      ),
+      tier: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tier'],
+      )!,
+      storyMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}story_mode'],
+      )!,
+      startedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}started_at'],
+      )!,
+      endedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}ended_at'],
+      ),
+      result: $FightsTable.$converterresultn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}result'],
+        ),
+      ),
+      perfect: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}perfect'],
+      )!,
+      good: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}good'],
+      )!,
+      miss: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}miss'],
+      )!,
+    );
+  }
+
+  @override
+  $FightsTable createAlias(String alias) {
+    return $FightsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BossFamily, String, String> $converterfamily =
+      const EnumNameConverter<BossFamily>(BossFamily.values);
+  static JsonTypeConverter2<FightResult, String, String> $converterresult =
+      const EnumNameConverter<FightResult>(FightResult.values);
+  static JsonTypeConverter2<FightResult?, String?, String?> $converterresultn =
+      JsonTypeConverter2.asNullable($converterresult);
+}
+
+class Fight extends DataClass implements Insertable<Fight> {
+  final int id;
+  final int profileId;
+  final BossFamily family;
+  final int tier;
+  final bool storyMode;
+  final DateTime startedAt;
+  final DateTime? endedAt;
+  final FightResult? result;
+  final int perfect;
+  final int good;
+  final int miss;
+  const Fight({
+    required this.id,
+    required this.profileId,
+    required this.family,
+    required this.tier,
+    required this.storyMode,
+    required this.startedAt,
+    this.endedAt,
+    this.result,
+    required this.perfect,
+    required this.good,
+    required this.miss,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    {
+      map['family'] = Variable<String>(
+        $FightsTable.$converterfamily.toSql(family),
+      );
+    }
+    map['tier'] = Variable<int>(tier);
+    map['story_mode'] = Variable<bool>(storyMode);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || endedAt != null) {
+      map['ended_at'] = Variable<DateTime>(endedAt);
+    }
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(
+        $FightsTable.$converterresultn.toSql(result),
+      );
+    }
+    map['perfect'] = Variable<int>(perfect);
+    map['good'] = Variable<int>(good);
+    map['miss'] = Variable<int>(miss);
+    return map;
+  }
+
+  FightsCompanion toCompanion(bool nullToAbsent) {
+    return FightsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      family: Value(family),
+      tier: Value(tier),
+      storyMode: Value(storyMode),
+      startedAt: Value(startedAt),
+      endedAt: endedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endedAt),
+      result: result == null && nullToAbsent
+          ? const Value.absent()
+          : Value(result),
+      perfect: Value(perfect),
+      good: Value(good),
+      miss: Value(miss),
+    );
+  }
+
+  factory Fight.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Fight(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      family: $FightsTable.$converterfamily.fromJson(
+        serializer.fromJson<String>(json['family']),
+      ),
+      tier: serializer.fromJson<int>(json['tier']),
+      storyMode: serializer.fromJson<bool>(json['storyMode']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      endedAt: serializer.fromJson<DateTime?>(json['endedAt']),
+      result: $FightsTable.$converterresultn.fromJson(
+        serializer.fromJson<String?>(json['result']),
+      ),
+      perfect: serializer.fromJson<int>(json['perfect']),
+      good: serializer.fromJson<int>(json['good']),
+      miss: serializer.fromJson<int>(json['miss']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'family': serializer.toJson<String>(
+        $FightsTable.$converterfamily.toJson(family),
+      ),
+      'tier': serializer.toJson<int>(tier),
+      'storyMode': serializer.toJson<bool>(storyMode),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'endedAt': serializer.toJson<DateTime?>(endedAt),
+      'result': serializer.toJson<String?>(
+        $FightsTable.$converterresultn.toJson(result),
+      ),
+      'perfect': serializer.toJson<int>(perfect),
+      'good': serializer.toJson<int>(good),
+      'miss': serializer.toJson<int>(miss),
+    };
+  }
+
+  Fight copyWith({
+    int? id,
+    int? profileId,
+    BossFamily? family,
+    int? tier,
+    bool? storyMode,
+    DateTime? startedAt,
+    Value<DateTime?> endedAt = const Value.absent(),
+    Value<FightResult?> result = const Value.absent(),
+    int? perfect,
+    int? good,
+    int? miss,
+  }) => Fight(
+    id: id ?? this.id,
+    profileId: profileId ?? this.profileId,
+    family: family ?? this.family,
+    tier: tier ?? this.tier,
+    storyMode: storyMode ?? this.storyMode,
+    startedAt: startedAt ?? this.startedAt,
+    endedAt: endedAt.present ? endedAt.value : this.endedAt,
+    result: result.present ? result.value : this.result,
+    perfect: perfect ?? this.perfect,
+    good: good ?? this.good,
+    miss: miss ?? this.miss,
+  );
+  Fight copyWithCompanion(FightsCompanion data) {
+    return Fight(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      family: data.family.present ? data.family.value : this.family,
+      tier: data.tier.present ? data.tier.value : this.tier,
+      storyMode: data.storyMode.present ? data.storyMode.value : this.storyMode,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      endedAt: data.endedAt.present ? data.endedAt.value : this.endedAt,
+      result: data.result.present ? data.result.value : this.result,
+      perfect: data.perfect.present ? data.perfect.value : this.perfect,
+      good: data.good.present ? data.good.value : this.good,
+      miss: data.miss.present ? data.miss.value : this.miss,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Fight(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('family: $family, ')
+          ..write('tier: $tier, ')
+          ..write('storyMode: $storyMode, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('result: $result, ')
+          ..write('perfect: $perfect, ')
+          ..write('good: $good, ')
+          ..write('miss: $miss')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    profileId,
+    family,
+    tier,
+    storyMode,
+    startedAt,
+    endedAt,
+    result,
+    perfect,
+    good,
+    miss,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Fight &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.family == this.family &&
+          other.tier == this.tier &&
+          other.storyMode == this.storyMode &&
+          other.startedAt == this.startedAt &&
+          other.endedAt == this.endedAt &&
+          other.result == this.result &&
+          other.perfect == this.perfect &&
+          other.good == this.good &&
+          other.miss == this.miss);
+}
+
+class FightsCompanion extends UpdateCompanion<Fight> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<BossFamily> family;
+  final Value<int> tier;
+  final Value<bool> storyMode;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> endedAt;
+  final Value<FightResult?> result;
+  final Value<int> perfect;
+  final Value<int> good;
+  final Value<int> miss;
+  const FightsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.family = const Value.absent(),
+    this.tier = const Value.absent(),
+    this.storyMode = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.endedAt = const Value.absent(),
+    this.result = const Value.absent(),
+    this.perfect = const Value.absent(),
+    this.good = const Value.absent(),
+    this.miss = const Value.absent(),
+  });
+  FightsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required BossFamily family,
+    required int tier,
+    this.storyMode = const Value.absent(),
+    required DateTime startedAt,
+    this.endedAt = const Value.absent(),
+    this.result = const Value.absent(),
+    this.perfect = const Value.absent(),
+    this.good = const Value.absent(),
+    this.miss = const Value.absent(),
+  }) : profileId = Value(profileId),
+       family = Value(family),
+       tier = Value(tier),
+       startedAt = Value(startedAt);
+  static Insertable<Fight> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? family,
+    Expression<int>? tier,
+    Expression<bool>? storyMode,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? endedAt,
+    Expression<String>? result,
+    Expression<int>? perfect,
+    Expression<int>? good,
+    Expression<int>? miss,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (family != null) 'family': family,
+      if (tier != null) 'tier': tier,
+      if (storyMode != null) 'story_mode': storyMode,
+      if (startedAt != null) 'started_at': startedAt,
+      if (endedAt != null) 'ended_at': endedAt,
+      if (result != null) 'result': result,
+      if (perfect != null) 'perfect': perfect,
+      if (good != null) 'good': good,
+      if (miss != null) 'miss': miss,
+    });
+  }
+
+  FightsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? profileId,
+    Value<BossFamily>? family,
+    Value<int>? tier,
+    Value<bool>? storyMode,
+    Value<DateTime>? startedAt,
+    Value<DateTime?>? endedAt,
+    Value<FightResult?>? result,
+    Value<int>? perfect,
+    Value<int>? good,
+    Value<int>? miss,
+  }) {
+    return FightsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      family: family ?? this.family,
+      tier: tier ?? this.tier,
+      storyMode: storyMode ?? this.storyMode,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      result: result ?? this.result,
+      perfect: perfect ?? this.perfect,
+      good: good ?? this.good,
+      miss: miss ?? this.miss,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (family.present) {
+      map['family'] = Variable<String>(
+        $FightsTable.$converterfamily.toSql(family.value),
+      );
+    }
+    if (tier.present) {
+      map['tier'] = Variable<int>(tier.value);
+    }
+    if (storyMode.present) {
+      map['story_mode'] = Variable<bool>(storyMode.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (endedAt.present) {
+      map['ended_at'] = Variable<DateTime>(endedAt.value);
+    }
+    if (result.present) {
+      map['result'] = Variable<String>(
+        $FightsTable.$converterresultn.toSql(result.value),
+      );
+    }
+    if (perfect.present) {
+      map['perfect'] = Variable<int>(perfect.value);
+    }
+    if (good.present) {
+      map['good'] = Variable<int>(good.value);
+    }
+    if (miss.present) {
+      map['miss'] = Variable<int>(miss.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FightsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('family: $family, ')
+          ..write('tier: $tier, ')
+          ..write('storyMode: $storyMode, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('endedAt: $endedAt, ')
+          ..write('result: $result, ')
+          ..write('perfect: $perfect, ')
+          ..write('good: $good, ')
+          ..write('miss: $miss')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2288,6 +2998,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CompletionsTable completions = $CompletionsTable(this);
   late final $PointLedgerTable pointLedger = $PointLedgerTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
+  late final $FightsTable fights = $FightsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2298,6 +3009,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     completions,
     pointLedger,
     settings,
+    fights,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -2352,6 +3064,25 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_pointLedgerRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$FightsTable, List<Fight>> _fightsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.fights,
+    aliasName: 'profiles__id__fights__profile_id',
+  );
+
+  $$FightsTableProcessedTableManager get fightsRefs {
+    final manager = $$FightsTableTableManager(
+      $_db,
+      $_db.fights,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_fightsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2428,6 +3159,31 @@ class $$ProfilesTableFilterComposer
           }) => $$PointLedgerTableFilterComposer(
             $db: $db,
             $table: $db.pointLedger,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> fightsRefs(
+    Expression<bool> Function($$FightsTableFilterComposer f) f,
+  ) {
+    final $$FightsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.fights,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FightsTableFilterComposer(
+            $db: $db,
+            $table: $db.fights,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2538,6 +3294,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> fightsRefs<T extends Object>(
+    Expression<T> Function($$FightsTableAnnotationComposer a) f,
+  ) {
+    final $$FightsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.fights,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$FightsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.fights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -2553,7 +3334,11 @@ class $$ProfilesTableTableManager
           $$ProfilesTableUpdateCompanionBuilder,
           (Profile, $$ProfilesTableReferences),
           Profile,
-          PrefetchHooks Function({bool completionsRefs, bool pointLedgerRefs})
+          PrefetchHooks Function({
+            bool completionsRefs,
+            bool pointLedgerRefs,
+            bool fightsRefs,
+          })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
     : super(
@@ -2599,12 +3384,17 @@ class $$ProfilesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({completionsRefs = false, pointLedgerRefs = false}) {
+              ({
+                completionsRefs = false,
+                pointLedgerRefs = false,
+                fightsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (completionsRefs) db.completions,
                     if (pointLedgerRefs) db.pointLedger,
+                    if (fightsRefs) db.fights,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -2649,6 +3439,26 @@ class $$ProfilesTableTableManager
                           referencedColumn: 'profile_id',
                           typedResults: items,
                         ),
+                      if (fightsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Profile,
+                          $ProfilesTable,
+                          Fight,
+                          $FightsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._fightsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).fightsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'profile_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -2669,7 +3479,11 @@ typedef $$ProfilesTableProcessedTableManager =
       $$ProfilesTableUpdateCompanionBuilder,
       (Profile, $$ProfilesTableReferences),
       Profile,
-      PrefetchHooks Function({bool completionsRefs, bool pointLedgerRefs})
+      PrefetchHooks Function({
+        bool completionsRefs,
+        bool pointLedgerRefs,
+        bool fightsRefs,
+      })
     >;
 typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<int> id,
@@ -2688,6 +3502,7 @@ typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatStart,
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
+  Value<BossFamily?> bossFamily,
 });
 typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<int> id,
@@ -2706,6 +3521,7 @@ typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatStart,
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
+  Value<BossFamily?> bossFamily,
 });
 
 final class $$ChoresTableReferences
@@ -2819,6 +3635,12 @@ class $$ChoresTableFilterComposer
   ColumnFilters<int> get reminderMinutes => $composableBuilder(
     column: $table.reminderMinutes,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BossFamily?, BossFamily, String>
+  get bossFamily => $composableBuilder(
+    column: $table.bossFamily,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   Expression<bool> completionsRefs(
@@ -2935,6 +3757,11 @@ class $$ChoresTableOrderingComposer
     column: $table.reminderMinutes,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get bossFamily => $composableBuilder(
+    column: $table.bossFamily,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChoresTableAnnotationComposer
@@ -3015,6 +3842,12 @@ class $$ChoresTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumnWithTypeConverter<BossFamily?, String> get bossFamily =>
+      $composableBuilder(
+        column: $table.bossFamily,
+        builder: (column) => column,
+      );
+
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
   ) {
@@ -3085,6 +3918,7 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatStart = const Value.absent(),
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
+                Value<BossFamily?> bossFamily = const Value.absent(),
               }) => ChoresCompanion(
                 id: id,
                 seedKey: seedKey,
@@ -3102,6 +3936,7 @@ class $$ChoresTableTableManager
                 repeatStart: repeatStart,
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
+                bossFamily: bossFamily,
               ),
           createCompanionCallback:
               ({
@@ -3121,6 +3956,7 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatStart = const Value.absent(),
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
+                Value<BossFamily?> bossFamily = const Value.absent(),
               }) => ChoresCompanion.insert(
                 id: id,
                 seedKey: seedKey,
@@ -3138,6 +3974,7 @@ class $$ChoresTableTableManager
                 repeatStart: repeatStart,
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
+                bossFamily: bossFamily,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4265,6 +5102,429 @@ typedef $$SettingsTableProcessedTableManager =
       SettingEntry,
       PrefetchHooks Function()
     >;
+typedef $$FightsTableCreateCompanionBuilder = FightsCompanion Function({
+  Value<int> id,
+  required int profileId,
+  required BossFamily family,
+  required int tier,
+  Value<bool> storyMode,
+  required DateTime startedAt,
+  Value<DateTime?> endedAt,
+  Value<FightResult?> result,
+  Value<int> perfect,
+  Value<int> good,
+  Value<int> miss,
+});
+typedef $$FightsTableUpdateCompanionBuilder = FightsCompanion Function({
+  Value<int> id,
+  Value<int> profileId,
+  Value<BossFamily> family,
+  Value<int> tier,
+  Value<bool> storyMode,
+  Value<DateTime> startedAt,
+  Value<DateTime?> endedAt,
+  Value<FightResult?> result,
+  Value<int> perfect,
+  Value<int> good,
+  Value<int> miss,
+});
+
+final class $$FightsTableReferences
+    extends BaseReferences<_$AppDatabase, $FightsTable, Fight> {
+  $$FightsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('fights__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$FightsTableFilterComposer
+    extends Composer<_$AppDatabase, $FightsTable> {
+  $$FightsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BossFamily, BossFamily, String> get family =>
+      $composableBuilder(
+        column: $table.family,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<int> get tier => $composableBuilder(
+    column: $table.tier,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get storyMode => $composableBuilder(
+    column: $table.storyMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<FightResult?, FightResult, String>
+  get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get perfect => $composableBuilder(
+    column: $table.perfect,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get good => $composableBuilder(
+    column: $table.good,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get miss => $composableBuilder(
+    column: $table.miss,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FightsTableOrderingComposer
+    extends Composer<_$AppDatabase, $FightsTable> {
+  $$FightsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get family => $composableBuilder(
+    column: $table.family,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tier => $composableBuilder(
+    column: $table.tier,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get storyMode => $composableBuilder(
+    column: $table.storyMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+    column: $table.startedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endedAt => $composableBuilder(
+    column: $table.endedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get result => $composableBuilder(
+    column: $table.result,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get perfect => $composableBuilder(
+    column: $table.perfect,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get good => $composableBuilder(
+    column: $table.good,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get miss => $composableBuilder(
+    column: $table.miss,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FightsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FightsTable> {
+  $$FightsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BossFamily, String> get family =>
+      $composableBuilder(column: $table.family, builder: (column) => column);
+
+  GeneratedColumn<int> get tier =>
+      $composableBuilder(column: $table.tier, builder: (column) => column);
+
+  GeneratedColumn<bool> get storyMode =>
+      $composableBuilder(column: $table.storyMode, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endedAt =>
+      $composableBuilder(column: $table.endedAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<FightResult?, String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<int> get perfect =>
+      $composableBuilder(column: $table.perfect, builder: (column) => column);
+
+  GeneratedColumn<int> get good =>
+      $composableBuilder(column: $table.good, builder: (column) => column);
+
+  GeneratedColumn<int> get miss =>
+      $composableBuilder(column: $table.miss, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$FightsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FightsTable,
+          Fight,
+          $$FightsTableFilterComposer,
+          $$FightsTableOrderingComposer,
+          $$FightsTableAnnotationComposer,
+          $$FightsTableCreateCompanionBuilder,
+          $$FightsTableUpdateCompanionBuilder,
+          (Fight, $$FightsTableReferences),
+          Fight,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$FightsTableTableManager(_$AppDatabase db, $FightsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FightsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FightsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FightsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<BossFamily> family = const Value.absent(),
+                Value<int> tier = const Value.absent(),
+                Value<bool> storyMode = const Value.absent(),
+                Value<DateTime> startedAt = const Value.absent(),
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<FightResult?> result = const Value.absent(),
+                Value<int> perfect = const Value.absent(),
+                Value<int> good = const Value.absent(),
+                Value<int> miss = const Value.absent(),
+              }) => FightsCompanion(
+                id: id,
+                profileId: profileId,
+                family: family,
+                tier: tier,
+                storyMode: storyMode,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                result: result,
+                perfect: perfect,
+                good: good,
+                miss: miss,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int profileId,
+                required BossFamily family,
+                required int tier,
+                Value<bool> storyMode = const Value.absent(),
+                required DateTime startedAt,
+                Value<DateTime?> endedAt = const Value.absent(),
+                Value<FightResult?> result = const Value.absent(),
+                Value<int> perfect = const Value.absent(),
+                Value<int> good = const Value.absent(),
+                Value<int> miss = const Value.absent(),
+              }) => FightsCompanion.insert(
+                id: id,
+                profileId: profileId,
+                family: family,
+                tier: tier,
+                storyMode: storyMode,
+                startedAt: startedAt,
+                endedAt: endedAt,
+                result: result,
+                perfect: perfect,
+                good: good,
+                miss: miss,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FightsTable, Fight>(table),
+                  $$FightsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.profileId,
+                        referencedTable: $$FightsTableReferences
+                            ._profileIdTable(db),
+                        referencedColumn: $$FightsTableReferences
+                            ._profileIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$FightsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FightsTable,
+      Fight,
+      $$FightsTableFilterComposer,
+      $$FightsTableOrderingComposer,
+      $$FightsTableAnnotationComposer,
+      $$FightsTableCreateCompanionBuilder,
+      $$FightsTableUpdateCompanionBuilder,
+      (Fight, $$FightsTableReferences),
+      Fight,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4279,4 +5539,6 @@ class $AppDatabaseManager {
       $$PointLedgerTableTableManager(_db, _db.pointLedger);
   $$SettingsTableTableManager get settings =>
       $$SettingsTableTableManager(_db, _db.settings);
+  $$FightsTableTableManager get fights =>
+      $$FightsTableTableManager(_db, _db.fights);
 }

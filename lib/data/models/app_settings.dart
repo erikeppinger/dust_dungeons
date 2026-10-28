@@ -13,6 +13,12 @@ class AppSettings {
     this.choreReminders = true,
     this.weeklyRecap = true,
     this.monthlyRecap = true,
+    this.fightSound = true,
+    this.fightHaptics = true,
+    this.fightStoryMode = false,
+    this.avatarSkin = 0,
+    this.avatarHair = 0,
+    this.avatarCape = 0,
   });
 
   final ThemeMode themeMode;
@@ -31,6 +37,20 @@ class AppSettings {
   final bool weeklyRecap;
   final bool monthlyRecap;
 
+  /// Fight sounds (on by default).
+  final bool fightSound;
+
+  /// Vibration on each beat.
+  final bool fightHaptics;
+
+  /// Story mode: fights cannot be lost, wider timing.
+  final bool fightStoryMode;
+
+  /// Avatar choices, as indexes into the avatar palettes.
+  final int avatarSkin;
+  final int avatarHair;
+  final int avatarCape;
+
   AppSettings copyWith({
     ThemeMode? themeMode,
     bool? colorblindSafe,
@@ -41,6 +61,12 @@ class AppSettings {
     bool? choreReminders,
     bool? weeklyRecap,
     bool? monthlyRecap,
+    bool? fightSound,
+    bool? fightHaptics,
+    bool? fightStoryMode,
+    int? avatarSkin,
+    int? avatarHair,
+    int? avatarCape,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     colorblindSafe: colorblindSafe ?? this.colorblindSafe,
@@ -51,6 +77,12 @@ class AppSettings {
     choreReminders: choreReminders ?? this.choreReminders,
     weeklyRecap: weeklyRecap ?? this.weeklyRecap,
     monthlyRecap: monthlyRecap ?? this.monthlyRecap,
+    fightSound: fightSound ?? this.fightSound,
+    fightHaptics: fightHaptics ?? this.fightHaptics,
+    fightStoryMode: fightStoryMode ?? this.fightStoryMode,
+    avatarSkin: avatarSkin ?? this.avatarSkin,
+    avatarHair: avatarHair ?? this.avatarHair,
+    avatarCape: avatarCape ?? this.avatarCape,
   );
 
   @override
@@ -64,10 +96,16 @@ class AppSettings {
       other.dailySummaryMinutes == dailySummaryMinutes &&
       other.choreReminders == choreReminders &&
       other.weeklyRecap == weeklyRecap &&
-      other.monthlyRecap == monthlyRecap;
+      other.monthlyRecap == monthlyRecap &&
+      other.fightSound == fightSound &&
+      other.fightHaptics == fightHaptics &&
+      other.fightStoryMode == fightStoryMode &&
+      other.avatarSkin == avatarSkin &&
+      other.avatarHair == avatarHair &&
+      other.avatarCape == avatarCape;
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     themeMode,
     colorblindSafe,
     locale,
@@ -77,5 +115,11 @@ class AppSettings {
     choreReminders,
     weeklyRecap,
     monthlyRecap,
-  );
+    fightSound,
+    fightHaptics,
+    fightStoryMode,
+    avatarSkin,
+    avatarHair,
+    avatarCape,
+  ]);
 }

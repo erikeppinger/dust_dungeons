@@ -18,6 +18,12 @@ class SettingsRepository {
   static const _choreReminders = 'choreReminders';
   static const _weeklyRecap = 'weeklyRecap';
   static const _monthlyRecap = 'monthlyRecap';
+  static const _fightSound = 'fightSound';
+  static const _fightHaptics = 'fightHaptics';
+  static const _fightStoryMode = 'fightStoryMode';
+  static const _avatarSkin = 'avatarSkin';
+  static const _avatarHair = 'avatarHair';
+  static const _avatarCape = 'avatarCape';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -44,6 +50,12 @@ class SettingsRepository {
       choreReminders: flag(_choreReminders, defaults.choreReminders),
       weeklyRecap: flag(_weeklyRecap, defaults.weeklyRecap),
       monthlyRecap: flag(_monthlyRecap, defaults.monthlyRecap),
+      fightSound: flag(_fightSound, defaults.fightSound),
+      fightHaptics: flag(_fightHaptics, defaults.fightHaptics),
+      fightStoryMode: flag(_fightStoryMode, defaults.fightStoryMode),
+      avatarSkin: int.tryParse(map[_avatarSkin] ?? '') ?? defaults.avatarSkin,
+      avatarHair: int.tryParse(map[_avatarHair] ?? '') ?? defaults.avatarHair,
+      avatarCape: int.tryParse(map[_avatarCape] ?? '') ?? defaults.avatarCape,
     );
   }
 
@@ -64,6 +76,12 @@ class SettingsRepository {
     await _put(_choreReminders, '${settings.choreReminders}');
     await _put(_weeklyRecap, '${settings.weeklyRecap}');
     await _put(_monthlyRecap, '${settings.monthlyRecap}');
+    await _put(_fightSound, '${settings.fightSound}');
+    await _put(_fightHaptics, '${settings.fightHaptics}');
+    await _put(_fightStoryMode, '${settings.fightStoryMode}');
+    await _put(_avatarSkin, '${settings.avatarSkin}');
+    await _put(_avatarHair, '${settings.avatarHair}');
+    await _put(_avatarCape, '${settings.avatarCape}');
   });
 
   Future<void> _put(String key, String value) => _db

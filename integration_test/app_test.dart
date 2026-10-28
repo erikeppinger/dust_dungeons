@@ -74,6 +74,12 @@ void main() {
       await tester.tap(find.text('Week'));
       await tester.pumpAndSettle();
 
+      // World: the bosses and the hero.
+      await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+      await tester.pumpAndSettle();
+      expect(find.text('Dust Bunny King'), findsOneWidget);
+      expect(find.text('Customize'), findsOneWidget);
+
       // Stats: level card and points explanation.
       await tester.tap(find.widgetWithText(NavigationDestination, 'Stats'));
       await tester.pumpAndSettle();

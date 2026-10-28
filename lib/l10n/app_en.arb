@@ -9,16 +9,6 @@
   "navWorld": "World",
   "navStats": "Stats",
   "navSettings": "Settings",
-  "comingInVersion": "Coming in version {version}",
-  "@comingInVersion": {
-    "placeholders": {
-      "version": {
-        "type": "String",
-        "example": "0.1.0"
-      }
-    }
-  },
-  "worldPlaceholder": "Spend your points to grow your world.",
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",
   "themeSystem": "System",
@@ -452,5 +442,223 @@
         "type": "String"
       }
     }
-  }
+  },
+  "bossDust": "Dust Bunny King",
+  "bossLaundry": "Laundry Hydra",
+  "bossKitchen": "Sink Kraken",
+  "bossBath": "Porcelain Golem",
+  "bossTrash": "Trash Titan",
+  "bossBedroom": "Pillow Phantom",
+  "bossOutside": "Window Wraith",
+  "bossClutter": "Clutter Imp",
+  "bossSourceDust": "dusting, floors",
+  "bossSourceLaundry": "laundry, ironing",
+  "bossSourceKitchen": "dishes, kitchen",
+  "bossSourceBath": "bathroom, toilet",
+  "bossSourceTrash": "trash, recycling",
+  "bossSourceBedroom": "beds, tidying",
+  "bossSourceOutside": "windows, plants, errands",
+  "bossSourceClutter": "your own chores",
+  "trophyDust": "Golden Feather Duster",
+  "trophyClutter": "Tidy Crown",
+  "trophyGeneric": "{boss} trophy",
+  "@trophyGeneric": {
+    "placeholders": {
+      "boss": {
+        "type": "String"
+      }
+    }
+  },
+  "fightGetReady": "Get ready…",
+  "fightListen": "{n, plural, =1{Listen · 1 beat} other{Listen · {n} beats}}",
+  "@fightListen": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fightYourTurn": "Your turn · after the tick",
+  "fightJudged": "Perfect {perfect} · Good {good} · Miss {miss}",
+  "@fightJudged": {
+    "placeholders": {
+      "perfect": {
+        "type": "int"
+      },
+      "good": {
+        "type": "int"
+      },
+      "miss": {
+        "type": "int"
+      }
+    }
+  },
+  "fightTierPhase": "Tier {tier} · phase {phase} of 2",
+  "@fightTierPhase": {
+    "placeholders": {
+      "tier": {
+        "type": "int"
+      },
+      "phase": {
+        "type": "int"
+      }
+    }
+  },
+  "fightCleaned": "Cleaned",
+  "fightCombo": "Combo × {n}",
+  "@fightCombo": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fightPad": "TAP",
+  "fightPadWait": "wait for your turn",
+  "fightHealth": "Health {hp} of {max}",
+  "@fightHealth": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "fightLeaveTitle": "Leave the fight?",
+  "fightLeaveBody": "The token for this fight is used up.",
+  "fightLeave": "Leave",
+  "fightStay": "Keep fighting",
+  "fightAbandoned": "The fight was stopped because the app left the screen. The token is used up.",
+  "fightWonTitle": "{boss} cleaned!",
+  "@fightWonTitle": {
+    "placeholders": {
+      "boss": {
+        "type": "String"
+      }
+    }
+  },
+  "fightLostTitle": "{boss} got away",
+  "@fightLostTitle": {
+    "placeholders": {
+      "boss": {
+        "type": "String"
+      }
+    }
+  },
+  "fightNewTrophy": "New trophy: {name}",
+  "@fightNewTrophy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fightTrophyAgain": "{name} · won {wins}×",
+  "@fightTrophyAgain": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "wins": {
+        "type": "int"
+      }
+    }
+  },
+  "fightLostHint": "Try again with another token. Story mode in the fight settings makes it easier.",
+  "fightAccuracy": "Accuracy",
+  "fightBestCombo": "Best combo",
+  "hitPerfect": "Perfect",
+  "hitGood": "Good",
+  "hitMiss": "Miss",
+  "fightNoPoints": "Fights never give points: those come from chores only.",
+  "fightBack": "Back to World",
+  "fightAgain": "{n, plural, =1{Fight again · 1 token left} other{Fight again · {n} tokens left}}",
+  "@fightAgain": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "worldTokens": "{n, plural, =1{1 token} other{{n} tokens}}",
+  "@worldTokens": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "worldTokenCount": "× {n}",
+  "@worldTokenCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "worldHeroLevel": "Level {level} hero",
+  "@worldHeroLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "worldHeroStats": "HP {hp} · damage {damage}",
+  "@worldHeroStats": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "damage": {
+        "type": "int"
+      }
+    }
+  },
+  "worldCustomize": "Customize",
+  "worldBosses": "Bosses",
+  "worldFight": "Fight",
+  "worldNoTokens": "Do a chore for a token",
+  "worldComingSoon": "Arrives in 0.5.1",
+  "worldTier": "Tier {tier}",
+  "@worldTier": {
+    "placeholders": {
+      "tier": {
+        "type": "int"
+      }
+    }
+  },
+  "worldTrophies": "Trophy shelf",
+  "worldNoTrophies": "No trophies yet. Win a fight to get the first one!",
+  "worldTrophyWins": "Won {n}× · best accuracy {accuracy} %",
+  "@worldTrophyWins": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "avatarTitle": "Customize hero",
+  "avatarSkin": "Skin",
+  "avatarHair": "Hair",
+  "avatarCape": "Cape",
+  "avatarOption": "option {n}",
+  "@avatarOption": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "avatarMoreSoon": "More items arrive with the shop in 0.5.1.",
+  "settingsFights": "Boss fights",
+  "fightSettingSound": "Sound",
+  "fightSettingHaptics": "Vibration on each beat",
+  "fightSettingStory": "Story mode",
+  "fightSettingStorySubtitle": "Fights can't be lost, and the timing is more forgiving"
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../chores/manage_chores_screen.dart';
+import '../fight/fight_settings.dart';
 import '../notifications/notification_settings.dart';
 import 'settings_controller.dart';
 import 'settings_pages.dart';
@@ -29,6 +30,11 @@ class SettingsScreen extends ConsumerWidget {
         : permitted
         ? l10n.stateOn
         : l10n.notifBlockedShort;
+    final fights = [
+      if (settings.fightSound) l10n.fightSettingSound,
+      if (settings.fightHaptics) l10n.fightSettingHaptics,
+      if (settings.fightStoryMode) l10n.fightSettingStory,
+    ];
     final language =
         languageNames[settings.locale?.languageCode] ?? l10n.languageSystem;
 
@@ -64,6 +70,16 @@ class SettingsScreen extends ConsumerWidget {
             context,
             (l) => l.settingsNotifications,
             const NotificationSettings(),
+          ),
+        ),
+        _Entry(
+          icon: Icons.sports_martial_arts,
+          title: l10n.settingsFights,
+          subtitle: fights.isEmpty ? l10n.stateOff : fights.join(' · '),
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsFights,
+            const FightSettings(),
           ),
         ),
         _Entry(

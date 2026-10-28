@@ -2,9 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day_clock.dart';
 import 'db/app_database.dart';
+import 'models/fight_progress.dart';
 import 'models/progress_stats.dart';
 import 'models/scheduled_chore.dart';
 import 'repositories/chore_repository.dart';
+import 'repositories/fight_repository.dart';
 import 'repositories/progress_repository.dart';
 import 'repositories/settings_repository.dart';
 
@@ -118,3 +120,26 @@ final allCompletionsProvider = StreamProvider<List<Completion>>(
       .watch(progressRepositoryProvider)
       .watchAllCompletions(ref.watch(currentProfileIdProvider)),
 );
+
+final fightRepositoryProvider = Provider(
+  (ref) => FightRepository(ref.watch(databaseProvider)),
+);
+
+final fightsProvider = StreamProvider<List<Fight>>(
+  (ref) => ref
+      .watch(fightRepositoryProvider)
+      .watchAll(ref.watch(currentProfileIdProvider)),
+);
+
+/// Tokens, wins and tiers per boss family.
+final fightProgressProvider = Provider<AsyncValue<FightProgress>>((ref) {
+  final completions = ref.watch(allCompletionsProvider);
+  final chores = ref.watch(allChoresProvider);
+  final fights = ref.watch(fightsProvider);
+  for (final value in [completions, chores, fights]) {
+    if (value.hasError) return AsyncError(value.error!, value.stackTrace!);
+  }
+  final c = completions.value, ch = chores.value, f = fights.value;
+  if (c == null || ch == null || f == null) return const AsyncLoading();
+  return AsyncData(FightProgress(completions: c, chores: ch, fights: f));
+});

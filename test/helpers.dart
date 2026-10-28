@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/core/day_clock.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/features/fight/fight_sounds.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/features/notifications/notification_service.dart';
 import 'package:homework_and_chores/main.dart';
@@ -81,7 +82,10 @@ Future<AppDatabase> pumpApp(
     () => bootstrap(
       database,
       notifications: notifications ?? FakeNotificationService(),
-      overrides: [todayProvider.overrideWith(FixedToday.new)],
+      overrides: [
+        todayProvider.overrideWith(FixedToday.new),
+        fightSoundsProvider.overrideWithValue(SilentFightSounds()),
+      ],
     ),
   );
   await tester.pumpWidget(app!);

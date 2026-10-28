@@ -3,6 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../domain/default_chores.dart';
+import '../../domain/fight/boss.dart';
 import '../../domain/recurrence.dart';
 import 'tables.dart';
 
@@ -10,7 +11,9 @@ export 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Profiles, Chores, Completions, PointLedger, Settings])
+@DriftDatabase(
+  tables: [Profiles, Chores, Completions, PointLedger, Settings, Fights],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor, {DateTime Function()? clock})
     : _clock = clock ?? DateTime.now;
@@ -33,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +61,12 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         // v3: optional per-chore reminder time.
         await m.addColumn(chores, chores.reminderMinutes);
+      }
+      if (from < 4) {
+        // v4: boss fights. Tokens are derived, so nothing to backfill:
+        // every past completion already counts as an earned token.
+        await m.addColumn(chores, chores.bossFamily);
+        await m.createTable(fights);
       }
     },
     beforeOpen: (details) async {
@@ -98,6 +107,11 @@ class AppDatabase extends _$AppDatabase {
             .getSingle();
     return first.id;
   }
+}
+
+/// Boss family of a stored chore.
+extension ChoreFamily on Chore {
+  BossFamily get family => bossFamily ?? familyOfSeed(seedKey);
 }
 
 /// Schedule of a stored chore.

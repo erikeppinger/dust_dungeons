@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 
+import '../../domain/fight/boss.dart';
 import '../../domain/recurrence.dart';
 
+export '../../domain/fight/boss.dart' show BossFamily;
 export '../../domain/recurrence.dart' show RepeatType;
 
 /// A person using the app. 0.1 uses a single default profile; switching arrives in 0.8.
@@ -44,6 +46,10 @@ class Chores extends Table {
 
   /// Reminder on due days, as minutes after midnight (schema v3); `null` = off.
   IntColumn get reminderMinutes => integer().nullable()();
+
+  /// Boss family for fight tokens (schema v4); `null` = the default for the
+  /// built-in chore, or the Clutter Imp for user chores.
+  TextColumn get bossFamily => textEnum<BossFamily>().nullable()();
 }
 
 /// One time a chore was done. Undo sets [undoneAt] instead of deleting the row.
@@ -68,6 +74,25 @@ class PointLedger extends Table {
   IntColumn get completionId =>
       integer().nullable().references(Completions, #id)();
   DateTimeColumn get createdAt => dateTime()();
+}
+
+enum FightResult { won, lost, abandoned }
+
+/// One boss fight (schema v4). Starting a fight spends a token of its
+/// family; [result] stays `null` while it runs (or if the app was killed,
+/// which counts as abandoned).
+class Fights extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get profileId => integer().references(Profiles, #id)();
+  TextColumn get family => textEnum<BossFamily>()();
+  IntColumn get tier => integer()();
+  BoolColumn get storyMode => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get startedAt => dateTime()();
+  DateTimeColumn get endedAt => dateTime().nullable()();
+  TextColumn get result => textEnum<FightResult>().nullable()();
+  IntColumn get perfect => integer().withDefault(const Constant(0))();
+  IntColumn get good => integer().withDefault(const Constant(0))();
+  IntColumn get miss => integer().withDefault(const Constant(0))();
 }
 
 /// Simple key/value store for app settings.

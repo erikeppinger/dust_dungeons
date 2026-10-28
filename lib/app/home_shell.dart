@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/widgets/coming_soon.dart';
 import '../features/chores/today_screen.dart';
 import '../features/plan/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stats/stats_screen.dart';
+import '../features/world/world_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'home_tab.dart';
 
@@ -32,11 +32,7 @@ class HomeShell extends ConsumerWidget {
         children: [
           const TodayScreen(),
           const PlanScreen(),
-          ComingSoon(
-            icon: Icons.public,
-            message: l10n.worldPlaceholder,
-            version: '0.5.0',
-          ),
+          const WorldScreen(),
           const StatsScreen(),
           const SettingsScreen(),
         ],

@@ -7,6 +7,7 @@ import 'package:homework_and_chores/features/chores/chore_edit_screen.dart';
 import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
+import 'package:homework_and_chores/features/world/world_screen.dart';
 import 'package:homework_and_chores/main.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -232,6 +233,120 @@ void main() {
     notifications.onTap!(NotificationTarget.stats);
     await tester.pumpAndSettle();
     expect(find.widgetWithText(AppBar, 'Stats'), findsOneWidget);
+  });
+
+  testWidgets('a chore earns a token; leaving a fight uses it up', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    Finder dustCard() => find.byKey(const ValueKey('boss-dust'));
+
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dust Bunny King'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: dustCard(),
+        matching: find.text('Do a chore for a token'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Arrives in 0.5.1'), findsWidgets);
+
+    // Dusting belongs to the dust family: one token.
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dusting'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: dustCard(), matching: find.text('× 1')),
+      findsOneWidget,
+    );
+
+    final fight = find.descendant(of: dustCard(), matching: find.text('Fight'));
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    // A double tap must start only one fight.
+    await tester.tap(fight);
+    await tester.tap(fight, warnIfMissed: false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Get ready…'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Leave the fight?'), findsOneWidget);
+    // "Keep fighting" goes back to the fight, which starts a fresh round.
+    await tester.tap(find.text('Keep fighting'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Get ready…'), findsOneWidget);
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Leave'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: dustCard(),
+        matching: find.text('Do a chore for a token'),
+      ),
+      findsOneWidget,
+    );
+    final fights = await tester.runAsync(() => db.select(db.fights).get());
+    expect(fights!.single.family, BossFamily.dust);
+    expect(fights.single.result, FightResult.abandoned);
+  });
+
+  testWidgets('the hero can be customized and the choice is saved', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Customize'));
+    await tester.pumpAndSettle();
+    expect(find.text('Customize hero'), findsOneWidget);
+
+    await tester.ensureVisible(find.byKey(const ValueKey('cape-2')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('cape-2')));
+    await tester.pumpAndSettle();
+
+    final saved = await tester.runAsync(() => SettingsRepository(db).load());
+    expect(saved!.avatarCape, 2);
+  });
+
+  testWidgets('fight settings are reachable from World and saved', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Boss fights'),
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(WorldScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(find.text('Boss fights'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Boss fights'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Story mode'));
+    await tester.pumpAndSettle();
+
+    final saved = await tester.runAsync(() => SettingsRepository(db).load());
+    expect(saved!.fightStoryMode, isTrue);
+    expect(saved.fightSound, isTrue, reason: 'sound is on by default');
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

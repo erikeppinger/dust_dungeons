@@ -6,22 +6,23 @@ import 'package:homework_and_chores/domain/default_chores.dart';
 import 'generated_migrations/schema.dart';
 import 'generated_migrations/schema_v1.dart' as v1;
 import 'generated_migrations/schema_v2.dart' as v2;
+import 'generated_migrations/schema_v3.dart' as v3;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2]) {
-    test('v$from -> v3 produces the current schema', () async {
+  for (final from in [1, 2, 3]) {
+    test('v$from -> v4 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 3);
+      await verifier.migrateAndValidate(db, 4);
       await db.close();
     });
   }
 
-  test('v1 -> v3 keeps data and gives built-in chores a rhythm', () async {
+  test('v1 -> v4 keeps data and gives built-in chores a rhythm', () async {
     final schema = await verifier.schemaAt(1);
     final old = v1.DatabaseAtV1(schema.newConnection());
     await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
@@ -64,7 +65,7 @@ void main() {
     expect((await db.select(db.pointLedger).get()).single.delta, 15);
   });
 
-  test('v2 -> v3 keeps schedules; reminders start switched off', () async {
+  test('v2 -> v4 keeps schedules; reminders start switched off', () async {
     final schema = await verifier.schemaAt(2);
     final old = v2.DatabaseAtV2(schema.newConnection());
     await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
@@ -84,5 +85,31 @@ void main() {
     expect(chore.recurrence.interval, 2);
     expect(chore.recurrence.weekdays, {DateTime.monday, DateTime.thursday});
     expect(chore.reminderMinutes, isNull);
+  });
+
+  test('v3 -> v4: past completions become tokens, no fights yet', () async {
+    final schema = await verifier.schemaAt(3);
+    final old = v3.DatabaseAtV3(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO chores (seed_key, icon_key, color_key, base_points, '
+      "sort_order, reminder_minutes) VALUES ('dusting', 'auto_awesome', 6, 15, 0, 540)",
+    );
+    await old.customStatement(
+      'INSERT INTO completions (chore_id, profile_id, completed_at, '
+      "points_awarded) VALUES (1, 1, '2026-10-27T09:00:00.000', 15)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final dusting = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.seedKey == 'dusting',
+    );
+    expect(dusting.bossFamily, isNull);
+    expect(dusting.family, BossFamily.dust);
+    expect(dusting.reminderMinutes, 540);
+    expect(await db.select(db.fights).get(), isEmpty);
+    expect(await db.select(db.completions).get(), hasLength(1));
   });
 }
