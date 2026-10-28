@@ -41,10 +41,26 @@ class FightProgress {
         for (final f in fights)
           if (f.result == FightResult.won) (f.family, f.startedAt),
       ],
+      [
+        ...completions.map((c) => c.completedAt),
+        ...fights.map((f) => f.startedAt),
+      ].fold<DateTime?>(
+        null,
+        (first, d) => first == null || d.isBefore(first) ? d : first,
+      ),
     );
   }
 
-  FightProgress._(this._balance, this._wins, this._bestAccuracy, this._won);
+  FightProgress._(
+    this._balance,
+    this._wins,
+    this._bestAccuracy,
+    this._won,
+    this._firstActivity,
+  );
+
+  /// The first completion or fight, `null` without any history.
+  final DateTime? _firstActivity;
 
   final Map<BossFamily, int> _balance;
   final Map<BossFamily, int> _wins;
@@ -101,4 +117,29 @@ class FightProgress {
   /// week ends.
   bool overlordReady(DateTime today) =>
       weekWins(today) >= overlordWinsNeeded && !overlordBeaten(today);
+
+  /// Every week from the first activity to [today]'s, oldest first, for the
+  /// realm: the chore-boss wins in order and whether the Overlord fell.
+  List<WeekRecord> weekHistory(DateTime today) {
+    final last = weekStartOf(today);
+    final first = _firstActivity == null ? last : weekStartOf(_firstActivity);
+    return [
+      for (
+        var monday = first.isAfter(last) ? last : first;
+        !monday.isAfter(last);
+        monday = addDays(monday, 7)
+      )
+        WeekRecord(monday, weekWinFamilies(monday), overlordBeaten(monday)),
+    ];
+  }
+}
+
+/// One week of the realm: its Monday, the chore-boss wins in order and
+/// whether the Overlord was beaten.
+class WeekRecord {
+  const WeekRecord(this.monday, this.wins, this.beaten);
+
+  final DateTime monday;
+  final List<BossFamily> wins;
+  final bool beaten;
 }

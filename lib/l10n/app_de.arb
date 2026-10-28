@@ -307,5 +307,15 @@
   "onboardingSkip": "Überspringen",
   "onboardingDone": "Los geht's",
   "onboardingStep": "Schritt {n} von {total}",
-  "aboutReplayIntro": "Einführung erneut zeigen"
+  "aboutReplayIntro": "Einführung erneut zeigen",
+  "statsRealm": "Dein Reich",
+  "realmWeeks": "Erkundete Wochen",
+  "realmCrowns": "Wochenkronen",
+  "realmLairs": "Bezwungene Höhlen",
+  "realmMonth": "Monat",
+  "realmYear": "Jahr",
+  "realmHint": "Tippe auf eine Woche, um sie anzusehen.",
+  "realmWeekLabel": "KW {week}",
+  "realmWeekProgress": "KW {week}: {lairs} von {total} Höhlen bezwungen",
+  "realmWeekBeaten": "KW {week}: Overlord besiegt"
 }

@@ -8,6 +8,23 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-28
+### Added
+- **A new quest map every week.** The map is generated from the week number, so it stays the same Monday
+  to Sunday and changes when the Overlord's week resets. Any past week can be redrawn exactly as it was.
+  - Lakes, forests, hills, mountains and dunes move around.
+  - The camp, the five lairs and the castle are placed fresh each week.
+  - The road finds its way around water and mountains, crossing on bridges where it must.
+- **Your realm (Hall of Fame):** every week since your first chore, joined into one world.
+  - Each week is a window onto the same endless land: lakes and forests run on across the seams, each
+    castle's road leads on to the next week's camp, and the ground blends where the season changes.
+  - Month: a strip of weeks to scroll through, starting at this week, with your hero and the bosses you beat.
+  - Year: all weeks small, four to a row. Tap one to open it in the strip.
+  - Counts weeks explored, Crowns of the Week and lairs cleared, all from the fight history the app already
+    stores.
+- **Seasonal looks:** snow from December to February, autumn colors from September to November, and meadow
+  for the rest of the year. About one week in five turns into a desert instead.
+
 ## [0.6.0] - 2026-10-28
 ### Changed
 - **Game-themed names, like a pen-and-paper adventure:**
@@ -171,6 +188,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.6.1]: #
 [0.6.0]: #
 [0.5.2]: #
 [0.5.1]: #

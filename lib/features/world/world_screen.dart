@@ -6,6 +6,7 @@ import '../../core/widgets/section_header.dart';
 import '../../data/models/fight_progress.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/boss.dart';
+import '../../domain/fight/overworld.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
@@ -293,6 +294,7 @@ class _OverlordCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             QuestMap(
+              map: WeekMap.forWeek(today),
               wins: wins,
               beaten: beaten,
               semanticLabel: l10n.worldOverlordProgress(

@@ -105,7 +105,12 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Level 1'), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('How points work'), 300);
+      // The page, not the realm's sideways strip.
+      await tester.scrollUntilVisible(
+        find.text('How points work'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
 
       // Every tab opens.
       for (final tab in ['Quest Log', 'Arena', 'Hall of Fame', 'Settings']) {

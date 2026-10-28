@@ -196,4 +196,57 @@ void main() {
       expect(p.totalTokens, 1);
     });
   });
+
+  test('week history runs from the first activity to this week', () {
+    final p = FightProgress(
+      completions: [
+        Completion(
+          id: 900,
+          choreId: 1,
+          profileId: 1,
+          completedAt: DateTime(2026, 10, 14), // a Wednesday, 2 weeks back
+          pointsAwarded: 10,
+        ),
+      ],
+      chores: chores,
+      fights: [
+        fight(
+          BossFamily.dust,
+          result: FightResult.won,
+          at: DateTime(2026, 10, 15),
+        ),
+        fight(
+          BossFamily.trash,
+          result: FightResult.lost,
+          at: DateTime(2026, 10, 27),
+        ),
+        fight(
+          BossFamily.bath,
+          result: FightResult.won,
+          at: DateTime(2026, 10, 28),
+        ),
+      ],
+    );
+    final weeks = p.weekHistory(DateTime(2026, 10, 28));
+    expect(weeks.map((w) => w.monday), [
+      DateTime(2026, 10, 12),
+      DateTime(2026, 10, 19),
+      DateTime(2026, 10, 26),
+    ]);
+    expect(weeks.map((w) => w.wins), [
+      [BossFamily.dust],
+      <BossFamily>[],
+      [BossFamily.bath],
+    ]);
+    expect(weeks.every((w) => !w.beaten), isTrue);
+    expect(
+      FightProgress(
+        completions: [],
+        chores: chores,
+        fights: [],
+      ).weekHistory(DateTime(2026, 10, 28)).single.monday,
+      DateTime(2026, 10, 26),
+      reason: 'without history, just this week',
+    );
+  });
 }

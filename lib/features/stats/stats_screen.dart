@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../chores/chore_icons.dart';
 import '../chores/chore_titles.dart';
 import '../chores/schedule_text.dart';
+import 'realm_card.dart';
 
 /// Level, streaks, point totals, the last 7 days and the most done chores.
 class StatsScreen extends ConsumerWidget {
@@ -52,6 +53,8 @@ class StatsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
+              SectionHeader(l10n.statsRealm),
+              const RealmCard(),
               SectionHeader(l10n.statsPoints),
               Card(
                 child: Column(

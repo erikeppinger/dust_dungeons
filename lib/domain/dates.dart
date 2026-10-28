@@ -18,6 +18,16 @@ int daysBetween(DateTime from, DateTime to) => DateTime.utc(
 /// Monday of [day]'s week (ISO weeks).
 DateTime weekStartOf(DateTime day) => addDays(dayOf(day), 1 - day.weekday);
 
+/// ISO 8601 week of [day] as (week-based year, week 1..53): weeks start on
+/// Monday, and week 1 is the one with the year's first Thursday.
+(int, int) isoWeek(DateTime day) {
+  final thursday = addDays(dayOf(day), 4 - day.weekday);
+  return (
+    thursday.year,
+    daysBetween(DateTime(thursday.year), thursday) ~/ 7 + 1,
+  );
+}
+
 int daysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
 
 /// Calendar months from [from]'s month to [to]'s month.

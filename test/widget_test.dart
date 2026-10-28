@@ -6,6 +6,7 @@ import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/chores/chore_edit_screen.dart';
 import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/domain/dates.dart';
 import 'package:homework_and_chores/domain/fight/calibration.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/features/fight/boss_art.dart';
@@ -143,13 +144,24 @@ void main() {
     expect(find.text('Level 1'), findsOneWidget);
     expect(find.text('83 XP to level 2'), findsOneWidget);
     expect(find.text('1-day streak'), findsOneWidget);
+    // Below the realm.
+    await tester.scrollUntilVisible(
+      find.text('Last 30 days'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('17 points'), findsWidgets);
 
     await tester.scrollUntilVisible(
       find.text('Favorite quests (30 days)'),
       200,
+      scrollable: find.byType(Scrollable).first,
     );
-    await tester.scrollUntilVisible(find.text('1×'), 200);
+    await tester.scrollUntilVisible(
+      find.text('1×'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text('1×'), findsOneWidget);
   });
 
@@ -651,6 +663,82 @@ void main() {
     // One portrait per win, in order (repeats included); the lairs ahead
     // are still unexplored.
     expect(bosses, [BossFamily.trash, BossFamily.dust, BossFamily.trash]);
+    handle.dispose();
+  });
+
+  testWidgets('the Hall of Fame shows the realm by month and by year', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    final db = await tester.runAsync(() async {
+      final db = memoryDb();
+      final profile = await db.defaultProfileId();
+      final now = DateTime.now();
+      // A win three weeks ago and two this week.
+      for (final (f, daysAgo) in [
+        (BossFamily.dust, 21),
+        (BossFamily.trash, 0),
+        (BossFamily.bath, 0),
+      ]) {
+        await db
+            .into(db.fights)
+            .insert(
+              FightsCompanion.insert(
+                profileId: profile,
+                family: f,
+                tier: 1,
+                startedAt: now.subtract(Duration(days: daysAgo)),
+                result: const Value(FightResult.won),
+              ),
+            );
+      }
+      return db;
+    });
+    await pumpApp(tester, db: db);
+    await tester.tap(
+      find.widgetWithText(NavigationDestination, 'Hall of Fame'),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Your realm'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    final strip = find.byKey(const ValueKey('realm-strip'));
+    await tester.scrollUntilVisible(
+      strip,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Weeks explored'), findsOneWidget);
+    expect(find.text('Lairs cleared'), findsOneWidget);
+    // This week shows its two cleared lairs.
+    final (_, thisWeek) = isoWeek(DateTime.now());
+    expect(
+      find.bySemanticsLabel('Week $thisWeek: 2 of 5 lairs cleared'),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(find.text('Year'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Year'));
+    await tester.pumpAndSettle();
+    final year = find.byKey(const ValueKey('realm-year'));
+    expect(year, findsOneWidget);
+    // Opening the oldest week returns to the strip.
+    final (_, firstWeek) = isoWeek(
+      DateTime.now().subtract(const Duration(days: 21)),
+    );
+    final oldest = find.bySemanticsLabel(
+      'Week $firstWeek: 1 of 5 lairs cleared',
+    );
+    await tester.ensureVisible(oldest);
+    await tester.pumpAndSettle();
+    await tester.tap(oldest);
+    await tester.pumpAndSettle();
+    expect(year, findsNothing);
+    expect(strip, findsOneWidget);
     handle.dispose();
   });
 

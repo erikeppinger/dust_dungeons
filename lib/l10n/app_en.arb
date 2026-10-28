@@ -835,5 +835,42 @@
       }
     }
   },
-  "aboutReplayIntro": "Show the introduction again"
+  "aboutReplayIntro": "Show the introduction again",
+  "statsRealm": "Your realm",
+  "realmWeeks": "Weeks explored",
+  "realmCrowns": "Crowns of the Week",
+  "realmLairs": "Lairs cleared",
+  "realmMonth": "Month",
+  "realmYear": "Year",
+  "realmHint": "Tap a week to look at it.",
+  "realmWeekLabel": "Wk {week}",
+  "@realmWeekLabel": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "realmWeekProgress": "Week {week}: {lairs} of {total} lairs cleared",
+  "@realmWeekProgress": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      },
+      "lairs": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "realmWeekBeaten": "Week {week}: Overlord beaten",
+  "@realmWeekBeaten": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  }
 }
