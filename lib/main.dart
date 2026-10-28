@@ -6,9 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 
 import 'app/app.dart';
+import 'app/home_tab.dart';
 import 'data/db/app_database.dart';
 import 'data/providers.dart';
 import 'data/repositories/settings_repository.dart';
+import 'features/notifications/notification_planner.dart';
+import 'features/notifications/notification_service.dart';
+import 'features/notifications/notification_sync.dart';
 import 'features/settings/settings_controller.dart';
 import 'l10n/app_localizations.dart';
 
@@ -72,21 +76,70 @@ class StartupErrorApp extends StatelessWidget {
 }
 
 /// Opens [db], loads what the first frame needs and builds the app.
-/// Shared with tests, which pass an in-memory database and may add
-/// [overrides] (e.g. a fixed day instead of the midnight timer).
+/// Shared with tests, which pass an in-memory database, a fake
+/// [notifications] service and may add [overrides] (e.g. a fixed day).
 Future<Widget> bootstrap(
   AppDatabase db, {
+  NotificationService? notifications,
   List<Override> overrides = const [],
 }) async {
   final profileId = await db.defaultProfileId();
   final settings = await SettingsRepository(db).load();
-  return ProviderScope(
+  final service = notifications ?? LocalNotificationService();
+  final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
       currentProfileIdProvider.overrideWithValue(profileId),
       initialSettingsProvider.overrideWithValue(settings),
+      notificationServiceProvider.overrideWithValue(service),
       ...overrides,
     ],
+  );
+  void open(NotificationTarget target) =>
+      container.read(homeTabProvider.notifier).openFor(target);
+  try {
+    await service.init(onTap: open);
+    final launchedBy = await service.launchTarget();
+    if (launchedBy != null) open(launchedBy);
+  } catch (error, stack) {
+    // Notifications are optional: the app must start without them.
+    FlutterError.reportError(
+      FlutterErrorDetails(exception: error, stack: stack),
+    );
+  }
+  return _AppRoot(container: container);
+}
+
+/// Owns the provider container for the app's lifetime.
+class _AppRoot extends StatefulWidget {
+  const _AppRoot({required this.container});
+
+  final ProviderContainer container;
+
+  @override
+  State<_AppRoot> createState() => _AppRootState();
+}
+
+class _AppRootState extends State<_AppRoot> {
+  /// Keeps scheduled notifications in line with the data.
+  late final ProviderSubscription<Object?> _sync;
+
+  @override
+  void initState() {
+    super.initState();
+    _sync = syncNotifications(widget.container);
+  }
+
+  @override
+  void dispose() {
+    _sync.close();
+    widget.container.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => UncontrolledProviderScope(
+    container: widget.container,
     child: const ChoresApp(),
   );
 }

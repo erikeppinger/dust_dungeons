@@ -6,6 +6,7 @@ import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/chores/chore_edit_screen.dart';
 import 'package:homework_and_chores/features/chores/today_screen.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/main.dart';
 
 import 'helpers.dart';
@@ -141,6 +142,96 @@ void main() {
     expect(find.text('2-day streak'), findsOneWidget);
   });
 
+  testWidgets('turning on notifications asks for permission and plans', (
+    tester,
+  ) async {
+    final notifications = FakeNotificationService();
+    await pumpApp(tester, notifications: notifications);
+    expect(notifications.scheduled, isEmpty);
+
+    await _openSettings(tester);
+    await tester.scrollUntilVisible(find.text('Reminders & summaries'), 200);
+    await tester.ensureVisible(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+
+    expect(notifications.permissionRequests, 1);
+    expect(find.text('Daily summary'), findsOneWidget);
+    // Daily built-ins are due every day -> a summary is planned.
+    expect(
+      notifications.scheduled.where(
+        (n) => n.channel == NotificationChannel.summary,
+      ),
+      isNotEmpty,
+    );
+
+    await tester.scrollUntilVisible(find.text('Send a test notification'), 200);
+    await tester.ensureVisible(find.text('Send a test notification'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send a test notification'));
+    await tester.pump();
+    expect(notifications.shown.single.title, startsWith('Notifications work'));
+
+    // Turning it off clears the plan.
+    await tester.ensureVisible(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+    expect(notifications.scheduled, isEmpty);
+  });
+
+  testWidgets('denied permission keeps notifications off', (tester) async {
+    final notifications = FakeNotificationService(grantPermission: false);
+    await pumpApp(tester, notifications: notifications);
+    await _openSettings(tester);
+    await tester.scrollUntilVisible(find.text('Reminders & summaries'), 200);
+    await tester.ensureVisible(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reminders & summaries'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Notifications are blocked'), findsOneWidget);
+    expect(find.text('Daily summary'), findsNothing);
+    expect(notifications.scheduled, isEmpty);
+  });
+
+  testWidgets('a chore reminder can be switched on in the editor', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await tester.longPress(find.text('Wash the dishes'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('reminder-switch')),
+      200,
+      scrollable: _editScrollable,
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('reminder-switch')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Notifications are off'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('reminder-switch')));
+    await tester.pumpAndSettle();
+    expect(find.text('At 9:00 AM'), findsOneWidget);
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final dishes = await tester.runAsync(
+      () => (db.select(
+        db.chores,
+      )..where((c) => c.seedKey.equals('dishes'))).getSingle(),
+    );
+    expect(dishes!.reminderMinutes, 9 * 60);
+  });
+
+  testWidgets('tapping a recap notification opens Stats', (tester) async {
+    final notifications = FakeNotificationService();
+    await pumpApp(tester, notifications: notifications);
+    notifications.onTap!(NotificationTarget.stats);
+    await tester.pumpAndSettle();
+    expect(find.widgetWithText(AppBar, 'Stats'), findsOneWidget);
+  });
+
   testWidgets('startup error screen explains the problem', (tester) async {
     tester.platformDispatcher.localesTestValue = [const Locale('en')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
@@ -168,6 +259,8 @@ void main() {
       200,
       scrollable: _editScrollable,
     );
+    await tester.ensureVisible(find.byKey(const ValueKey('icon-pets')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('icon-pets')));
     await tester.pump();
     await tester.tap(find.text('Save'));
@@ -214,6 +307,8 @@ void main() {
       200,
       scrollable: _editScrollable,
     );
+    await tester.ensureVisible(find.byKey(const ValueKey('repeat-type')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('repeat-type')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Weekly on set days').last);
@@ -226,6 +321,8 @@ void main() {
       100,
       scrollable: _editScrollable,
     );
+    await tester.ensureVisible(find.byKey(ValueKey('weekday-$today')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(ValueKey('weekday-$today')));
     await tester.pump();
     await tester.tap(find.text('Save'));
@@ -265,6 +362,8 @@ void main() {
       200,
       scrollable: _editScrollable,
     );
+    await tester.ensureVisible(find.text('First due'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('First due'));
     await tester.pumpAndSettle();
     expect(find.byType(DatePickerDialog), findsOneWidget);
@@ -355,6 +454,8 @@ void main() {
     await _openSettings(tester);
 
     await tester.scrollUntilVisible(find.text('Deutsch'), 200);
+    await tester.ensureVisible(find.text('Deutsch'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Deutsch'));
     await tester.pumpAndSettle();
 

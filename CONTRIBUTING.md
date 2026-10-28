@@ -35,7 +35,12 @@ flutter build apk --release
 ```
 
 Then install the APK (`adb install -r build/app/outputs/flutter-apk/app-release.apk`) and check the changed screens by hand
-in light and dark mode.
+in light and dark mode. Check the installed `versionName`, because a failed build silently leaves the old APK in place.
+
+**Notification changes** need a check with real notifications on the device: tests use a fake service, so they cannot
+catch platform problems. Two bugs were caught this way in 0.4.0: the release build stripped the icon, and the
+emulator's "GMT" time zone was unknown. Use *Settings → Send a test notification*, and set the daily summary a few
+minutes ahead to see a scheduled one fire (`adb shell dumpsys alarm` shows what is pending).
 
 ## Commit messages
 [Conventional Commits](https://www.conventionalcommits.org): `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.

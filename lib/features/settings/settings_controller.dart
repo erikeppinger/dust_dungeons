@@ -24,6 +24,9 @@ class SettingsController extends Notifier<AppSettings> {
 
   void setLocale(Locale? locale) => _set(state.copyWith(locale: () => locale));
 
+  /// Applies any change, e.g. `update((s) => s.copyWith(weeklyRecap: false))`.
+  void update(AppSettings Function(AppSettings) change) => _set(change(state));
+
   void _set(AppSettings settings) {
     state = settings;
     // The UI updates immediately; a failed write is reported, not swallowed.

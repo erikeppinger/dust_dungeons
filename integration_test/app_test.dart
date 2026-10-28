@@ -125,6 +125,9 @@ void main() {
 
       // Language override to German and back.
       await tester.scrollUntilVisible(find.text('Deutsch'), 200);
+      // scrollUntilVisible may stop with the row half under the bottom bar.
+      await tester.ensureVisible(find.text('Deutsch'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Deutsch'));
       await tester.pumpAndSettle();
       expect(find.text('Einstellungen'), findsWidgets);

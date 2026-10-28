@@ -260,7 +260,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.1.0** ✅ | Core chores | Drift DB, seed chores (`lib/domain/default_chores.dart`), chore list, add/edit/archive, icons & colors, complete + undo, settings saved |
 | **0.2.0** ✅ | Scheduling | Recurrence engine (with heavy unit tests), Today view, week/month overview, overdue logic |
 | **0.3.0** ✅ | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
-| **0.4.0** | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
+| **0.4.0** ✅ | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
 | **0.5.0** | Progression v1 | `ProgressionTheme` interface, one placeholder theme, goal graph, spend flow, optional real-life rewards |
 | **0.6.0** | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
 | **0.7.0** | Data safety | Export/import, auto-backup folder, DB migration tests |
@@ -298,6 +298,9 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 
 ## 14. Known limits (revisit later)
 
+- **Quiet hours** (from §10) are not built yet. All notification times are user-chosen or fixed at sensible hours (summary at the chosen time, recaps 10:00/18:00), so this is low priority.
+- **Notification content is decided when planning.** Counts are right as long as nothing changes without the app being opened. Streaks are left out of recaps for this reason.
+
 - **Stats performance:** `ProgressStats` aggregates the whole completion history in Dart on every change. That is fine for the first year (a few thousand rows). If it gets slow, move the sums into SQL. Group by local day carefully: stored timestamps carry UTC offsets.
 
 ---
@@ -326,7 +329,16 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | Repo name / app ID | **`homework-and-chores`** · placeholder Android ID `io.github.changeme.homework_and_chores` | Swap in the real GitHub user (`applicationId` in `android/app/build.gradle.kts` + Kotlin package) right before the first push. Changing it installs as a separate app, which doesn't matter during dev. Permanent after the first public release |
 | Display name | **Working title only** until the genre is chosen (~0.5.0) | The name lives in the ARB files (`appTitle`), so renaming is a one-line change |
 
+### Direction for 0.5 (2026-10-28)
+- **Boss fights** are the leading genre idea: chore-themed bosses ("Dust Bunny", "Laundry Hydra") plus a weekly
+  "Chore Overlord", fought in a short original rhythm/action round (Flame engine, offline, CC0 or own assets).
+  Level sets hero strength, and points buy abilities, gear and retries.
+- **Fight tokens (decided):** every completed chore grants a token. Fights are optional and can be played whenever
+  you like, so logging a chore never requires playing.
+- **Screen-time reward (idea):** start with a "soft" version (usage access only: budget, earned minutes and a
+  notification when over). Hard blocking (accessibility service + overlay) is risky for Google Play and is deferred.
+
 ### Still open
 1. **GitHub username**: replaces the `changeme` placeholder in the app ID before the first push
-2. **Genre / theme** for the progression system (can wait until ~0.5.0)
+2. **Genre / theme**: confirm boss fights (above) when 0.5 starts
 3. **Final display name** (after the genre is chosen)

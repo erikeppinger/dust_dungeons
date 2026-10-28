@@ -5,6 +5,7 @@ import '../../app/theme/chore_palette.dart';
 import '../../core/widgets/section_header.dart';
 import '../chores/manage_chores_screen.dart';
 import '../../l10n/app_localizations.dart';
+import '../notifications/notification_settings.dart';
 import 'settings_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -79,6 +80,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ),
+        const NotificationSettingsSection(),
         SectionHeader(l10n.settingsLanguage),
         RadioGroup<String?>(
           groupValue: settings.locale?.languageCode,

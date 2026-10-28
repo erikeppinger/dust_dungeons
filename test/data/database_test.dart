@@ -226,6 +226,27 @@ void main() {
     Future<Chore> byId(int id) =>
         (db.select(db.chores)..where((c) => c.id.equals(id))).getSingle();
 
+    test('reminder time is stored and can be cleared', () async {
+      final id = await chores.add(
+        title: 'Pflanzen',
+        iconKey: 'local_florist',
+        colorKey: 3,
+        basePoints: 5,
+        recurrence: weekly,
+        reminderMinutes: 18 * 60 + 15,
+      );
+      expect((await byId(id)).reminderMinutes, 18 * 60 + 15);
+      await chores.update(
+        id,
+        customTitle: 'Pflanzen',
+        iconKey: 'local_florist',
+        colorKey: 3,
+        basePoints: 5,
+        recurrence: weekly,
+      );
+      expect((await byId(id)).reminderMinutes, isNull);
+    });
+
     test('a schedule is stored and read back unchanged', () async {
       final id = await chores.add(
         title: 'Bettwäsche',
@@ -354,6 +375,17 @@ void main() {
 
       await repo.save(custom.copyWith(locale: () => null));
       expect((await repo.load()).locale, isNull);
+
+      final notifications = custom.copyWith(
+        notificationsEnabled: true,
+        dailySummary: false,
+        dailySummaryMinutes: 7 * 60 + 30,
+        choreReminders: false,
+        weeklyRecap: false,
+        monthlyRecap: false,
+      );
+      await repo.save(notifications);
+      expect(await repo.load(), notifications);
     });
   });
 }

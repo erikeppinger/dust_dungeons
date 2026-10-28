@@ -5,20 +5,23 @@ import 'package:homework_and_chores/domain/default_chores.dart';
 
 import 'generated_migrations/schema.dart';
 import 'generated_migrations/schema_v1.dart' as v1;
+import 'generated_migrations/schema_v2.dart' as v2;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  test('v1 -> v2 produces the current schema', () async {
-    final schema = await verifier.schemaAt(1);
-    final db = AppDatabase(schema.newConnection());
-    await verifier.migrateAndValidate(db, 2);
-    await db.close();
-  });
+  for (final from in [1, 2]) {
+    test('v$from -> v3 produces the current schema', () async {
+      final schema = await verifier.schemaAt(from);
+      final db = AppDatabase(schema.newConnection());
+      await verifier.migrateAndValidate(db, 3);
+      await db.close();
+    });
+  }
 
-  test('v1 -> v2 keeps data and gives built-in chores a rhythm', () async {
+  test('v1 -> v3 keeps data and gives built-in chores a rhythm', () async {
     final schema = await verifier.schemaAt(1);
     final old = v1.DatabaseAtV1(schema.newConnection());
     await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
@@ -59,5 +62,27 @@ void main() {
     expect(chores, hasLength(defaultChores.length + 1));
     expect(await db.select(db.completions).get(), hasLength(1));
     expect((await db.select(db.pointLedger).get()).single.delta, 15);
+  });
+
+  test('v2 -> v3 keeps schedules; reminders start switched off', () async {
+    final schema = await verifier.schemaAt(2);
+    final old = v2.DatabaseAtV2(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO chores (custom_title, icon_key, color_key, base_points, '
+      'sort_order, repeat_type, repeat_interval, repeat_weekdays) '
+      "VALUES ('Müll', 'delete', 3, 5, 0, 'weekly', 2, 9)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final chore = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.customTitle == 'Müll',
+    );
+    expect(chore.recurrence.type, RepeatType.weekly);
+    expect(chore.recurrence.interval, 2);
+    expect(chore.recurrence.weekdays, {DateTime.monday, DateTime.thursday});
+    expect(chore.reminderMinutes, isNull);
   });
 }

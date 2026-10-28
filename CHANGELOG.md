@@ -8,6 +8,17 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-28
+### Added
+- Local notifications (off by default; turning them on asks for Android's permission):
+  - Daily summary at a chosen time: how many chores are due and which ones, overdue first.
+  - Per-chore reminders on due days at a time set in the chore editor (and daily while overdue).
+  - Weekly recap (Sundays 18:00) and monthly recap (1st, 10:00) of chores done and points earned.
+  - "Send a test notification" in Settings. Tapping a notification opens Today, or Stats for recaps.
+- Notifications are planned a week ahead and rebuilt after every change. They survive reboots and
+  app updates, use inexact timing (no exact-alarm permission) and never use the network.
+- Database schema v3 (per-chore reminder time) with tested migrations from v1 and v2.
+
 ## [0.3.0] - 2026-10-28
 ### Added
 - Point bonuses: +10% for doing a scheduled chore on its due day, +2% per streak day (up to +20%).
@@ -64,6 +75,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.4.0]: #
 [0.3.0]: #
 [0.2.0]: #
 [0.1.0]: #

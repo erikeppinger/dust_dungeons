@@ -36,6 +36,7 @@ class ChoreRepository {
     required int colorKey,
     required int basePoints,
     required Recurrence recurrence,
+    int? reminderMinutes,
   }) => _db.transaction(() async {
     final maxOrder = _db.chores.sortOrder.max();
     final row = await (_db.selectOnly(
@@ -50,6 +51,7 @@ class ChoreRepository {
             colorKey: colorKey,
             basePoints: basePoints,
             sortOrder: Value((row.read(maxOrder) ?? -1) + 1),
+            reminderMinutes: Value(reminderMinutes),
           ).withSchedule(recurrence, _clock()),
         );
   });
@@ -64,6 +66,7 @@ class ChoreRepository {
     required int colorKey,
     required int basePoints,
     required Recurrence recurrence,
+    int? reminderMinutes,
   }) => _db.transaction(() async {
     final current = await (_db.select(
       _db.chores,
@@ -73,6 +76,7 @@ class ChoreRepository {
       iconKey: Value(iconKey),
       colorKey: Value(colorKey),
       basePoints: Value(basePoints),
+      reminderMinutes: Value(reminderMinutes),
     );
     if (current.recurrence != recurrence) {
       changes = changes.withSchedule(recurrence, _clock());

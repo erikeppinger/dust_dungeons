@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/widgets/coming_soon.dart';
 import '../features/chores/today_screen.dart';
@@ -6,21 +7,16 @@ import '../features/plan/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stats/stats_screen.dart';
 import '../l10n/app_localizations.dart';
+import 'home_tab.dart';
 
 /// Main scaffold with bottom navigation between the top-level screens.
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
 
   @override
-  State<HomeShell> createState() => _HomeShellState();
-}
-
-class _HomeShellState extends State<HomeShell> {
-  int _index = 0;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final index = ref.watch(homeTabProvider).index;
     final titles = [
       l10n.navToday,
       l10n.navPlan,
@@ -30,9 +26,9 @@ class _HomeShellState extends State<HomeShell> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(titles[_index])),
+      appBar: AppBar(title: Text(titles[index])),
       body: IndexedStack(
-        index: _index,
+        index: index,
         children: [
           const TodayScreen(),
           const PlanScreen(),
@@ -46,8 +42,9 @@ class _HomeShellState extends State<HomeShell> {
         ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        selectedIndex: index,
+        onDestinationSelected: (i) =>
+            ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.checklist_outlined),

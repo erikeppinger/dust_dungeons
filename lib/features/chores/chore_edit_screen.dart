@@ -11,6 +11,8 @@ import '../../l10n/app_localizations.dart';
 import 'chore_icons.dart';
 import 'chore_tile.dart';
 import 'chore_titles.dart';
+import '../notifications/notification_settings.dart';
+import '../settings/settings_controller.dart';
 import 'repeat_editor.dart';
 
 /// Add a new chore (`chore == null`) or edit/archive an existing one.
@@ -37,6 +39,9 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   late int _colorKey;
   late int _points;
   late Recurrence _recurrence;
+
+  /// Reminder time in minutes after midnight; `null` = no reminder.
+  int? _reminderMinutes;
   bool _showErrors = false;
   bool _initialized = false;
   bool _saving = false;
@@ -56,6 +61,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     _points = (chore?.basePoints ?? 10).clamp(minBasePoints, maxBasePoints);
     _recurrence =
         chore?.recurrence ?? Recurrence.anytime(ref.read(todayProvider));
+    _reminderMinutes = chore?.reminderMinutes;
     _title.addListener(() => setState(() {}));
   }
 
@@ -79,6 +85,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     final builtIn = chore == null
         ? null
         : builtInTitle(chore, AppLocalizations.of(context));
+    // Reminders need due days; an unscheduled chore never has one.
+    final reminder = _recurrence.type == RepeatType.anytime
+        ? null
+        : _reminderMinutes;
     await _run(
       () => chore == null
           ? repo.add(
@@ -87,6 +97,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               colorKey: _colorKey,
               basePoints: _points,
               recurrence: _recurrence,
+              reminderMinutes: reminder,
             )
           : repo.update(
               chore.id,
@@ -95,6 +106,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               colorKey: _colorKey,
               basePoints: _points,
               recurrence: _recurrence,
+              reminderMinutes: reminder,
             ),
     );
   }
@@ -209,6 +221,12 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               showErrors: _showErrors,
               onChanged: (r) => setState(() => _recurrence = r),
             ),
+            const SizedBox(height: 16),
+            _ReminderEditor(
+              minutes: _reminderMinutes,
+              hasSchedule: _recurrence.type != RepeatType.anytime,
+              onChanged: (m) => setState(() => _reminderMinutes = m),
+            ),
             const SizedBox(height: 24),
             Text(l10n.choreColor, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
@@ -276,6 +294,70 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Optional reminder time on the chore's due days.
+class _ReminderEditor extends ConsumerWidget {
+  const _ReminderEditor({
+    required this.minutes,
+    required this.hasSchedule,
+    required this.onChanged,
+  });
+
+  static const _defaultMinutes = 9 * 60;
+
+  final int? minutes;
+  final bool hasSchedule;
+  final ValueChanged<int?> onChanged;
+
+  Future<void> _pick(BuildContext context) async {
+    final m = minutes ?? _defaultMinutes;
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: m ~/ 60, minute: m % 60),
+    );
+    if (picked != null) onChanged(picked.hour * 60 + picked.minute);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final notificationsOn = ref.watch(settingsProvider).notificationsEnabled;
+    final m = minutes;
+    String? hint;
+    if (!hasSchedule) {
+      hint = l10n.choreReminderNeedsSchedule;
+    } else if (!notificationsOn) {
+      hint = l10n.choreReminderNotificationsOff;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.choreReminder, style: theme.textTheme.titleSmall),
+        SwitchListTile(
+          key: const ValueKey('reminder-switch'),
+          contentPadding: EdgeInsets.zero,
+          secondary: const Icon(Icons.alarm),
+          title: Text(l10n.choreReminderOn),
+          value: hasSchedule && m != null,
+          onChanged: hasSchedule
+              ? (on) => onChanged(on ? _defaultMinutes : null)
+              : null,
+        ),
+        if (hasSchedule && m != null)
+          ListTile(
+            key: const ValueKey('reminder-time'),
+            contentPadding: EdgeInsets.zero,
+            leading: const SizedBox(width: 24),
+            title: Text(l10n.choreReminderAt(formatMinutes(context, m))),
+            trailing: const Icon(Icons.schedule),
+            onTap: () => _pick(context),
+          ),
+        if (hint != null) Text(hint, style: theme.textTheme.bodySmall),
+      ],
     );
   }
 }

@@ -41,6 +41,9 @@ class Chores extends Table {
   /// When the schedule was last changed. One-off chores only count
   /// completions made after this.
   DateTimeColumn get repeatSetAt => dateTime().nullable()();
+
+  /// Reminder on due days, as minutes after midnight (schema v3); `null` = off.
+  IntColumn get reminderMinutes => integer().nullable()();
 }
 
 /// One time a chore was done. Undo sets [undoneAt] instead of deleting the row.

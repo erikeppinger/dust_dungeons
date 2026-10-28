@@ -4,7 +4,7 @@ publish_to: 'none'
 
 # SemVer: MAJOR.MINOR.PATCH+BUILD. BUILD = Android versionCode and must always increase.
 # Bump with tool/bump_version.ps1 and record changes in CHANGELOG.md.
-version: 0.3.0+4
+version: 0.4.0+5
 environment:
   sdk: ^3.13.1
 
@@ -14,11 +14,14 @@ dependencies:
   drift_flutter: ^0.3.1
   flutter:
     sdk: flutter
+  flutter_local_notifications: ^22.3.3
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.3
+  flutter_timezone: ^5.1.1
   intl: ^0.20.3
   path_provider: ^2.1.6
+  timezone: ^0.11.2
 
 dev_dependencies:
   flutter_test:

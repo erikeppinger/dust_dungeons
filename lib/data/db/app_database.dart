@@ -33,7 +33,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,6 +54,10 @@ class AppDatabase extends _$AppDatabase {
             scheduleColumns(seed.defaultRecurrence(_clock(), i), _clock()),
           );
         }
+      }
+      if (from < 3) {
+        // v3: optional per-chore reminder time.
+        await m.addColumn(chores, chores.reminderMinutes);
       }
     },
     beforeOpen: (details) async {

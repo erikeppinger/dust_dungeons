@@ -340,5 +340,105 @@
         "type": "int"
       }
     }
-  }
+  },
+  "notifSummaryTitle": "{n, plural, =1{1 chore today} other{{n} chores today}}",
+  "@notifSummaryTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "notifOverdueCount": "{n} overdue",
+  "@notifOverdueCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "notifReminderDue": "Due today · {points} points",
+  "@notifReminderDue": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifReminderOverdue": "Overdue · {points} points",
+  "@notifReminderOverdue": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifWeeklyTitle": "Your week",
+  "notifWeeklyBody": "This week: {chores, plural, =1{1 chore} other{{chores} chores}} done, {points} points earned.",
+  "@notifWeeklyBody": {
+    "placeholders": {
+      "chores": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifMonthlyTitle": "Your month",
+  "notifMonthlyBody": "This month: {chores, plural, =1{1 chore} other{{chores} chores}} done, {points} points earned.",
+  "@notifMonthlyBody": {
+    "placeholders": {
+      "chores": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notifTestTitle": "Notifications work 👍",
+  "notifTestBody": "This is how reminders will look.",
+  "channelSummary": "Daily summary",
+  "channelReminder": "Chore reminders",
+  "channelRecap": "Weekly and monthly recap",
+  "settingsNotifications": "Notifications",
+  "notifEnable": "Reminders & summaries",
+  "notifEnableSubtitle": "Local notifications only, nothing leaves the device",
+  "notifBlocked": "Notifications are blocked. Allow them for this app in Android settings.",
+  "notifDailySummary": "Daily summary",
+  "notifDailySummarySubtitle": "What is due today, at the time below",
+  "notifChoreReminders": "Chore reminders",
+  "notifChoreRemindersSubtitle": "At the time set in each chore",
+  "notifWeeklyRecap": "Weekly recap",
+  "notifWeeklyRecapSubtitle": "Sundays at {time}",
+  "@notifWeeklyRecapSubtitle": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMonthlyRecap": "Monthly recap",
+  "notifMonthlyRecapSubtitle": "On the 1st at {time}",
+  "@notifMonthlyRecapSubtitle": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notifSendTest": "Send a test notification",
+  "choreReminder": "Reminder",
+  "choreReminderOn": "Remind me on due days",
+  "choreReminderAt": "At {time}",
+  "@choreReminderAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "choreReminderNeedsSchedule": "Choose a schedule above to use reminders.",
+  "choreReminderNotificationsOff": "Notifications are off. Turn them on in Settings."
 }

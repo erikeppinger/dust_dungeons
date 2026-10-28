@@ -476,6 +476,17 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _reminderMinutesMeta = const VerificationMeta(
+    'reminderMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> reminderMinutes = GeneratedColumn<int>(
+    'reminder_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -493,6 +504,7 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     repeatDayOfMonth,
     repeatStart,
     repeatSetAt,
+    reminderMinutes,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -611,6 +623,15 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         ),
       );
     }
+    if (data.containsKey('reminder_minutes')) {
+      context.handle(
+        _reminderMinutesMeta,
+        reminderMinutes.isAcceptableOrUnknown(
+          data['reminder_minutes']!,
+          _reminderMinutesMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -682,6 +703,10 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}repeat_set_at'],
       ),
+      reminderMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_minutes'],
+      ),
     );
   }
 
@@ -717,6 +742,9 @@ class Chore extends DataClass implements Insertable<Chore> {
   /// When the schedule was last changed. One-off chores only count
   /// completions made after this.
   final DateTime? repeatSetAt;
+
+  /// Reminder on due days, as minutes after midnight (schema v3); `null` = off.
+  final int? reminderMinutes;
   const Chore({
     required this.id,
     this.seedKey,
@@ -733,6 +761,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     this.repeatDayOfMonth,
     this.repeatStart,
     this.repeatSetAt,
+    this.reminderMinutes,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -766,6 +795,9 @@ class Chore extends DataClass implements Insertable<Chore> {
     if (!nullToAbsent || repeatSetAt != null) {
       map['repeat_set_at'] = Variable<DateTime>(repeatSetAt);
     }
+    if (!nullToAbsent || reminderMinutes != null) {
+      map['reminder_minutes'] = Variable<int>(reminderMinutes);
+    }
     return map;
   }
 
@@ -796,6 +828,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       repeatSetAt: repeatSetAt == null && nullToAbsent
           ? const Value.absent()
           : Value(repeatSetAt),
+      reminderMinutes: reminderMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reminderMinutes),
     );
   }
 
@@ -822,6 +857,7 @@ class Chore extends DataClass implements Insertable<Chore> {
       repeatDayOfMonth: serializer.fromJson<int?>(json['repeatDayOfMonth']),
       repeatStart: serializer.fromJson<DateTime?>(json['repeatStart']),
       repeatSetAt: serializer.fromJson<DateTime?>(json['repeatSetAt']),
+      reminderMinutes: serializer.fromJson<int?>(json['reminderMinutes']),
     );
   }
   @override
@@ -845,6 +881,7 @@ class Chore extends DataClass implements Insertable<Chore> {
       'repeatDayOfMonth': serializer.toJson<int?>(repeatDayOfMonth),
       'repeatStart': serializer.toJson<DateTime?>(repeatStart),
       'repeatSetAt': serializer.toJson<DateTime?>(repeatSetAt),
+      'reminderMinutes': serializer.toJson<int?>(reminderMinutes),
     };
   }
 
@@ -864,6 +901,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     Value<int?> repeatDayOfMonth = const Value.absent(),
     Value<DateTime?> repeatStart = const Value.absent(),
     Value<DateTime?> repeatSetAt = const Value.absent(),
+    Value<int?> reminderMinutes = const Value.absent(),
   }) => Chore(
     id: id ?? this.id,
     seedKey: seedKey.present ? seedKey.value : this.seedKey,
@@ -882,6 +920,9 @@ class Chore extends DataClass implements Insertable<Chore> {
         : this.repeatDayOfMonth,
     repeatStart: repeatStart.present ? repeatStart.value : this.repeatStart,
     repeatSetAt: repeatSetAt.present ? repeatSetAt.value : this.repeatSetAt,
+    reminderMinutes: reminderMinutes.present
+        ? reminderMinutes.value
+        : this.reminderMinutes,
   );
   Chore copyWithCompanion(ChoresCompanion data) {
     return Chore(
@@ -918,6 +959,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       repeatSetAt: data.repeatSetAt.present
           ? data.repeatSetAt.value
           : this.repeatSetAt,
+      reminderMinutes: data.reminderMinutes.present
+          ? data.reminderMinutes.value
+          : this.reminderMinutes,
     );
   }
 
@@ -938,7 +982,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           ..write('repeatWeekdays: $repeatWeekdays, ')
           ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
           ..write('repeatStart: $repeatStart, ')
-          ..write('repeatSetAt: $repeatSetAt')
+          ..write('repeatSetAt: $repeatSetAt, ')
+          ..write('reminderMinutes: $reminderMinutes')
           ..write(')'))
         .toString();
   }
@@ -960,6 +1005,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     repeatDayOfMonth,
     repeatStart,
     repeatSetAt,
+    reminderMinutes,
   );
   @override
   bool operator ==(Object other) =>
@@ -979,7 +1025,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           other.repeatWeekdays == this.repeatWeekdays &&
           other.repeatDayOfMonth == this.repeatDayOfMonth &&
           other.repeatStart == this.repeatStart &&
-          other.repeatSetAt == this.repeatSetAt);
+          other.repeatSetAt == this.repeatSetAt &&
+          other.reminderMinutes == this.reminderMinutes);
 }
 
 class ChoresCompanion extends UpdateCompanion<Chore> {
@@ -998,6 +1045,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
   final Value<int?> repeatDayOfMonth;
   final Value<DateTime?> repeatStart;
   final Value<DateTime?> repeatSetAt;
+  final Value<int?> reminderMinutes;
   const ChoresCompanion({
     this.id = const Value.absent(),
     this.seedKey = const Value.absent(),
@@ -1014,6 +1062,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatDayOfMonth = const Value.absent(),
     this.repeatStart = const Value.absent(),
     this.repeatSetAt = const Value.absent(),
+    this.reminderMinutes = const Value.absent(),
   });
   ChoresCompanion.insert({
     this.id = const Value.absent(),
@@ -1031,6 +1080,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatDayOfMonth = const Value.absent(),
     this.repeatStart = const Value.absent(),
     this.repeatSetAt = const Value.absent(),
+    this.reminderMinutes = const Value.absent(),
   }) : iconKey = Value(iconKey),
        colorKey = Value(colorKey),
        basePoints = Value(basePoints);
@@ -1050,6 +1100,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Expression<int>? repeatDayOfMonth,
     Expression<DateTime>? repeatStart,
     Expression<DateTime>? repeatSetAt,
+    Expression<int>? reminderMinutes,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1067,6 +1118,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       if (repeatDayOfMonth != null) 'repeat_day_of_month': repeatDayOfMonth,
       if (repeatStart != null) 'repeat_start': repeatStart,
       if (repeatSetAt != null) 'repeat_set_at': repeatSetAt,
+      if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
     });
   }
 
@@ -1086,6 +1138,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Value<int?>? repeatDayOfMonth,
     Value<DateTime?>? repeatStart,
     Value<DateTime?>? repeatSetAt,
+    Value<int?>? reminderMinutes,
   }) {
     return ChoresCompanion(
       id: id ?? this.id,
@@ -1103,6 +1156,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       repeatDayOfMonth: repeatDayOfMonth ?? this.repeatDayOfMonth,
       repeatStart: repeatStart ?? this.repeatStart,
       repeatSetAt: repeatSetAt ?? this.repeatSetAt,
+      reminderMinutes: reminderMinutes ?? this.reminderMinutes,
     );
   }
 
@@ -1156,6 +1210,9 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     if (repeatSetAt.present) {
       map['repeat_set_at'] = Variable<DateTime>(repeatSetAt.value);
     }
+    if (reminderMinutes.present) {
+      map['reminder_minutes'] = Variable<int>(reminderMinutes.value);
+    }
     return map;
   }
 
@@ -1176,7 +1233,8 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
           ..write('repeatWeekdays: $repeatWeekdays, ')
           ..write('repeatDayOfMonth: $repeatDayOfMonth, ')
           ..write('repeatStart: $repeatStart, ')
-          ..write('repeatSetAt: $repeatSetAt')
+          ..write('repeatSetAt: $repeatSetAt, ')
+          ..write('reminderMinutes: $reminderMinutes')
           ..write(')'))
         .toString();
   }
@@ -2629,6 +2687,7 @@ typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<int?> repeatDayOfMonth,
   Value<DateTime?> repeatStart,
   Value<DateTime?> repeatSetAt,
+  Value<int?> reminderMinutes,
 });
 typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<int> id,
@@ -2646,6 +2705,7 @@ typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<int?> repeatDayOfMonth,
   Value<DateTime?> repeatStart,
   Value<DateTime?> repeatSetAt,
+  Value<int?> reminderMinutes,
 });
 
 final class $$ChoresTableReferences
@@ -2753,6 +2813,11 @@ class $$ChoresTableFilterComposer
 
   ColumnFilters<DateTime> get repeatSetAt => $composableBuilder(
     column: $table.repeatSetAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2865,6 +2930,11 @@ class $$ChoresTableOrderingComposer
     column: $table.repeatSetAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChoresTableAnnotationComposer
@@ -2940,6 +3010,11 @@ class $$ChoresTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get reminderMinutes => $composableBuilder(
+    column: $table.reminderMinutes,
+    builder: (column) => column,
+  );
+
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
   ) {
@@ -3009,6 +3084,7 @@ class $$ChoresTableTableManager
                 Value<int?> repeatDayOfMonth = const Value.absent(),
                 Value<DateTime?> repeatStart = const Value.absent(),
                 Value<DateTime?> repeatSetAt = const Value.absent(),
+                Value<int?> reminderMinutes = const Value.absent(),
               }) => ChoresCompanion(
                 id: id,
                 seedKey: seedKey,
@@ -3025,6 +3101,7 @@ class $$ChoresTableTableManager
                 repeatDayOfMonth: repeatDayOfMonth,
                 repeatStart: repeatStart,
                 repeatSetAt: repeatSetAt,
+                reminderMinutes: reminderMinutes,
               ),
           createCompanionCallback:
               ({
@@ -3043,6 +3120,7 @@ class $$ChoresTableTableManager
                 Value<int?> repeatDayOfMonth = const Value.absent(),
                 Value<DateTime?> repeatStart = const Value.absent(),
                 Value<DateTime?> repeatSetAt = const Value.absent(),
+                Value<int?> reminderMinutes = const Value.absent(),
               }) => ChoresCompanion.insert(
                 id: id,
                 seedKey: seedKey,
@@ -3059,6 +3137,7 @@ class $$ChoresTableTableManager
                 repeatDayOfMonth: repeatDayOfMonth,
                 repeatStart: repeatStart,
                 repeatSetAt: repeatSetAt,
+                reminderMinutes: reminderMinutes,
               ),
           withReferenceMapper: (p0) => p0
               .map(

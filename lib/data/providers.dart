@@ -108,11 +108,12 @@ final completionsBetweenProvider = StreamProvider.autoDispose
 final progressStatsProvider = Provider<AsyncValue<ProgressStats>>((ref) {
   final today = ref.watch(todayProvider);
   return ref
-      .watch(_allCompletionsProvider)
+      .watch(allCompletionsProvider)
       .whenData((list) => ProgressStats(list, today: today));
 });
 
-final _allCompletionsProvider = StreamProvider<List<Completion>>(
+/// Every completion (not undone), oldest first.
+final allCompletionsProvider = StreamProvider<List<Completion>>(
   (ref) => ref
       .watch(progressRepositoryProvider)
       .watchAllCompletions(ref.watch(currentProfileIdProvider)),
