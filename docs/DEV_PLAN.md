@@ -262,7 +262,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.3.0** ✅ | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
 | **0.4.0** ✅ | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
 | **0.5.0** ✅ | Boss fights v1 | Fight tokens, echo duel, 2 playable bosses, World hub, trophy shelf, avatar, story mode, sound + haptics ([design](design/0.5-boss-fights.md)) |
-| **0.5.1** | Bosses & shop | All 8 bosses, gear and avatar shop (spending points) |
+| **0.5.1** ✅ | Bosses & shop | All 8 bosses, gear and avatar shop (spending points) |
 | **0.5.2** | Overlord | Weekly Chore Overlord with lane phase, latency calibration, slow mode |
 | **0.6.0** | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
 | **0.7.0** | Data safety | Export/import, auto-backup folder, DB migration tests |

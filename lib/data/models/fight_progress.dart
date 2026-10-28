@@ -61,6 +61,5 @@ class FightProgress {
   /// The tier the next fight against [family] has.
   int tier(BossFamily family) => tierForWins(wins(family));
 
-  bool canFight(BossFamily family) =>
-      playableFamilies.contains(family) && tokens(family) > 0;
+  bool canFight(BossFamily family) => tokens(family) > 0;
 }

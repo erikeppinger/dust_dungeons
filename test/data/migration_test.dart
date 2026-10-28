@@ -7,17 +7,18 @@ import 'generated_migrations/schema.dart';
 import 'generated_migrations/schema_v1.dart' as v1;
 import 'generated_migrations/schema_v2.dart' as v2;
 import 'generated_migrations/schema_v3.dart' as v3;
+import 'generated_migrations/schema_v4.dart' as v4;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3]) {
-    test('v$from -> v4 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4]) {
+    test('v$from -> v5 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 4);
+      await verifier.migrateAndValidate(db, 5);
       await db.close();
     });
   }
@@ -112,4 +113,28 @@ void main() {
     expect(await db.select(db.fights).get(), isEmpty);
     expect(await db.select(db.completions).get(), hasLength(1));
   });
+
+  test(
+    'v4 -> v5 keeps fights and points; the inventory starts empty',
+    () async {
+      final schema = await verifier.schemaAt(4);
+      final old = v4.DatabaseAtV4(schema.newConnection());
+      await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+      await old.customStatement(
+        'INSERT INTO fights (profile_id, family, tier, started_at, result) '
+        "VALUES (1, 'dust', 1, '2026-10-28T10:00:00.000', 'won')",
+      );
+      await old.customStatement(
+        'INSERT INTO point_ledger (profile_id, delta, reason, created_at) '
+        "VALUES (1, 40, 'completion', '2026-10-28T09:00:00.000')",
+      );
+      await old.close();
+
+      final db = AppDatabase(schema.newConnection());
+      addTearDown(db.close);
+      expect((await db.select(db.fights).get()).single.result, FightResult.won);
+      expect(await db.select(db.inventory).get(), isEmpty);
+      expect((await db.select(db.pointLedger).get()).single.delta, 40);
+    },
+  );
 }

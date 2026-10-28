@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/domain/fight/boss.dart';
 import 'package:homework_and_chores/domain/fight/echo_duel.dart';
+import 'package:homework_and_chores/domain/fight/shop.dart';
 
 const pattern = Pattern([0, 500, 750, 1000], beatMs: 500);
 
@@ -154,6 +155,55 @@ void main() {
       expect(d.phase, 0);
       d.bossHp = d.bossMaxHp ~/ 2;
       expect(d.phase, 1);
+    });
+  });
+
+  group('gear', () {
+    EchoDuel geared(Loadout loadout) => EchoDuel(
+      family: BossFamily.dust,
+      tier: 1,
+      hero: const HeroStats(maxHp: 5, damage: 1),
+      loadout: loadout,
+    );
+
+    test('Sponge Shield forgives the first miss of the fight only', () {
+      final d = geared(const Loadout(shield: true));
+      d.applyEcho(pattern, const [0, 500, 750]); // one miss
+      expect(d.heroHp, 5);
+      expect(d.shieldReady, isFalse);
+      d.applyEcho(pattern, const [0, 500, 750]);
+      expect(d.heroHp, 4);
+    });
+
+    test('Turbo Mop: perfect hits deal triple damage', () {
+      final plain = geared(Loadout.none)..applyEcho(pattern, pattern.beatsMs);
+      final mop = geared(const Loadout(turboMop: true))
+        ..applyEcho(pattern, pattern.beatsMs);
+      expect(plain.bossMaxHp - plain.bossHp, 8);
+      expect(mop.bossMaxHp - mop.bossHp, 12);
+    });
+
+    test('Metronome Charm widens the windows', () {
+      final d = geared(const Loadout(metronome: true));
+      expect(d.windows.goodMs, greaterThan(TimingWindows.normal.goodMs));
+      expect(d.applyEcho(pattern, const [150, 500, 750, 1000]).first, Hit.good);
+    });
+
+    test('Rubber Gloves add a heart', () {
+      final d = geared(const Loadout(gloves: true));
+      expect(d.hero.maxHp, 6);
+      expect(d.heroHp, 6);
+    });
+
+    test('Second Wind revives a lost fight with half the hearts', () {
+      final d = geared(Loadout.none);
+      while (d.outcome == DuelOutcome.ongoing) {
+        d.applyEcho(d.nextPattern(), const []);
+      }
+      expect(d.outcome, DuelOutcome.lost);
+      d.revive();
+      expect(d.outcome, DuelOutcome.ongoing);
+      expect(d.heroHp, 3);
     });
   });
 

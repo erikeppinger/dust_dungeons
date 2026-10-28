@@ -125,9 +125,10 @@ class FightController extends ChangeNotifier {
   /// dropped without judging it, so pausing never costs health.
   void pause() => stop();
 
-  /// Continues after [pause] with a short "get ready" and a fresh round.
+  /// Continues after [pause] (or after a Second Wind revived a lost duel)
+  /// with a short "get ready" and a fresh round.
   void resume() {
-    if (stage == FightStage.finished) return;
+    if (duel.outcome != DuelOutcome.ongoing) return;
     stop();
     lastHits = const [];
     litBeat = -1;

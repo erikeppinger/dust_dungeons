@@ -13,6 +13,8 @@ import 'chore_tile.dart';
 import 'chore_titles.dart';
 import '../notifications/notification_settings.dart';
 import '../settings/settings_controller.dart';
+import '../../domain/fight/boss.dart';
+import '../fight/boss_art.dart';
 import 'repeat_editor.dart';
 
 /// Add a new chore (`chore == null`) or edit/archive an existing one.
@@ -42,6 +44,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
 
   /// Reminder time in minutes after midnight; `null` = no reminder.
   int? _reminderMinutes;
+  late BossFamily _family;
   bool _showErrors = false;
   bool _initialized = false;
   bool _saving = false;
@@ -62,6 +65,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     _recurrence =
         chore?.recurrence ?? Recurrence.anytime(ref.read(todayProvider));
     _reminderMinutes = chore?.reminderMinutes;
+    _family = chore?.family ?? BossFamily.clutter;
     _title.addListener(() => setState(() {}));
   }
 
@@ -89,6 +93,9 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     final reminder = _recurrence.type == RepeatType.anytime
         ? null
         : _reminderMinutes;
+    // Store only a deviation from the default, so built-ins keep following
+    // their default family.
+    final family = _family == familyOfSeed(chore?.seedKey) ? null : _family;
     await _run(
       () => chore == null
           ? repo.add(
@@ -98,6 +105,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               basePoints: _points,
               recurrence: _recurrence,
               reminderMinutes: reminder,
+              bossFamily: family,
             )
           : repo.update(
               chore.id,
@@ -107,6 +115,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               basePoints: _points,
               recurrence: _recurrence,
               reminderMinutes: reminder,
+              bossFamily: family,
             ),
     );
   }
@@ -220,6 +229,32 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               today: ref.watch(todayProvider),
               showErrors: _showErrors,
               onChanged: (r) => setState(() => _recurrence = r),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<BossFamily>(
+              key: const ValueKey('boss-family'),
+              initialValue: _family,
+              decoration: InputDecoration(
+                labelText: l10n.choreBoss,
+                helperText: l10n.choreBossHelp,
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                for (final f in BossFamily.values)
+                  DropdownMenuItem(
+                    value: f,
+                    child: Row(
+                      children: [
+                        BossArt(family: f, size: 28),
+                        const SizedBox(width: 10),
+                        Text(bossName(l10n, f)),
+                      ],
+                    ),
+                  ),
+              ],
+              onChanged: (f) {
+                if (f != null) setState(() => _family = f);
+              },
             ),
             const SizedBox(height: 16),
             _ReminderEditor(

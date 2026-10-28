@@ -24,6 +24,7 @@ class SettingsRepository {
   static const _avatarSkin = 'avatarSkin';
   static const _avatarHair = 'avatarHair';
   static const _avatarCape = 'avatarCape';
+  static const _avatarHat = 'avatarHat';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -56,6 +57,7 @@ class SettingsRepository {
       avatarSkin: int.tryParse(map[_avatarSkin] ?? '') ?? defaults.avatarSkin,
       avatarHair: int.tryParse(map[_avatarHair] ?? '') ?? defaults.avatarHair,
       avatarCape: int.tryParse(map[_avatarCape] ?? '') ?? defaults.avatarCape,
+      avatarHat: int.tryParse(map[_avatarHat] ?? '') ?? defaults.avatarHat,
     );
   }
 
@@ -82,6 +84,7 @@ class SettingsRepository {
     await _put(_avatarSkin, '${settings.avatarSkin}');
     await _put(_avatarHair, '${settings.avatarHair}');
     await _put(_avatarCape, '${settings.avatarCape}');
+    await _put(_avatarHat, '${settings.avatarHat}');
   });
 
   Future<void> _put(String key, String value) => _db

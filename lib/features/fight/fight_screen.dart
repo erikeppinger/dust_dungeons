@@ -8,8 +8,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/repositories/fight_repository.dart';
+import '../../data/repositories/shop_repository.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/echo_duel.dart';
+import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'boss_art.dart';
@@ -19,10 +21,18 @@ import 'fight_sounds.dart';
 /// One boss fight. Starting it spends a token; leaving early or putting the
 /// app in the background abandons it (the token stays spent).
 class FightScreen extends ConsumerStatefulWidget {
-  const FightScreen({super.key, required this.family, required this.tier});
+  const FightScreen({
+    super.key,
+    required this.family,
+    required this.tier,
+    this.loadout = Loadout.none,
+  });
 
   final BossFamily family;
   final int tier;
+
+  /// The gear owned when the fight starts.
+  final Loadout loadout;
 
   static bool _opening = false;
 
@@ -32,13 +42,15 @@ class FightScreen extends ConsumerStatefulWidget {
     BuildContext context,
     BossFamily family,
     int tier,
+    Loadout loadout,
   ) async {
     if (_opening) return;
     _opening = true;
     try {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) => FightScreen(family: family, tier: tier),
+          builder: (_) =>
+              FightScreen(family: family, tier: tier, loadout: loadout),
         ),
       );
     } finally {
@@ -53,6 +65,8 @@ class FightScreen extends ConsumerStatefulWidget {
 class _FightScreenState extends ConsumerState<FightScreen> {
   late final FightController _controller;
   late final FightRepository _repo;
+  late final ShopRepository _shop;
+  late final int _profileId;
   late final Future<int> _fightId;
   late final AppLifecycleListener _lifecycle;
   bool _recorded = false;
@@ -70,8 +84,10 @@ class _FightScreenState extends ConsumerState<FightScreen> {
     // Kept in a field: recording the result may finish after the screen is
     // gone, when `ref` can no longer be used.
     _repo = ref.read(fightRepositoryProvider);
+    _shop = ref.read(shopRepositoryProvider);
+    _profileId = ref.read(currentProfileIdProvider);
     _fightId = _repo.start(
-      profileId: ref.read(currentProfileIdProvider),
+      profileId: _profileId,
       family: widget.family,
       tier: widget.tier,
       storyMode: settings.fightStoryMode,
@@ -81,15 +97,18 @@ class _FightScreenState extends ConsumerState<FightScreen> {
         family: widget.family,
         tier: widget.tier,
         hero: HeroStats.forLevel(level),
+        loadout: widget.loadout,
         storyMode: settings.fightStoryMode,
         seed: DateTime.now().microsecondsSinceEpoch,
       ),
       sounds: sounds,
       sound: settings.fightSound,
       haptics: settings.fightHaptics,
-      onFinished: (outcome) => _record(
-        outcome == DuelOutcome.won ? FightResult.won : FightResult.lost,
-      ),
+      // A loss is recorded only when the player moves on: Second Wind can
+      // still turn it around.
+      onFinished: (outcome) {
+        if (outcome == DuelOutcome.won) unawaited(_record(FightResult.won));
+      },
     )..start();
     // A rhythm fight cannot continue in the background.
     _lifecycle = AppLifecycleListener(onHide: _abandon);
@@ -109,6 +128,22 @@ class _FightScreenState extends ConsumerState<FightScreen> {
   }
 
   bool get _over => _controller.stage == FightStage.finished || _abandoned;
+
+  bool _reviving = false;
+
+  /// Spends a Second Wind and continues the lost duel. Guarded so a double
+  /// tap cannot spend two.
+  Future<void> _useSecondWind() async {
+    if (_reviving || _controller.duel.outcome != DuelOutcome.lost) return;
+    _reviving = true;
+    try {
+      if (!await _shop.use(_profileId, secondWindItem) || !mounted) return;
+      _controller.duel.revive();
+      _controller.resume();
+    } finally {
+      _reviving = false;
+    }
+  }
 
   /// Stops the fight and records it as abandoned (the token stays spent).
   void _stopAbandoned() {
@@ -158,7 +193,11 @@ class _FightScreenState extends ConsumerState<FightScreen> {
   @override
   void dispose() {
     _lifecycle.dispose();
-    if (!_over) _stopAbandoned();
+    if (!_over) {
+      _stopAbandoned();
+    } else if (!_recorded && _controller.duel.outcome == DuelOutcome.lost) {
+      unawaited(_record(FightResult.lost));
+    }
     _controller.dispose();
     super.dispose();
   }
@@ -188,7 +227,11 @@ class _FightScreenState extends ConsumerState<FightScreen> {
                 builder: (context, _) => _abandoned
                     ? _Abandoned(onBack: () => Navigator.of(context).pop())
                     : _controller.stage == FightStage.finished
-                    ? _Result(family: widget.family, duel: _controller.duel)
+                    ? _Result(
+                        family: widget.family,
+                        duel: _controller.duel,
+                        onSecondWind: _useSecondWind,
+                      )
                     : _Duel(controller: _controller, onLeave: _confirmLeave),
               ),
             ),
@@ -328,7 +371,9 @@ class _Duel extends StatelessWidget {
               ),
               const Spacer(),
               if (duel.storyMode)
-                Text(l10n.fightSettingStory, style: theme.textTheme.bodySmall),
+                Text(l10n.fightSettingStory, style: theme.textTheme.bodySmall)
+              else if (duel.shieldReady)
+                Text(l10n.fightShieldReady, style: theme.textTheme.bodySmall),
             ],
           ),
         ],
@@ -456,10 +501,15 @@ class _Pad extends StatelessWidget {
 }
 
 class _Result extends ConsumerWidget {
-  const _Result({required this.family, required this.duel});
+  const _Result({
+    required this.family,
+    required this.duel,
+    required this.onSecondWind,
+  });
 
   final BossFamily family;
   final EchoDuel duel;
+  final VoidCallback onSecondWind;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -469,6 +519,8 @@ class _Result extends ConsumerWidget {
     final progress = ref.watch(fightProgressProvider).value;
     final wins = progress?.wins(family) ?? 0;
     final tokensLeft = progress?.tokens(family) ?? 0;
+    final secondWinds =
+        ref.watch(inventoryProvider).value?[secondWindItem.key] ?? 0;
     final boss = bossName(l10n, family);
 
     Widget stat(String value, String label) => Expanded(
@@ -544,6 +596,14 @@ class _Result extends ConsumerWidget {
             style: theme.textTheme.bodySmall,
           ),
         ),
+        if (!won && secondWinds > 0) ...[
+          FilledButton.icon(
+            onPressed: onSecondWind,
+            icon: const Icon(Icons.air),
+            label: Text(l10n.fightSecondWind(secondWinds)),
+          ),
+          const SizedBox(height: 8),
+        ],
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(l10n.fightBack),

@@ -226,6 +226,25 @@ void main() {
     Future<Chore> byId(int id) =>
         (db.select(db.chores)..where((c) => c.id.equals(id))).getSingle();
 
+    test('a boss family can be chosen and reset to the default', () async {
+      final dusting = (await chores.watchAll().first).singleWhere(
+        (c) => c.seedKey == 'dusting',
+      );
+      Future<void> save(BossFamily? family) => chores.update(
+        dusting.id,
+        customTitle: null,
+        iconKey: dusting.iconKey,
+        colorKey: dusting.colorKey,
+        basePoints: dusting.basePoints,
+        recurrence: dusting.recurrence,
+        bossFamily: family,
+      );
+      await save(BossFamily.trash);
+      expect((await byId(dusting.id)).family, BossFamily.trash);
+      await save(null);
+      expect((await byId(dusting.id)).family, BossFamily.dust);
+    });
+
     test('reminder time is stored and can be cleared', () async {
       final id = await chores.add(
         title: 'Pflanzen',

@@ -8,6 +8,20 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-28
+### Added
+- **All eight bosses are playable:** Laundry Hydra, Sink Kraken, Porcelain Golem, Trash Titan, Pillow
+  Phantom and Window Wraith join Dust Bunny King and Clutter Imp, each with its own silhouette and rhythm.
+- **Boss picker in the chore editor:** choose which boss a chore's tokens are for (built-in chores keep
+  their default unless changed).
+- **Shop (World → Shop):** spend points. Spending never lowers level or XP.
+  - Gear, always active once bought: Sponge Shield (first miss each fight costs no heart), Turbo Mop
+    (perfect hits clean 50% more), Metronome Charm (more forgiving timing), Rubber Gloves (+1 heart).
+  - Second Wind: continue once after losing a fight.
+  - Hats for the hero (cap, bandana, wizard hat, crown), worn via Customize; locked ones link to the shop.
+- The hero card shows hearts including gear; a ready Sponge Shield is shown during fights.
+- Database schema v5 (shop inventory) with tested migrations from v1–v4.
+
 ## [0.5.0] - 2026-10-28
 ### Added
 - **Boss fights (World tab).** Every completed chore earns a fight token for its boss family. Fights are
@@ -109,6 +123,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.5.1]: #
 [0.5.0]: #
 [0.4.1]: #
 [0.4.0]: #

@@ -251,7 +251,7 @@ void main() {
       ),
       findsOneWidget,
     );
-    expect(find.text('Arrives in 0.5.1'), findsWidgets);
+    expect(find.text('Laundry Hydra'), findsOneWidget);
 
     // Dusting belongs to the dust family: one token.
     await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
@@ -347,6 +347,184 @@ void main() {
     final saved = await tester.runAsync(() => SettingsRepository(db).load());
     expect(saved!.fightStoryMode, isTrue);
     expect(saved.fightSound, isTrue, reason: 'sound is on by default');
+  });
+
+  /// A database with [points] to spend and one dust token.
+  Future<AppDatabase> richDb(int points) async {
+    final db = memoryDb();
+    final profile = await db.defaultProfileId();
+    final dusting = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.seedKey == 'dusting',
+    );
+    final id = await db
+        .into(db.completions)
+        .insert(
+          CompletionsCompanion.insert(
+            choreId: dusting.id,
+            profileId: profile,
+            completedAt: DateTime.now(),
+            pointsAwarded: points,
+          ),
+        );
+    await db
+        .into(db.pointLedger)
+        .insert(
+          PointLedgerCompanion.insert(
+            profileId: profile,
+            delta: points,
+            reason: LedgerReason.completion,
+            completionId: Value(id),
+            createdAt: DateTime.now(),
+          ),
+        );
+    return db;
+  }
+
+  testWidgets('the shop sells hats that the hero can wear', (tester) async {
+    final db = await tester.runAsync(() => richDb(300));
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Shop'));
+    await tester.pumpAndSettle();
+    expect(find.text('You have 300 points'), findsOneWidget);
+
+    final crown = find.byKey(const ValueKey('shop-hat_crown'));
+    await tester.scrollUntilVisible(crown, 200);
+    await tester.ensureVisible(crown);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(of: crown, matching: find.text('250 pts')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Buy Crown?'), findsOneWidget);
+    await tester.tap(find.widgetWithText(TextButton, 'Buy'));
+    await tester.pumpAndSettle();
+    expect(find.text('Crown bought!'), findsOneWidget);
+    expect(
+      find.descendant(of: crown, matching: find.text('Owned')),
+      findsOneWidget,
+    );
+
+    // Too expensive now: the button is disabled.
+    final mop = find.byKey(const ValueKey('shop-turbo_mop'));
+    await tester.scrollUntilVisible(mop, -200);
+    await tester.scrollUntilVisible(find.text('You have 50 points'), -200);
+    expect(find.text('You have 50 points'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.descendant(of: mop, matching: find.byType(FilledButton)),
+          )
+          .onPressed,
+      isNull,
+    );
+
+    // Wear it.
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Customize'));
+    await tester.pumpAndSettle();
+    final hat = find.byKey(const ValueKey('hat-4'));
+    await tester.scrollUntilVisible(hat, 200);
+    await tester.ensureVisible(hat);
+    await tester.pumpAndSettle();
+    await tester.tap(hat);
+    await tester.pumpAndSettle();
+    final saved = await tester.runAsync(() => SettingsRepository(db!).load());
+    expect(saved!.avatarHat, 4);
+  });
+
+  testWidgets('owned gear is used in the next fight after a restart', (
+    tester,
+  ) async {
+    final db = await tester.runAsync(() async {
+      final db = await richDb(10);
+      await db
+          .into(db.inventory)
+          .insert(
+            InventoryCompanion.insert(
+              profileId: 1,
+              itemKey: 'rubber_gloves',
+              count: 1,
+            ),
+          );
+      return db;
+    });
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    expect(find.text('HP 6 · damage 1'), findsOneWidget);
+
+    final fight = find.descendant(
+      of: find.byKey(const ValueKey('boss-dust')),
+      matching: find.text('Fight'),
+    );
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(fight);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.bySemanticsLabel('Health 6 of 6'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Leave'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('Second Wind continues a lost fight', (tester) async {
+    final db = await tester.runAsync(() => richDb(100));
+    await pumpApp(tester, db: db);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'World'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Shop'));
+    await tester.pumpAndSettle();
+    final wind = find.byKey(const ValueKey('shop-second_wind'));
+    await tester.scrollUntilVisible(wind, 200);
+    await tester.ensureVisible(wind);
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: wind, matching: find.text('60 pts')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Buy'));
+    await tester.pumpAndSettle();
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    final fight = find.descendant(
+      of: find.byKey(const ValueKey('boss-dust')),
+      matching: find.text('Fight'),
+    );
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(fight);
+    // Never tap: the fight is lost after a few rounds.
+    for (
+      var i = 0;
+      i < 400 && find.textContaining('got away').evaluate().isEmpty;
+      i++
+    ) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.text('Dust Bunny King got away'), findsOneWidget);
+    await tester.tap(find.text('Use Second Wind · 1 left'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Get ready…'), findsOneWidget);
+    final inventory = await tester.runAsync(
+      () => db!.select(db.inventory).get(),
+    );
+    expect(inventory!.single.count, 0);
+
+    // Leave; the fight is recorded once, as abandoned (it was still running).
+    await tester.tap(find.byTooltip('Leave'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.widgetWithText(TextButton, 'Leave'));
+    await tester.pumpAndSettle();
+    final fights = await tester.runAsync(() => db!.select(db.fights).get());
+    expect(fights!.single.result, FightResult.abandoned);
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

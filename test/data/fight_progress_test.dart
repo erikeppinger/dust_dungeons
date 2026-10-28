@@ -116,7 +116,8 @@ void main() {
     expect(p.bestAccuracy(BossFamily.clutter), closeTo(0.9, 0.001));
     expect(p.bestAccuracy(BossFamily.dust), isNull);
     expect(p.canFight(BossFamily.dust), isTrue);
-    expect(p.canFight(BossFamily.laundry), isFalse, reason: 'not playable yet');
+    expect(p.canFight(BossFamily.laundry), isTrue);
+    expect(p.canFight(BossFamily.kitchen), isFalse, reason: 'no tokens');
     expect(p.totalWins, 3);
   });
 }

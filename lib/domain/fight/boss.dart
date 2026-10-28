@@ -11,10 +11,6 @@ enum BossFamily {
   clutter,
 }
 
-/// Families with a playable boss in this version (the rest arrive in 0.5.1;
-/// their tokens are collected already).
-const playableFamilies = {BossFamily.dust, BossFamily.clutter};
-
 /// Default family of each built-in chore; user chores are [BossFamily.clutter].
 const seedFamilies = <String, BossFamily>{
   'dusting': BossFamily.dust,

@@ -2990,6 +2990,273 @@ class FightsCompanion extends UpdateCompanion<Fight> {
   }
 }
 
+class $InventoryTable extends Inventory
+    with TableInfo<$InventoryTable, InventoryEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $InventoryTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _itemKeyMeta = const VerificationMeta(
+    'itemKey',
+  );
+  @override
+  late final GeneratedColumn<String> itemKey = GeneratedColumn<String>(
+    'item_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countMeta = const VerificationMeta('count');
+  @override
+  late final GeneratedColumn<int> count = GeneratedColumn<int>(
+    'count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [profileId, itemKey, count];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'inventory';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<InventoryEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('item_key')) {
+      context.handle(
+        _itemKeyMeta,
+        itemKey.isAcceptableOrUnknown(data['item_key']!, _itemKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemKeyMeta);
+    }
+    if (data.containsKey('count')) {
+      context.handle(
+        _countMeta,
+        count.isAcceptableOrUnknown(data['count']!, _countMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_countMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId, itemKey};
+  @override
+  InventoryEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return InventoryEntry(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      itemKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}item_key'],
+      )!,
+      count: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}count'],
+      )!,
+    );
+  }
+
+  @override
+  $InventoryTable createAlias(String alias) {
+    return $InventoryTable(attachedDatabase, alias);
+  }
+}
+
+class InventoryEntry extends DataClass implements Insertable<InventoryEntry> {
+  final int profileId;
+  final String itemKey;
+  final int count;
+  const InventoryEntry({
+    required this.profileId,
+    required this.itemKey,
+    required this.count,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<int>(profileId);
+    map['item_key'] = Variable<String>(itemKey);
+    map['count'] = Variable<int>(count);
+    return map;
+  }
+
+  InventoryCompanion toCompanion(bool nullToAbsent) {
+    return InventoryCompanion(
+      profileId: Value(profileId),
+      itemKey: Value(itemKey),
+      count: Value(count),
+    );
+  }
+
+  factory InventoryEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return InventoryEntry(
+      profileId: serializer.fromJson<int>(json['profileId']),
+      itemKey: serializer.fromJson<String>(json['itemKey']),
+      count: serializer.fromJson<int>(json['count']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<int>(profileId),
+      'itemKey': serializer.toJson<String>(itemKey),
+      'count': serializer.toJson<int>(count),
+    };
+  }
+
+  InventoryEntry copyWith({int? profileId, String? itemKey, int? count}) =>
+      InventoryEntry(
+        profileId: profileId ?? this.profileId,
+        itemKey: itemKey ?? this.itemKey,
+        count: count ?? this.count,
+      );
+  InventoryEntry copyWithCompanion(InventoryCompanion data) {
+    return InventoryEntry(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      itemKey: data.itemKey.present ? data.itemKey.value : this.itemKey,
+      count: data.count.present ? data.count.value : this.count,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InventoryEntry(')
+          ..write('profileId: $profileId, ')
+          ..write('itemKey: $itemKey, ')
+          ..write('count: $count')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(profileId, itemKey, count);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is InventoryEntry &&
+          other.profileId == this.profileId &&
+          other.itemKey == this.itemKey &&
+          other.count == this.count);
+}
+
+class InventoryCompanion extends UpdateCompanion<InventoryEntry> {
+  final Value<int> profileId;
+  final Value<String> itemKey;
+  final Value<int> count;
+  final Value<int> rowid;
+  const InventoryCompanion({
+    this.profileId = const Value.absent(),
+    this.itemKey = const Value.absent(),
+    this.count = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  InventoryCompanion.insert({
+    required int profileId,
+    required String itemKey,
+    required int count,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       itemKey = Value(itemKey),
+       count = Value(count);
+  static Insertable<InventoryEntry> custom({
+    Expression<int>? profileId,
+    Expression<String>? itemKey,
+    Expression<int>? count,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (itemKey != null) 'item_key': itemKey,
+      if (count != null) 'count': count,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  InventoryCompanion copyWith({
+    Value<int>? profileId,
+    Value<String>? itemKey,
+    Value<int>? count,
+    Value<int>? rowid,
+  }) {
+    return InventoryCompanion(
+      profileId: profileId ?? this.profileId,
+      itemKey: itemKey ?? this.itemKey,
+      count: count ?? this.count,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (itemKey.present) {
+      map['item_key'] = Variable<String>(itemKey.value);
+    }
+    if (count.present) {
+      map['count'] = Variable<int>(count.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('InventoryCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('itemKey: $itemKey, ')
+          ..write('count: $count, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2999,6 +3266,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PointLedgerTable pointLedger = $PointLedgerTable(this);
   late final $SettingsTable settings = $SettingsTable(this);
   late final $FightsTable fights = $FightsTable(this);
+  late final $InventoryTable inventory = $InventoryTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3010,6 +3278,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     pointLedger,
     settings,
     fights,
+    inventory,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -3083,6 +3352,24 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_fightsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$InventoryTable, List<InventoryEntry>>
+  _inventoryRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.inventory,
+    aliasName: 'profiles__id__inventory__profile_id',
+  );
+
+  $$InventoryTableProcessedTableManager get inventoryRefs {
+    final manager = $$InventoryTableTableManager(
+      $_db,
+      $_db.inventory,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_inventoryRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3184,6 +3471,31 @@ class $$ProfilesTableFilterComposer
           }) => $$FightsTableFilterComposer(
             $db: $db,
             $table: $db.fights,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> inventoryRefs(
+    Expression<bool> Function($$InventoryTableFilterComposer f) f,
+  ) {
+    final $$InventoryTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventory,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InventoryTableFilterComposer(
+            $db: $db,
+            $table: $db.inventory,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3319,6 +3631,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> inventoryRefs<T extends Object>(
+    Expression<T> Function($$InventoryTableAnnotationComposer a) f,
+  ) {
+    final $$InventoryTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.inventory,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$InventoryTableAnnotationComposer(
+            $db: $db,
+            $table: $db.inventory,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -3338,6 +3675,7 @@ class $$ProfilesTableTableManager
             bool completionsRefs,
             bool pointLedgerRefs,
             bool fightsRefs,
+            bool inventoryRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -3388,6 +3726,7 @@ class $$ProfilesTableTableManager
                 completionsRefs = false,
                 pointLedgerRefs = false,
                 fightsRefs = false,
+                inventoryRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3395,6 +3734,7 @@ class $$ProfilesTableTableManager
                     if (completionsRefs) db.completions,
                     if (pointLedgerRefs) db.pointLedger,
                     if (fightsRefs) db.fights,
+                    if (inventoryRefs) db.inventory,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3459,6 +3799,26 @@ class $$ProfilesTableTableManager
                           referencedColumn: 'profile_id',
                           typedResults: items,
                         ),
+                      if (inventoryRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Profile,
+                          $ProfilesTable,
+                          InventoryEntry,
+                          $InventoryTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._inventoryRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).inventoryRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'profile_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3483,6 +3843,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool completionsRefs,
         bool pointLedgerRefs,
         bool fightsRefs,
+        bool inventoryRefs,
       })
     >;
 typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
@@ -5525,6 +5886,281 @@ typedef $$FightsTableProcessedTableManager =
       Fight,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$InventoryTableCreateCompanionBuilder = InventoryCompanion Function({
+  required int profileId,
+  required String itemKey,
+  required int count,
+  Value<int> rowid,
+});
+typedef $$InventoryTableUpdateCompanionBuilder = InventoryCompanion Function({
+  Value<int> profileId,
+  Value<String> itemKey,
+  Value<int> count,
+  Value<int> rowid,
+});
+
+final class $$InventoryTableReferences
+    extends BaseReferences<_$AppDatabase, $InventoryTable, InventoryEntry> {
+  $$InventoryTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('inventory__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$InventoryTableFilterComposer
+    extends Composer<_$AppDatabase, $InventoryTable> {
+  $$InventoryTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get itemKey => $composableBuilder(
+    column: $table.itemKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InventoryTableOrderingComposer
+    extends Composer<_$AppDatabase, $InventoryTable> {
+  $$InventoryTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get itemKey => $composableBuilder(
+    column: $table.itemKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get count => $composableBuilder(
+    column: $table.count,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InventoryTableAnnotationComposer
+    extends Composer<_$AppDatabase, $InventoryTable> {
+  $$InventoryTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get itemKey =>
+      $composableBuilder(column: $table.itemKey, builder: (column) => column);
+
+  GeneratedColumn<int> get count =>
+      $composableBuilder(column: $table.count, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$InventoryTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InventoryTable,
+          InventoryEntry,
+          $$InventoryTableFilterComposer,
+          $$InventoryTableOrderingComposer,
+          $$InventoryTableAnnotationComposer,
+          $$InventoryTableCreateCompanionBuilder,
+          $$InventoryTableUpdateCompanionBuilder,
+          (InventoryEntry, $$InventoryTableReferences),
+          InventoryEntry,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$InventoryTableTableManager(_$AppDatabase db, $InventoryTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$InventoryTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$InventoryTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$InventoryTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> profileId = const Value.absent(),
+                Value<String> itemKey = const Value.absent(),
+                Value<int> count = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InventoryCompanion(
+                profileId: profileId,
+                itemKey: itemKey,
+                count: count,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int profileId,
+                required String itemKey,
+                required int count,
+                Value<int> rowid = const Value.absent(),
+              }) => InventoryCompanion.insert(
+                profileId: profileId,
+                itemKey: itemKey,
+                count: count,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$InventoryTable, InventoryEntry>(table),
+                  $$InventoryTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.profileId,
+                        referencedTable: $$InventoryTableReferences
+                            ._profileIdTable(db),
+                        referencedColumn: $$InventoryTableReferences
+                            ._profileIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$InventoryTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InventoryTable,
+      InventoryEntry,
+      $$InventoryTableFilterComposer,
+      $$InventoryTableOrderingComposer,
+      $$InventoryTableAnnotationComposer,
+      $$InventoryTableCreateCompanionBuilder,
+      $$InventoryTableUpdateCompanionBuilder,
+      (InventoryEntry, $$InventoryTableReferences),
+      InventoryEntry,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5541,4 +6177,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableManager(_db, _db.settings);
   $$FightsTableTableManager get fights =>
       $$FightsTableTableManager(_db, _db.fights);
+  $$InventoryTableTableManager get inventory =>
+      $$InventoryTableTableManager(_db, _db.inventory);
 }

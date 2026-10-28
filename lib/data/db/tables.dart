@@ -62,7 +62,8 @@ class Completions extends Table {
   DateTimeColumn get undoneAt => dateTime().nullable()();
 }
 
-enum LedgerReason { completion, undo }
+/// Stored by name: only ever add values.
+enum LedgerReason { completion, undo, spend }
 
 /// Append-only point history. A profile's balance is the sum of its [delta]s.
 @DataClassName('LedgerEntry')
@@ -93,6 +94,18 @@ class Fights extends Table {
   IntColumn get perfect => integer().withDefault(const Constant(0))();
   IntColumn get good => integer().withDefault(const Constant(0))();
   IntColumn get miss => integer().withDefault(const Constant(0))();
+}
+
+/// Items bought in the shop (schema v5): gear and hats have count 1,
+/// consumables any count.
+@DataClassName('InventoryEntry')
+class Inventory extends Table {
+  IntColumn get profileId => integer().references(Profiles, #id)();
+  TextColumn get itemKey => text()();
+  IntColumn get count => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId, itemKey};
 }
 
 /// Simple key/value store for app settings.

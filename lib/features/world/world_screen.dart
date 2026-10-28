@@ -5,6 +5,7 @@ import '../../core/widgets/section_header.dart';
 import '../../data/models/fight_progress.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/boss.dart';
+import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
 import '../fight/fight_screen.dart';
@@ -13,6 +14,7 @@ import '../fight/hero_art.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
 import 'avatar_editor.dart';
+import 'shop_screen.dart';
 
 /// The hub: your hero, the bosses with their tokens, and the trophy shelf.
 class WorldScreen extends ConsumerWidget {
@@ -21,57 +23,66 @@ class WorldScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    // Watched here so it is loaded before any fight reads the gear.
+    final inventory = ref.watch(inventoryProvider).value ?? const {};
     return ref
         .watch(fightProgressProvider)
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(child: Text(l10n.errorGeneric)),
-          data: (progress) => ListView(
-            padding: EdgeInsets.fromLTRB(
-              12,
-              4,
-              12,
-              16 + MediaQuery.paddingOf(context).bottom,
-            ),
-            children: [
-              const _HeroCard(),
-              SectionHeader(
-                '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
-              ),
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 0.78,
-                children: [
-                  // Playable bosses first.
-                  for (final family in [
-                    ...BossFamily.values.where(playableFamilies.contains),
-                    ...BossFamily.values.where(
-                      (f) => !playableFamilies.contains(f),
-                    ),
-                  ])
-                    _BossCard(family: family, progress: progress),
-                ],
-              ),
-              SectionHeader(l10n.worldTrophies),
-              _TrophyShelf(progress: progress),
-              const SizedBox(height: 8),
-              ListTile(
-                leading: const Icon(Icons.tune),
-                title: Text(l10n.settingsFights),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => SettingsPage.open(
-                  context,
-                  (l) => l.settingsFights,
-                  const FightSettings(),
-                ),
-              ),
-            ],
-          ),
+          data: (progress) => _list(context, progress, inventory),
         );
+  }
+
+  Widget _list(
+    BuildContext context,
+    FightProgress progress,
+    Map<String, int> inventory,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    return ListView(
+      padding: EdgeInsets.fromLTRB(
+        12,
+        4,
+        12,
+        16 + MediaQuery.paddingOf(context).bottom,
+      ),
+      children: [
+        const _HeroCard(),
+        SectionHeader(
+          '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
+        ),
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.78,
+          children: [
+            for (final family in BossFamily.values)
+              _BossCard(
+                family: family,
+                progress: progress,
+                loadout: Loadout.fromInventory(inventory),
+              ),
+          ],
+        ),
+        SectionHeader(l10n.worldTrophies),
+        _TrophyShelf(progress: progress),
+        const SizedBox(height: 8),
+        ListTile(
+          leading: const Icon(Icons.tune),
+          title: Text(l10n.settingsFights),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => SettingsPage.open(
+            context,
+            (l) => l.settingsFights,
+            const FightSettings(),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -85,7 +96,11 @@ class _HeroCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final stats = ref.watch(progressStatsProvider).value;
     final level = stats?.level ?? 1;
+    final loadout = Loadout.fromInventory(
+      ref.watch(inventoryProvider).value ?? const {},
+    );
     final hero = HeroStats.forLevel(level);
+    final hearts = hero.maxHp + (loadout.gloves ? 1 : 0);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -95,6 +110,7 @@ class _HeroCard extends ConsumerWidget {
               skin: settings.avatarSkin,
               hair: settings.avatarHair,
               cape: settings.avatarCape,
+              hat: settings.avatarHat,
               semanticLabel: l10n.worldHeroLevel(level),
             ),
             const SizedBox(width: 16),
@@ -115,13 +131,23 @@ class _HeroCard extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    l10n.worldHeroStats(hero.maxHp, hero.damage),
+                    l10n.worldHeroStats(hearts, hero.damage),
                     style: theme.textTheme.bodySmall,
                   ),
                   const SizedBox(height: 8),
-                  OutlinedButton(
-                    onPressed: () => AvatarEditor.open(context),
-                    child: Text(l10n.worldCustomize),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () => AvatarEditor.open(context),
+                        child: Text(l10n.worldCustomize),
+                      ),
+                      FilledButton(
+                        onPressed: () => ShopScreen.open(context),
+                        child: Text(l10n.worldShop),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -134,17 +160,21 @@ class _HeroCard extends ConsumerWidget {
 }
 
 class _BossCard extends StatelessWidget {
-  const _BossCard({required this.family, required this.progress});
+  const _BossCard({
+    required this.family,
+    required this.progress,
+    required this.loadout,
+  });
 
   final BossFamily family;
   final FightProgress progress;
+  final Loadout loadout;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final (_, light) = bossColors(family);
-    final playable = playableFamilies.contains(family);
     final tokens = progress.tokens(family);
     final background = Color.alphaBlend(
       light.withValues(alpha: 0.28),
@@ -161,10 +191,7 @@ class _BossCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Opacity(
-                  opacity: playable ? 1 : 0.55,
-                  child: BossArt(family: family, size: 60),
-                ),
+                BossArt(family: family, size: 60),
                 const Spacer(),
                 Chip(
                   label: Text(l10n.worldTokenCount(tokens)),
@@ -181,9 +208,7 @@ class _BossCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              playable
-                  ? '${l10n.worldTier(progress.tier(family))} · ${bossSource(l10n, family)}'
-                  : bossSource(l10n, family),
+              '${l10n.worldTier(progress.tier(family))} · ${bossSource(l10n, family)}',
               style: theme.textTheme.bodySmall,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -191,19 +216,20 @@ class _BossCard extends StatelessWidget {
             const SizedBox(height: 6),
             SizedBox(
               width: double.infinity,
-              child: playable && tokens > 0
+              child: progress.canFight(family)
                   ? FilledButton(
                       onPressed: () => FightScreen.open(
                         context,
                         family,
                         progress.tier(family),
+                        loadout,
                       ),
                       child: Text(l10n.worldFight),
                     )
                   : FilledButton.tonal(
                       onPressed: null,
                       child: Text(
-                        playable ? l10n.worldNoTokens : l10n.worldComingSoon,
+                        l10n.worldNoTokens,
                         textAlign: TextAlign.center,
                       ),
                     ),

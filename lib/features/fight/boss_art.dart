@@ -93,13 +93,24 @@ class _BossPainter extends CustomPainter {
       canvas.translate(0, 18);
       canvas.rotate(-0.12);
     }
+    if (mood == BossMood.hit) canvas.translate(4, 0);
     switch (family) {
       case BossFamily.dust:
         _dust(canvas, fill, lightFill);
       case BossFamily.clutter:
         _clutter(canvas, fill);
-      default:
-        _blob(canvas, fill, lightFill);
+      case BossFamily.laundry:
+        _hydra(canvas, fill, lightFill);
+      case BossFamily.kitchen:
+        _kraken(canvas, fill, lightFill);
+      case BossFamily.bath:
+        _golem(canvas, fill, lightFill);
+      case BossFamily.trash:
+        _titan(canvas, fill, lightFill);
+      case BossFamily.bedroom:
+        _phantom(canvas, fill, lightFill);
+      case BossFamily.outside:
+        _wraith(canvas, fill, lightFill);
     }
     _face(canvas);
   }
@@ -187,20 +198,215 @@ class _BossPainter extends CustomPainter {
     );
   }
 
-  void _blob(Canvas c, Paint fill, Paint light) {
-    // Each family gets its own silhouette from a few parameters.
-    final i = family.index;
-    final path = Path();
-    const n = 9;
-    for (var k = 0; k <= n * 2; k++) {
-      final a = pi * 2 * k / (n * 2);
-      final r = 40 + (k.isEven ? 6 + i % 3 * 3 : -2.0);
-      final p = Offset(60 + cos(a) * r, 68 + sin(a) * r * 0.9);
-      k == 0 ? path.moveTo(p.dx, p.dy) : path.lineTo(p.dx, p.dy);
+  Paint _stroke(Color color, double width) => Paint()
+    ..color = color
+    ..strokeWidth = width
+    ..strokeCap = StrokeCap.round
+    ..style = PaintingStyle.stroke;
+
+  /// Laundry Hydra: a laundry basket with three sock-necked heads.
+  void _hydra(Canvas c, Paint fill, Paint light) {
+    final neck = _stroke(light.color, 11);
+    c.drawPath(
+      Path()
+        ..moveTo(36, 60)
+        ..quadraticBezierTo(22, 34, 26, 18),
+      neck,
+    );
+    c.drawPath(
+      Path()
+        ..moveTo(60, 56)
+        ..lineTo(60, 12),
+      neck,
+    );
+    c.drawPath(
+      Path()
+        ..moveTo(84, 60)
+        ..quadraticBezierTo(98, 34, 94, 18),
+      neck,
+    );
+    for (final o in const [Offset(26, 16), Offset(60, 10), Offset(94, 16)]) {
+      c.drawOval(Rect.fromCenter(center: o, width: 22, height: 16), fill);
+      c.drawCircle(o.translate(-4, -1), 2.5, Paint()..color = Colors.white);
+      c.drawCircle(o.translate(4, -1), 2.5, Paint()..color = Colors.white);
     }
-    path.close();
-    c.drawPath(path, fill);
-    c.drawCircle(const Offset(60, 90), 12, light);
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(16, 52, 88, 62),
+        const Radius.circular(18),
+      ),
+      fill,
+    );
+    // Basket weave.
+    final weave = _stroke(light.color, 3);
+    for (var y = 92.0; y <= 106; y += 7) {
+      c.drawLine(Offset(24, y), Offset(96, y), weave);
+    }
+  }
+
+  /// Sink Kraken: a dome with curling tentacles and soap bubbles.
+  void _kraken(Canvas c, Paint fill, Paint light) {
+    final arm = _stroke(light.color, 9);
+    for (final (x, dx) in const [
+      (26.0, -8.0),
+      (46.0, -4.0),
+      (74.0, 4.0),
+      (94.0, 8.0),
+    ]) {
+      c.drawPath(
+        Path()
+          ..moveTo(x, 86)
+          ..quadraticBezierTo(x + dx, 104, x + dx * 2, 112),
+        arm,
+      );
+    }
+    c.drawPath(
+      Path()
+        ..moveTo(18, 92)
+        ..quadraticBezierTo(18, 26, 60, 26)
+        ..quadraticBezierTo(102, 26, 102, 92)
+        ..close(),
+      fill,
+    );
+    final bubble = _stroke(const Color(0xFFB3E5FC), 2);
+    c.drawCircle(const Offset(104, 30), 6, bubble);
+    c.drawCircle(const Offset(112, 18), 4, bubble);
+    c.drawCircle(const Offset(14, 40), 5, bubble);
+  }
+
+  /// Porcelain Golem: a heavy block with arms and cracks.
+  void _golem(Canvas c, Paint fill, Paint light) {
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(26, 34, 68, 76),
+        const Radius.circular(14),
+      ),
+      fill,
+    );
+    for (final x in const [8.0, 96.0]) {
+      c.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x, 56, 16, 40),
+          const Radius.circular(8),
+        ),
+        light,
+      );
+    }
+    // A lid on top, slightly open.
+    c.save();
+    c.translate(60, 30);
+    c.rotate(-0.12);
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: 76, height: 12),
+        const Radius.circular(6),
+      ),
+      light,
+    );
+    c.restore();
+    final crack = _stroke(const Color(0xFF546E7A), 2);
+    c.drawPath(
+      Path()
+        ..moveTo(32, 46)
+        ..lineTo(38, 54)
+        ..lineTo(34, 60),
+      crack,
+    );
+    c.drawPath(
+      Path()
+        ..moveTo(88, 98)
+        ..lineTo(82, 104)
+        ..lineTo(86, 108),
+      crack,
+    );
+  }
+
+  /// Trash Titan: a stomping bin with a flapping lid.
+  void _titan(Canvas c, Paint fill, Paint light) {
+    c.drawPath(
+      Path()
+        ..moveTo(24, 38)
+        ..lineTo(96, 38)
+        ..lineTo(88, 108)
+        ..lineTo(32, 108)
+        ..close(),
+      fill,
+    );
+    c.save();
+    c.translate(60, 30);
+    c.rotate(mood == BossMood.hit ? -0.35 : -0.15);
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: Offset.zero, width: 84, height: 12),
+        const Radius.circular(4),
+      ),
+      light,
+    );
+    c.restore();
+    final rib = _stroke(light.color, 3);
+    for (final x in const [44.0, 60.0, 76.0]) {
+      c.drawLine(Offset(x, 90), Offset(x, 104), rib);
+    }
+    for (final x in const [30.0, 76.0]) {
+      c.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x, 106, 16, 10),
+          const Radius.circular(3),
+        ),
+        light,
+      );
+    }
+  }
+
+  /// Pillow Phantom: a ghost with a wavy hem and a pillow hat.
+  void _phantom(Canvas c, Paint fill, Paint light) {
+    final body = Path()
+      ..moveTo(22, 106)
+      ..lineTo(22, 64)
+      ..quadraticBezierTo(22, 28, 60, 28)
+      ..quadraticBezierTo(98, 28, 98, 64)
+      ..lineTo(98, 106);
+    for (var x = 98.0; x > 22; x -= 19) {
+      body.quadraticBezierTo(x - 9.5, 116, x - 19, 106);
+    }
+    body.close();
+    c.drawPath(body, fill);
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(30, 12, 60, 24),
+        const Radius.circular(12),
+      ),
+      light,
+    );
+  }
+
+  /// Window Wraith: a window frame trailing a wisp.
+  void _wraith(Canvas c, Paint fill, Paint light) {
+    c.drawPath(
+      Path()
+        ..moveTo(40, 96)
+        ..quadraticBezierTo(30, 112, 12, 114)
+        ..quadraticBezierTo(36, 106, 50, 92)
+        ..close(),
+      light,
+    );
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(24, 30, 72, 72),
+        const Radius.circular(8),
+      ),
+      fill,
+    );
+    final frame = _stroke(light.color, 5);
+    c.drawLine(const Offset(60, 34), const Offset(60, 52), frame);
+    c.drawLine(const Offset(60, 92), const Offset(60, 98), frame);
+    c.drawRRect(
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(24, 30, 72, 72),
+        const Radius.circular(8),
+      ),
+      frame,
+    );
   }
 
   void _face(Canvas c) {

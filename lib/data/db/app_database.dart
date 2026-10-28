@@ -12,7 +12,15 @@ export 'tables.dart';
 part 'app_database.g.dart';
 
 @DriftDatabase(
-  tables: [Profiles, Chores, Completions, PointLedger, Settings, Fights],
+  tables: [
+    Profiles,
+    Chores,
+    Completions,
+    PointLedger,
+    Settings,
+    Fights,
+    Inventory,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor, {DateTime Function()? clock})
@@ -36,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -67,6 +75,11 @@ class AppDatabase extends _$AppDatabase {
         // every past completion already counts as an earned token.
         await m.addColumn(chores, chores.bossFamily);
         await m.createTable(fights);
+      }
+      if (from < 5) {
+        // v5: the shop's inventory. The ledger gains the "spend" reason,
+        // which needs no schema change (stored as text).
+        await m.createTable(inventory);
       }
     },
     beforeOpen: (details) async {

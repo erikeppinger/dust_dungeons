@@ -621,7 +621,6 @@
   "worldBosses": "Bosses",
   "worldFight": "Fight",
   "worldNoTokens": "Do a chore for a token",
-  "worldComingSoon": "Arrives in 0.5.1",
   "worldTier": "Tier {tier}",
   "@worldTier": {
     "placeholders": {
@@ -655,10 +654,96 @@
       }
     }
   },
-  "avatarMoreSoon": "More items arrive with the shop in 0.5.1.",
   "settingsFights": "Boss fights",
   "fightSettingSound": "Sound",
   "fightSettingHaptics": "Vibration on each beat",
   "fightSettingStory": "Story mode",
-  "fightSettingStorySubtitle": "Fights can't be lost, and the timing is more forgiving"
+  "fightSettingStorySubtitle": "Fights can't be lost, and the timing is more forgiving",
+  "choreBoss": "Boss",
+  "choreBossHelp": "Doing this chore earns a fight token for this boss",
+  "itemShield": "Sponge Shield",
+  "itemShieldDesc": "Forgives your first miss in every fight",
+  "itemMop": "Turbo Mop",
+  "itemMopDesc": "Perfect hits clean 50% more",
+  "itemCharm": "Metronome Charm",
+  "itemCharmDesc": "More forgiving timing",
+  "itemGloves": "Rubber Gloves",
+  "itemGlovesDesc": "One extra heart",
+  "itemSecondWind": "Second Wind",
+  "itemSecondWindDesc": "Continue once after losing a fight",
+  "hatCap": "Cap",
+  "hatBandana": "Bandana",
+  "hatWizard": "Wizard hat",
+  "hatCrown": "Crown",
+  "hatDesc": "For your hero",
+  "shopTitle": "Shop",
+  "shopBalance": "You have {points} points",
+  "@shopBalance": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "shopXpNote": "Spending points never lowers your level or XP.",
+  "shopGear": "Gear (always active in fights)",
+  "shopConsumables": "Consumables",
+  "shopHats": "Hats",
+  "shopPrice": "{price} pts",
+  "@shopPrice": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "shopOwned": "Owned",
+  "shopInStock": "{n} in stock",
+  "@shopInStock": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "shopConfirmTitle": "Buy {item}?",
+  "@shopConfirmTitle": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "shopConfirmBody": "This costs {price} points. Your level and XP stay the same.",
+  "@shopConfirmBody": {
+    "placeholders": {
+      "price": {
+        "type": "int"
+      }
+    }
+  },
+  "shopBuyAction": "Buy",
+  "shopCancel": "Cancel",
+  "shopBought": "{item} bought!",
+  "@shopBought": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "shopNotEnough": "Not enough points yet",
+  "worldShop": "Shop",
+  "avatarHat": "Hat",
+  "avatarNoHat": "No hat",
+  "avatarMoreHats": "Locked hats can be bought in the shop.",
+  "fightSecondWind": "{n, plural, =1{Use Second Wind · 1 left} other{Use Second Wind · {n} left}}",
+  "@fightSecondWind": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fightShieldReady": "Sponge Shield ready"
 }

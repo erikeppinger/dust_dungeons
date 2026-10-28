@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../data/providers.dart';
+import '../../domain/fight/shop.dart';
 import '../fight/hero_art.dart';
+import 'shop_screen.dart';
 import '../settings/settings_controller.dart';
 
 /// Choose the hero's look. Changes apply (and are saved) immediately.
@@ -17,6 +20,7 @@ class AvatarEditor extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final s = ref.watch(settingsProvider);
+    final owned = ref.watch(inventoryProvider).value ?? const {};
     final controller = ref.read(settingsProvider.notifier);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.avatarTitle)),
@@ -33,6 +37,7 @@ class AvatarEditor extends ConsumerWidget {
               skin: s.avatarSkin,
               hair: s.avatarHair,
               cape: s.avatarCape,
+              hat: s.avatarHat,
               size: 160,
             ),
           ),
@@ -60,9 +65,48 @@ class AvatarEditor extends ConsumerWidget {
             onSelect: (i) =>
                 controller.update((x) => x.copyWith(avatarCape: i)),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
+          Text(l10n.avatarHat, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              ChoiceChip(
+                key: const ValueKey('hat-0'),
+                label: Text(l10n.avatarNoHat),
+                selected: s.avatarHat == 0,
+                onSelected: (_) =>
+                    controller.update((x) => x.copyWith(avatarHat: 0)),
+              ),
+              for (final (i, hat) in hats.indexed)
+                if ((owned[hat.key] ?? 0) > 0)
+                  ChoiceChip(
+                    key: ValueKey('hat-${i + 1}'),
+                    avatar: HeroArt(
+                      skin: s.avatarSkin,
+                      hair: s.avatarHair,
+                      cape: s.avatarCape,
+                      hat: i + 1,
+                      size: 22,
+                    ),
+                    label: Text(itemName(l10n, hat)),
+                    selected: s.avatarHat == i + 1,
+                    onSelected: (_) =>
+                        controller.update((x) => x.copyWith(avatarHat: i + 1)),
+                  )
+                else
+                  ActionChip(
+                    key: ValueKey('hat-${i + 1}'),
+                    avatar: const Icon(Icons.lock_outline, size: 18),
+                    label: Text(itemName(l10n, hat)),
+                    onPressed: () => ShopScreen.open(context),
+                  ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
-            l10n.avatarMoreSoon,
+            l10n.avatarMoreHats,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

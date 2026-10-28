@@ -9,6 +9,7 @@ import 'repositories/chore_repository.dart';
 import 'repositories/fight_repository.dart';
 import 'repositories/progress_repository.dart';
 import 'repositories/settings_repository.dart';
+import 'repositories/shop_repository.dart';
 
 /// The open database. Overridden in `main.dart` (and with an in-memory
 /// database in tests).
@@ -143,3 +144,14 @@ final fightProgressProvider = Provider<AsyncValue<FightProgress>>((ref) {
   if (c == null || ch == null || f == null) return const AsyncLoading();
   return AsyncData(FightProgress(completions: c, chores: ch, fights: f));
 });
+
+final shopRepositoryProvider = Provider(
+  (ref) => ShopRepository(ref.watch(databaseProvider)),
+);
+
+/// Items bought in the shop: item key → count.
+final inventoryProvider = StreamProvider<Map<String, int>>(
+  (ref) => ref
+      .watch(shopRepositoryProvider)
+      .watchInventory(ref.watch(currentProfileIdProvider)),
+);
