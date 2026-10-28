@@ -330,6 +330,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | Display name | **Working title only** until the genre is chosen (~0.5.0) | The name lives in the ARB files (`appTitle`), so renaming is a one-line change |
 
 ### Direction for 0.5 (2026-10-28)
+- **Full design: [design/0.5-boss-fights.md](design/0.5-boss-fights.md)** (mechanic, rewards, sound and avatar decided).
 - **Boss fights** are the leading genre idea: chore-themed bosses ("Dust Bunny", "Laundry Hydra") plus a weekly
   "Chore Overlord", fought in a short original rhythm/action round (Flame engine, offline, CC0 or own assets).
   Level sets hero strength, and points buy abilities, gear and retries.
