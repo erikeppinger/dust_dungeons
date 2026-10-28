@@ -8,6 +8,18 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-28
+### Added
+- Local SQLite database (Drift) with profiles, chores, completions, a point ledger and settings.
+- 21 built-in chores (de/en) with colorful icons; new built-ins are added automatically on updates.
+- Today screen: chore grid with point balance; tap to complete (double taps count once), snackbar with **Undo**, ✓ "done today" badge.
+- Add, edit and archive/restore chores (name, icon, color, points), and a "Manage chores" screen in Settings.
+- Settings (theme, colorblind palette, language) are now saved.
+- Error message instead of a blank screen if the database cannot be opened.
+- Chore names support umlauts, ß, accents, other scripts and emoji (tested in the database and on device).
+- Calm glow at scroll edges instead of Android's stretch effect, which distorted text.
+- Database, catalog and widget tests; on-device integration test covers the new flows.
+
 ## [0.0.1] - 2026-10-28
 ### Added
 - Flutter project for Android with placeholder application ID `io.github.changeme.homework_and_chores`.
@@ -25,4 +37,5 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.1.0]: #
 [0.0.1]: #

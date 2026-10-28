@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+
+import '../../app/theme/chore_palette.dart';
+import '../../l10n/app_localizations.dart';
+import 'chore_icons.dart';
+
+/// Colorful card for one chore. Color is never the only signal: every tile
+/// also shows its icon, title and points.
+class ChoreTile extends StatelessWidget {
+  const ChoreTile({
+    super.key,
+    required this.title,
+    required this.iconKey,
+    required this.colorKey,
+    required this.points,
+    this.doneToday = 0,
+    this.onTap,
+    this.onLongPress,
+  });
+
+  final String title;
+  final String iconKey;
+  final int colorKey;
+  final int points;
+  final int doneToday;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final palette = theme.extension<ChorePalette>()!;
+    final color = palette.colorFor(colorKey);
+    final l10n = AppLocalizations.of(context);
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      color: Color.alphaBlend(
+        color.withValues(alpha: 0.18),
+        theme.colorScheme.surfaceContainerLow,
+      ),
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: color,
+                    child: Icon(
+                      choreIcon(iconKey),
+                      color: palette.onColorFor(colorKey),
+                      size: 26,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (doneToday > 0) _DoneBadge(count: doneToday),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(l10n.pointsValue(points), style: theme.textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact "✓ 2" badge; the tooltip/semantics carry the full "2× today".
+class _DoneBadge extends StatelessWidget {
+  const _DoneBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Tooltip(
+      message: AppLocalizations.of(context).doneTodayCount(count),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: scheme.secondaryContainer,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check, size: 16, color: scheme.onSecondaryContainer),
+            const SizedBox(width: 2),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: scheme.onSecondaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

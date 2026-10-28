@@ -93,7 +93,7 @@ Homework-and-Chores/
 ├─ assets/
 │  ├─ icons/chores/          # SVG chore icons
 │  ├─ themes/                # theme/genre packs (later)
-│  └─ seed/default_chores.json
+│  └─ (images, sounds later)
 ├─ lib/
 │  ├─ main.dart
 │  ├─ app/                   # App widget, router, theme, l10n setup
@@ -251,8 +251,8 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 
 | Version | Milestone | Content |
 |---|---|---|
-| **0.0.1** | Scaffolding | `flutter create --org io.github.changeme --project-name homework_and_chores --platforms=android`, Dropbox ignore, local Git (no remote yet), license, README, CHANGELOG, lint rules, l10n setup, theme skeleton (light/dark) |
-| **0.1.0** | Core chores | Drift DB, seed chores, chore list, add/edit/archive, icons & colors, complete + undo |
+| **0.0.1** ✅ | Scaffolding | `flutter create --org io.github.changeme --project-name homework_and_chores --platforms=android`, Dropbox ignore, local Git (no remote yet), license, README, CHANGELOG, lint rules, l10n setup, theme skeleton (light/dark) |
+| **0.1.0** ✅ | Core chores | Drift DB, seed chores (`lib/domain/default_chores.dart`), chore list, add/edit/archive, icons & colors, complete + undo, settings saved |
 | **0.2.0** | Scheduling | Recurrence engine (with heavy unit tests), Today view, week/month overview, overdue logic |
 | **0.3.0** | Points | Ledger, XP/levels, point formula, streaks, stats screen v1 |
 | **0.4.0** | Notifications | Permission flow, daily summary, per-chore reminders, weekly recap, boot rescheduling |
@@ -286,6 +286,7 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 **Rules that keep both stores open**
 - No Google-Play-only libraries (Firebase, Play Services, in-app review/billing). If one is ever wanted, put it in a separate `play` build flavor.
 - Package name stays the placeholder only until the first public release, then it's permanent.
+- **SQLite build:** `sqlite3` 3.x (used by Drift) downloads hash-pinned prebuilt SQLite binaries from its GitHub releases at build time. F-Droid builds offline from source, so before 0.9 switch the `hooks: user_defines: sqlite3` option in `pubspec.yaml` to compile SQLite from source and verify that build works.
 - **Android developer verification:** Google has announced that apps on certified devices, including ones installed from outside Play, will need a registered developer and package name. It starts in some countries in 2026, with a wider rollout later, and F-Droid has publicly opposed it. Check the current status before the first public release, and register the package name if needed.
 
 ---

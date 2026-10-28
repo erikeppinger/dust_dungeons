@@ -1,29 +1,82 @@
 // On-device smoke test. Run on an emulator before every commit:
 //   flutter test integration_test -d emulator-5554
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:homework_and_chores/app/app.dart';
 import 'package:homework_and_chores/app/theme/chore_palette.dart';
+import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/main.dart';
 import 'package:integration_test/integration_test.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('app starts and every tab and setting works', (tester) async {
+  testWidgets('chores, points, undo, editing and settings work on device', (
+    tester,
+  ) async {
+    WidgetController.hitTestWarningShouldBeFatal = true;
     tester.platformDispatcher.localesTestValue = [const Locale('en')];
     addTearDown(tester.platformDispatcher.clearLocalesTestValue);
-    await tester.pumpWidget(const ProviderScope(child: ChoresApp()));
+    // Real SQLite on the device, but in memory so the run starts clean.
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    await tester.pumpWidget(await bootstrap(db));
     await tester.pumpAndSettle();
 
+    // Complete a chore, then undo it.
+    expect(find.text('0 points'), findsOneWidget);
+    await tester.tap(find.text('Dusting'));
+    await tester.pumpAndSettle();
+    expect(find.text('15 points'), findsWidgets);
+    expect(find.byTooltip('1× today'), findsOneWidget);
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+    expect(find.text('0 points'), findsOneWidget);
+    // Let the snackbar leave so it cannot cover the next taps.
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+
+    // Edit a built-in chore's points via long-press.
+    await tester.longPress(find.text('Dusting'));
+    await tester.pumpAndSettle();
+    expect(find.text('Edit chore'), findsOneWidget);
+    await tester.drag(find.byType(Slider), const Offset(400, 0));
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.text('100 points'), findsOneWidget);
+
+    // Add a custom chore.
+    await tester.tap(find.text('Add chore'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextFormField),
+      'Wäsche größer ß é Ж 日本 🧺',
+    );
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Wäsche größer ß é Ж 日本 🧺'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+
     // Every tab opens.
-    for (final tab in ['Plan', 'World', 'Stats', 'Settings', 'Today']) {
+    for (final tab in ['Plan', 'World', 'Stats', 'Settings']) {
       await tester.tap(find.widgetWithText(NavigationDestination, tab));
       await tester.pumpAndSettle();
       expect(find.widgetWithText(AppBar, tab), findsOneWidget);
     }
 
-    await tester.tap(find.widgetWithText(NavigationDestination, 'Settings'));
+    // Archive via Manage chores.
+    await tester.tap(find.text('Manage chores'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Dusting'),
+        matching: find.byTooltip('Archive'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.pageBack();
     await tester.pumpAndSettle();
 
     // Theme modes.
@@ -54,9 +107,12 @@ void main() {
     await tester.tap(find.text('Deutsch'));
     await tester.pumpAndSettle();
     expect(find.text('Einstellungen'), findsWidgets);
-
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
-    expect(find.text('Settings'), findsWidgets);
+
+    // Archived chore is gone from Today.
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Today'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dusting'), findsNothing);
   });
 }

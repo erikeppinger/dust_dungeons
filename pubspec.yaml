@@ -4,19 +4,21 @@ publish_to: 'none'
 
 # SemVer: MAJOR.MINOR.PATCH+BUILD. BUILD = Android versionCode and must always increase.
 # Bump with tool/bump_version.ps1 and record changes in CHANGELOG.md.
-version: 0.0.1+1
-
+version: 0.1.0+2
 environment:
   sdk: ^3.13.1
 
 # Rule: no dependency may use the network, collect analytics or need Google Play Services.
 dependencies:
+  drift: ^2.35.3
+  drift_flutter: ^0.3.1
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.3
   intl: ^0.20.3
+  path_provider: ^2.1.6
 
 dev_dependencies:
   flutter_test:
@@ -24,6 +26,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   integration_test:
     sdk: flutter
+  drift_dev: ^2.35.2
+  build_runner: ^2.17.1
 
 flutter:
   uses-material-design: true

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/chore_palette.dart';
+import '../../core/widgets/section_header.dart';
+import '../chores/manage_chores_screen.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_controller.dart';
 
@@ -20,7 +22,15 @@ class SettingsScreen extends ConsumerWidget {
 
     return ListView(
       children: [
-        _SectionHeader(l10n.settingsAppearance),
+        SectionHeader(l10n.settingsChores),
+        ListTile(
+          leading: const Icon(Icons.checklist),
+          title: Text(l10n.manageChores),
+          subtitle: Text(l10n.manageChoresSubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => ManageChoresScreen.open(context),
+        ),
+        SectionHeader(l10n.settingsAppearance),
         ListTile(
           title: Text(l10n.settingsTheme),
           subtitle: Padding(
@@ -69,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
         ),
-        _SectionHeader(l10n.settingsLanguage),
+        SectionHeader(l10n.settingsLanguage),
         RadioGroup<String?>(
           groupValue: settings.locale?.languageCode,
           onChanged: (code) =>
@@ -88,7 +98,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
         ),
-        _SectionHeader(l10n.settingsAbout),
+        SectionHeader(l10n.settingsAbout),
         ListTile(
           leading: const Icon(Icons.lock_outline),
           title: Text(l10n.aboutPrivacy),
@@ -100,20 +110,4 @@ class SettingsScreen extends ConsumerWidget {
       ],
     );
   }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-    child: Text(
-      text,
-      style: Theme.of(context).textTheme.titleSmall
-          ?.copyWith(color: Theme.of(context).colorScheme.primary),
-    ),
-  );
 }

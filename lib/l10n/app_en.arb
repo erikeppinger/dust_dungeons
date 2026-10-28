@@ -1,23 +1,26 @@
 {
   "@@locale": "en",
   "appTitle": "Homework & Chores",
-  "@appTitle": { "description": "Working title of the app; final name TBD." },
-
+  "@appTitle": {
+    "description": "Working title of the app; final name TBD."
+  },
   "navToday": "Today",
   "navPlan": "Plan",
   "navWorld": "World",
   "navStats": "Stats",
   "navSettings": "Settings",
-
   "comingInVersion": "Coming in version {version}",
   "@comingInVersion": {
-    "placeholders": { "version": { "type": "String", "example": "0.1.0" } }
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "0.1.0"
+      }
+    }
   },
-  "todayPlaceholder": "Your due chores will show up here.",
   "planPlaceholder": "Week and month overview of your chores.",
   "worldPlaceholder": "Spend your points to grow your world.",
   "statsPlaceholder": "Points, streaks and summaries.",
-
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",
   "themeSystem": "System",
@@ -30,5 +33,81 @@
   "languageSystem": "System default",
   "settingsAbout": "About",
   "aboutPrivacy": "All data stays on this device. No account, no network, no tracking, no ads.",
-  "aboutLicense": "Open source under GPL-3.0"
+  "aboutLicense": "Open source under GPL-3.0",
+  "pointsValue": "{count, plural, =1{1 point} other{{count} points}}",
+  "@pointsValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tapToComplete": "Tap a chore when it's done. Long-press to edit.",
+  "doneTodayCount": "{count}× today",
+  "@doneTodayCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "choreCompleted": "{chore} done · +{points}",
+  "@choreCompleted": {
+    "placeholders": {
+      "chore": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "undo": "Undo",
+  "noChores": "No active chores. Add one with the button below.",
+  "addChore": "Add chore",
+  "editChore": "Edit chore",
+  "settingsChores": "Chores",
+  "manageChores": "Manage chores",
+  "manageChoresSubtitle": "Add, edit, archive",
+  "activeChores": "Active",
+  "archivedChores": "Archived",
+  "choreName": "Name",
+  "choreNameRequired": "Please enter a name",
+  "chorePoints": "Points",
+  "choreColor": "Color",
+  "colorOption": "Color {number}",
+  "@colorOption": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "choreIcon": "Icon",
+  "save": "Save",
+  "archive": "Archive",
+  "restore": "Restore",
+  "choreDusting": "Dusting",
+  "choreSweeping": "Sweep the floor",
+  "choreVacuuming": "Vacuuming",
+  "choreMopping": "Mop the floor",
+  "choreDishes": "Wash the dishes",
+  "choreDishwasher": "Load/unload dishwasher",
+  "choreLaundry": "Do the laundry",
+  "choreHangLaundry": "Hang up laundry",
+  "choreFoldLaundry": "Fold laundry",
+  "choreIroning": "Ironing",
+  "choreCleanBathroom": "Clean the bathroom",
+  "choreCleanToilet": "Clean the toilet",
+  "choreCleanKitchen": "Clean the kitchen",
+  "choreTakeOutTrash": "Take out the trash",
+  "choreRecycling": "Take out recycling",
+  "choreChangeBedSheets": "Change bed sheets",
+  "choreCleanWindows": "Clean the windows",
+  "choreCleanFridge": "Clean the fridge",
+  "choreGroceries": "Grocery shopping",
+  "choreWaterPlants": "Water the plants",
+  "choreTidyUp": "Tidy up",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "startupError": "The app could not open its data. Your data has not been deleted. Please restart the app; if this keeps happening, report the error below."
 }

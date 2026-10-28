@@ -5,9 +5,13 @@ lib/
 ├─ main.dart             entry point (ProviderScope)
 ├─ app/                  MaterialApp, navigation shell, theme
 │  └─ theme/             Material 3 theme + ChorePalette (vibrant / Okabe-Ito)
-├─ core/                 shared widgets and helpers
-├─ data/                 (0.1+) Drift database, tables, migrations, repositories
-├─ domain/               (0.1+) pure Dart: models, points engine, recurrence engine
+├─ core/                 shared widgets, day clock (midnight/resume aware)
+├─ data/
+│  ├─ db/                Drift tables + AppDatabase (schema version, migrations, seeding)
+│  ├─ models/            plain data classes (AppSettings)
+│  ├─ repositories/      chores, progress (completions + point ledger), settings
+│  └─ providers.dart     Riverpod providers wiring database → repositories → UI streams
+├─ domain/               pure Dart: built-in chore catalog, points rule
 ├─ features/<feature>/   screens + Riverpod controllers per feature
 └─ l10n/                 ARB source files (generated Dart files are git-ignored)
 ```
@@ -15,7 +19,10 @@ lib/
 ## Principles
 - **`domain/` is pure Dart** with no Flutter imports, so it can be unit-tested in isolation.
 - **State:** Riverpod `Notifier`s per feature, and widgets only read providers.
-- **Persistence:** local SQLite via Drift (from 0.1.0). Points are an append-only ledger, and "due" dates are computed rather than stored.
+- **Persistence:** local SQLite via Drift. Points are an append-only ledger: undo marks the completion `undoneAt` and books a negative entry instead of deleting anything. "Due" dates (0.2) will be computed rather than stored.
+- **Layering:** `features` → `data` → `domain`. `data` never imports `features`.
+- **Built-in chores** are identified by a stable `seedKey` and get localized titles. Missing ones are inserted on every start (`insertOrIgnore`), so new built-ins arrive with updates without touching user edits.
+- **Schema changes:** bump `schemaVersion` in `app_database.dart`, add a migration step, run `dart run build_runner build`. The generated `*.g.dart` is committed.
 - **Theming:** chore colors come from the `ChorePalette` theme extension, never hard-coded colors.
 - **Localization:** `AppLocalizations.of(context)`, generated from `lib/l10n/*.arb` on `flutter pub get`.
 - **Privacy:** the main `AndroidManifest.xml` removes `INTERNET` from all merged manifests.

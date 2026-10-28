@@ -1,45 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// User-facing app settings.
-///
-/// Held in memory for now; persisted in the local database from 0.1.0.
-@immutable
-class AppSettings {
-  const AppSettings({
-    this.themeMode = ThemeMode.system,
-    this.colorblindSafe = false,
-    this.locale,
-  });
+import '../../data/models/app_settings.dart';
+import '../../data/providers.dart';
 
-  final ThemeMode themeMode;
-  final bool colorblindSafe;
+export '../../data/models/app_settings.dart';
 
-  /// `null` follows the device language.
-  final Locale? locale;
-
-  AppSettings copyWith({
-    ThemeMode? themeMode,
-    bool? colorblindSafe,
-    Locale? Function()? locale,
-  }) => AppSettings(
-    themeMode: themeMode ?? this.themeMode,
-    colorblindSafe: colorblindSafe ?? this.colorblindSafe,
-    locale: locale != null ? locale() : this.locale,
-  );
-}
+/// Settings loaded from the database before the first frame (see `main.dart`).
+final initialSettingsProvider = Provider<AppSettings>(
+  (ref) => const AppSettings(),
+);
 
 class SettingsController extends Notifier<AppSettings> {
   @override
-  AppSettings build() => const AppSettings();
+  AppSettings build() => ref.read(initialSettingsProvider);
 
-  void setThemeMode(ThemeMode mode) => state = state.copyWith(themeMode: mode);
+  void setThemeMode(ThemeMode mode) => _set(state.copyWith(themeMode: mode));
 
   void setColorblindSafe(bool value) =>
-      state = state.copyWith(colorblindSafe: value);
+      _set(state.copyWith(colorblindSafe: value));
 
-  void setLocale(Locale? locale) =>
-      state = state.copyWith(locale: () => locale);
+  void setLocale(Locale? locale) => _set(state.copyWith(locale: () => locale));
+
+  void _set(AppSettings settings) {
+    state = settings;
+    // The UI updates immediately; a failed write is reported, not swallowed.
+    unawaited(
+      ref
+          .read(settingsRepositoryProvider)
+          .save(settings)
+          .catchError(
+            (Object error, StackTrace stack) => FlutterError.reportError(
+              FlutterErrorDetails(exception: error, stack: stack),
+            ),
+          ),
+    );
+  }
 }
 
 final settingsProvider = NotifierProvider<SettingsController, AppSettings>(

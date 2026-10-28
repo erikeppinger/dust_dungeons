@@ -24,10 +24,28 @@ class ChoresApp extends ConsumerWidget {
         colorblindSafe: settings.colorblindSafe,
       ),
       themeMode: settings.themeMode,
+      scrollBehavior: const _GlowScrollBehavior(),
       locale: settings.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const HomeShell(),
     );
   }
+}
+
+/// Uses the subtle glow at the scroll edges instead of Material 3's
+/// "stretch", which distorts text when scrolling past the top or bottom.
+class _GlowScrollBehavior extends MaterialScrollBehavior {
+  const _GlowScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) => GlowingOverscrollIndicator(
+    axisDirection: details.direction,
+    color: Theme.of(context).colorScheme.primary,
+    child: child,
+  );
 }

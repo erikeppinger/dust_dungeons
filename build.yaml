@@ -1,0 +1,7 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Human-readable ISO-8601 timestamps that keep local-time semantics.
+          store_date_time_values_as_text: true
