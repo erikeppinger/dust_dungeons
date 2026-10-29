@@ -11,6 +11,7 @@ Chore chore(int id, RepeatType type, {int interval = 1, int order = 0}) =>
       colorKey: 0,
       basePoints: 10,
       isArchived: false,
+      assignment: Assignment.anyone,
       sortOrder: order,
       createdAt: DateTime(2026, 10, 1),
       repeatType: type,

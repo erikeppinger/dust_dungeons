@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/chores/today_screen.dart';
+import '../features/people/people_screen.dart';
 import '../features/plan/plan_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/stats/stats_screen.dart';
@@ -28,7 +29,11 @@ class HomeShell extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(titles[index])),
+      appBar: AppBar(
+        title: Text(titles[index]),
+        // Who is playing; tap to switch.
+        actions: const [PersonButton(), SizedBox(width: 4)],
+      ),
       body: IndexedStack(
         index: index,
         children: [

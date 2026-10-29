@@ -71,6 +71,13 @@ class _ChoreRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final palette = Theme.of(context).extension<ChorePalette>()!;
     final title = choreTitle(chore, l10n);
+    // Who it's for, with several people sharing the phone.
+    final people = ref.watch(profilesProvider);
+    final assigned = ref.watch(choreAssigneesProvider).value?[chore.id] ?? {};
+    final names = [
+      for (final p in people)
+        if (assigned.contains(p.id)) p.name,
+    ];
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: palette.colorFor(chore.colorKey),
@@ -81,8 +88,14 @@ class _ChoreRow extends ConsumerWidget {
       ),
       title: Text(title),
       subtitle: Text(
-        '${l10n.pointsValue(basePointsOf(chore.basePoints))}'
-        ' · ${recurrenceSummary(context, chore.recurrence)}',
+        [
+          l10n.pointsValue(basePointsOf(chore.basePoints)),
+          recurrenceSummary(context, chore.recurrence),
+          if (people.length > 1)
+            chore.assignment == Assignment.anyone || names.isEmpty
+                ? l10n.assignAnyone
+                : names.join(', '),
+        ].join(' · '),
       ),
       onTap: () => ChoreEditScreen.open(context, chore),
       trailing: IconButton(

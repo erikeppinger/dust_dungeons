@@ -83,6 +83,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final l10n = AppLocalizations.of(context);
     final streakBeforeToday =
         ref.watch(progressStatsProvider).value?.streakBefore ?? 0;
+    final people = ref.watch(profilesProvider);
     return [
       SliverToBoxAdapter(child: SectionHeader('$title (${chores.length})')),
       SliverPadding(
@@ -111,6 +112,14 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               points: points.total,
               bonus: points.bonus,
               doneToday: s.doneToday,
+              // With several people, anyone's chores say who did them.
+              doneBy:
+                  people.length > 1 && s.person == null && s.doneBy.isNotEmpty
+                  ? [
+                      for (final p in people)
+                        if (s.doneBy.contains(p.id)) p.name,
+                    ].join(', ')
+                  : null,
               status: dueLabel(l10n, s.due, s.today),
               overdue: s.isOverdue,
               onTap: () => _complete(s),

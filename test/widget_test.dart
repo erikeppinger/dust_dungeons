@@ -53,6 +53,12 @@ Future<void> _openSettings(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// The first person, as stored.
+Future<Profile> _person(WidgetTester tester, AppDatabase db) async =>
+    (await tester.runAsync(
+      () => (db.select(db.profiles)..limit(1)).getSingle(),
+    ))!;
+
 void main() {
   /// Scrolls the Arena until [finder] is built and on screen: the boss
   /// cards sit below the hero and the quest map.
@@ -370,8 +376,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('cape-2')));
     await tester.pumpAndSettle();
 
-    final saved = await tester.runAsync(() => SettingsRepository(db).load());
-    expect(saved!.avatarCape, 2);
+    expect((await _person(tester, db)).avatarCape, 2);
   });
 
   testWidgets('fight settings are reachable from World and saved', (
@@ -397,9 +402,9 @@ void main() {
     await tester.tap(find.text('Story mode'));
     await tester.pumpAndSettle();
 
+    expect((await _person(tester, db)).storyMode, isTrue);
     final saved = await tester.runAsync(() => SettingsRepository(db).load());
-    expect(saved!.fightStoryMode, isTrue);
-    expect(saved.fightSound, isTrue, reason: 'sound is on by default');
+    expect(saved!.fightSound, isTrue, reason: 'sound is on by default');
   });
 
   /// A database with [points] to spend and one dust token.
@@ -501,8 +506,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(hat);
     await tester.pumpAndSettle();
-    final saved = await tester.runAsync(() => SettingsRepository(db!).load());
-    expect(saved!.avatarHat, 4);
+    expect((await _person(tester, db!)).avatarHat, 4);
   });
 
   testWidgets('owned gear is used in the next fight after a restart', (
@@ -890,7 +894,7 @@ void main() {
 
     final saved = await tester.runAsync(() => SettingsRepository(db).load());
     expect(saved!.fightLatencyMs, 40);
-    expect(saved.fightSlowMode, isTrue);
+    expect((await _person(tester, db)).slowMode, isTrue);
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

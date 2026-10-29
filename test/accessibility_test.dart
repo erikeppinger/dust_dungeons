@@ -90,6 +90,7 @@ void main() {
     ('add chore', 'Quests', ['Add chore'], ['Aufgabe hinzufügen']),
     ('screen time', 'Settings', ['Screen time'], ['Bildschirmzeit']),
     ('backup', 'Settings', ['Backup'], ['Datensicherung']),
+    ('people', 'Settings', ['People'], ['Personen']),
   ];
 
   for (final (name, tab, steps, _) in screens) {

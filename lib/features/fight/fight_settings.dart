@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/db/app_database.dart';
+import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'calibration_screen.dart';
@@ -14,6 +17,9 @@ class FightSettings extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final s = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
+    final people = ref.watch(profilesProvider);
+    final person = ref.watch(currentProfileProvider);
+    final profiles = ref.read(profileRepositoryProvider);
     return Column(
       children: [
         SwitchListTile(
@@ -29,21 +35,35 @@ class FightSettings extends ConsumerWidget {
           onChanged: (v) =>
               controller.update((x) => x.copyWith(fightHaptics: v)),
         ),
+        // Story and slow mode belong to the person; the rest to the phone.
+        if (people.length > 1)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                l10n.fightModesFor(person.name),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+          ),
         SwitchListTile(
           secondary: const Icon(Icons.auto_stories_outlined),
           title: Text(l10n.fightSettingStory),
           subtitle: Text(l10n.fightSettingStorySubtitle),
-          value: s.fightStoryMode,
-          onChanged: (v) =>
-              controller.update((x) => x.copyWith(fightStoryMode: v)),
+          value: person.storyMode,
+          onChanged: (v) => profiles.update(
+            person.id,
+            ProfilesCompanion(storyMode: Value(v)),
+          ),
         ),
         SwitchListTile(
           secondary: const Icon(Icons.slow_motion_video),
           title: Text(l10n.fightSettingSlow),
           subtitle: Text(l10n.fightSettingSlowSubtitle),
-          value: s.fightSlowMode,
+          value: person.slowMode,
           onChanged: (v) =>
-              controller.update((x) => x.copyWith(fightSlowMode: v)),
+              profiles.update(person.id, ProfilesCompanion(slowMode: Value(v))),
         ),
         ListTile(
           leading: const Icon(Icons.av_timer),

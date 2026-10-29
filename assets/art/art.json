@@ -17,6 +17,7 @@
     "icons/coin": { "size": [12, 12], "palette": "ui" },
     "icons/heart": { "size": [12, 12], "palette": "ui" },
     "icons/heart_empty": { "size": [12, 12], "palette": "ui" },
+    "icons/crown": { "size": [12, 12], "palette": "ui" },
     "icons/app_shield": { "size": [16, 16], "palette": "app" },
     "map/grass": { "size": [16, 16], "palette": "map", "variants": 4 },
     "map/forest": { "size": [16, 16], "palette": "map", "variants": 2 },

@@ -21,6 +21,7 @@ part 'app_database.g.dart';
     Fights,
     Inventory,
     ScreenDays,
+    ChoreAssignees,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -45,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -85,6 +86,36 @@ class AppDatabase extends _$AppDatabase {
       if (from < 6) {
         // v6: the soft screen-time budget's daily totals.
         await m.createTable(screenDays);
+      }
+      if (from < 7) {
+        // v7: profiles. Every chore is for anyone; the hero's look and the
+        // fight modes move from settings onto the (only) profile.
+        for (final column in [
+          profiles.avatarSkin,
+          profiles.avatarHair,
+          profiles.avatarCape,
+          profiles.avatarHat,
+          profiles.storyMode,
+          profiles.slowMode,
+          profiles.archivedAt,
+        ]) {
+          await m.addColumn(profiles, column);
+        }
+        await m.addColumn(chores, chores.assignment);
+        await m.createTable(choreAssignees);
+        await customStatement("""
+          UPDATE profiles SET
+            avatar_skin = COALESCE((SELECT CAST(value AS INTEGER) FROM settings WHERE key = 'avatarSkin'), 0),
+            avatar_hair = COALESCE((SELECT CAST(value AS INTEGER) FROM settings WHERE key = 'avatarHair'), 0),
+            avatar_cape = COALESCE((SELECT CAST(value AS INTEGER) FROM settings WHERE key = 'avatarCape'), 0),
+            avatar_hat = COALESCE((SELECT CAST(value AS INTEGER) FROM settings WHERE key = 'avatarHat'), 0),
+            story_mode = COALESCE((SELECT value = 'true' FROM settings WHERE key = 'fightStoryMode'), 0),
+            slow_mode = COALESCE((SELECT value = 'true' FROM settings WHERE key = 'fightSlowMode'), 0)
+        """);
+        await customStatement(
+          "DELETE FROM settings WHERE key IN ('avatarSkin', 'avatarHair', "
+          "'avatarCape', 'avatarHat', 'fightStoryMode', 'fightSlowMode')",
+        );
       }
     },
     beforeOpen: (details) async {

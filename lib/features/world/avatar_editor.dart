@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/shop.dart';
 import '../fight/hero_art.dart';
 import 'shop_screen.dart';
-import '../settings/settings_controller.dart';
 
 /// Choose the hero's look. Changes apply (and are saved) immediately.
 class AvatarEditor extends ConsumerWidget {
@@ -19,9 +20,11 @@ class AvatarEditor extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final s = ref.watch(settingsProvider);
+    // The current person's hero.
+    final s = ref.watch(currentProfileProvider);
     final owned = ref.watch(inventoryProvider).value ?? const {};
-    final controller = ref.read(settingsProvider.notifier);
+    void set(ProfilesCompanion look) =>
+        ref.read(profileRepositoryProvider).update(s.id, look);
     return Scaffold(
       appBar: AppBar(title: Text(l10n.avatarTitle)),
       body: ListView(
@@ -46,24 +49,21 @@ class AvatarEditor extends ConsumerWidget {
             keyPrefix: 'skin',
             colors: avatarSkins,
             selected: s.avatarSkin,
-            onSelect: (i) =>
-                controller.update((x) => x.copyWith(avatarSkin: i)),
+            onSelect: (i) => set(ProfilesCompanion(avatarSkin: Value(i))),
           ),
           _Swatches(
             title: l10n.avatarHair,
             keyPrefix: 'hair',
             colors: avatarHair,
             selected: s.avatarHair,
-            onSelect: (i) =>
-                controller.update((x) => x.copyWith(avatarHair: i)),
+            onSelect: (i) => set(ProfilesCompanion(avatarHair: Value(i))),
           ),
           _Swatches(
             title: l10n.avatarCape,
             keyPrefix: 'cape',
             colors: avatarCapes,
             selected: s.avatarCape,
-            onSelect: (i) =>
-                controller.update((x) => x.copyWith(avatarCape: i)),
+            onSelect: (i) => set(ProfilesCompanion(avatarCape: Value(i))),
           ),
           const SizedBox(height: 20),
           Text(l10n.avatarHat, style: Theme.of(context).textTheme.titleSmall),
@@ -77,7 +77,7 @@ class AvatarEditor extends ConsumerWidget {
                 label: Text(l10n.avatarNoHat),
                 selected: s.avatarHat == 0,
                 onSelected: (_) =>
-                    controller.update((x) => x.copyWith(avatarHat: 0)),
+                    set(const ProfilesCompanion(avatarHat: Value(0))),
               ),
               for (final (i, hat) in hats.indexed)
                 if ((owned[hat.key] ?? 0) > 0)
@@ -93,7 +93,7 @@ class AvatarEditor extends ConsumerWidget {
                     label: Text(itemName(l10n, hat)),
                     selected: s.avatarHat == i + 1,
                     onSelected: (_) =>
-                        controller.update((x) => x.copyWith(avatarHat: i + 1)),
+                        set(ProfilesCompanion(avatarHat: Value(i + 1))),
                   )
                 else
                   ActionChip(

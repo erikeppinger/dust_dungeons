@@ -8,6 +8,30 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-29
+### Added
+- **Several people on one phone** ([design](docs/design/profiles.md)):
+  - **Switching:** tap the hero in the top bar. The app remembers the last person.
+  - **Settings → People:** add, rename and remove people. A removed person's history stays, and
+    adding the name again brings them back.
+  - **Per person:** points, level, streak, hero look, Armory, fights, the Overlord and the quest
+    map. Story mode and slow mode are also per person.
+  - **Who a quest is for:** **anyone** (done once for the household, with "✓ name" on the tile),
+    **one person** (only they see it), or **each** of chosen people (everyone does their own).
+  - **Quest Log:** an "Everyone's quests" filter.
+  - **Hall of Fame:** a **"This week" leaderboard** by points earned, with a crown for the leader
+    and last week's winner.
+  - **Notifications** cover the whole household, and name a person's own quests as in "Trash (Sam)".
+    Recaps count everyone's quests.
+  - **Backups** carry people with their heroes, and quest assignments.
+- Database schema v7 (people's heroes and fight modes, quest assignments) with tested migration.
+
+### Changed
+- Screen time works with one person only (usage is measured per phone). Adding a second person
+  turns it off, after a note.
+- The generated art file is now `lib/app/art/art_data.dart`, because `build_runner` deletes
+  `*.g.dart` files it didn't write.
+
 ## [0.8.0] - 2026-10-29
 ### Added
 - **Backups** (Settings → Backup, [design](docs/design/data-safety.md)):
@@ -237,6 +261,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.9.0]: #
 [0.8.0]: #
 [0.7.2]: #
 [0.7.1]: #

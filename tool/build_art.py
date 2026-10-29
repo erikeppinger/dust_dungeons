@@ -1,11 +1,11 @@
 """Checks the pixel art in assets/art and turns it into Dart code.
 
-The PNG and palette files are the source; lib/app/art/art.g.dart is
+The PNG and palette files are the source; lib/app/art/art_data.dart is
 generated from them (like the database code), so the app draws its art
 synchronously and pixel-exact. See docs/ART_GUIDE.md.
 
     python tool/build_art.py          # check and regenerate
-    python tool/build_art.py --check  # only check; fails if art.g.dart is out of date
+    python tool/build_art.py --check  # only check; fails if art_data.dart is out of date
 
 Needs Pillow (pip install pillow).
 """
@@ -22,7 +22,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 ART = ROOT / "assets" / "art"
-OUT = ROOT / "lib" / "app" / "art" / "art.g.dart"
+OUT = ROOT / "lib" / "app" / "art" / "art_data.dart"
 
 # Palette index -> character in the generated rows; '.' is transparent.
 DIGITS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -220,7 +220,7 @@ def dart_format(code):
     if dart is None:
         raise ArtError("dart not found: install Flutter and put it on the PATH")
     with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "art.g.dart"
+        path = Path(tmp) / "art_data.dart"
         path.write_text(code, encoding="utf-8", newline="\n")
         subprocess.run([dart, "format", str(path)], check=True, capture_output=True)
         return path.read_text(encoding="utf-8")
@@ -240,7 +240,7 @@ def main():
     if check:
         current = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
         if current != code:
-            print("lib/app/art/art.g.dart is out of date: run python tool/build_art.py",
+            print("lib/app/art/art_data.dart is out of date: run python tool/build_art.py",
                   file=sys.stderr)
             return 1
         print(f"Art OK: {count} sprites, {len(groups)} palette groups.")

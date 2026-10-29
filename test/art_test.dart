@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/app/art/art.dart';
 
-/// The generated `lib/app/art/art.g.dart` must match the PNG and palette
+/// The generated `lib/app/art/art_data.dart` must match the PNG and palette
 /// files in `assets/art`: if this fails, run `python tool/build_art.py`.
 void main() {
   const digits =

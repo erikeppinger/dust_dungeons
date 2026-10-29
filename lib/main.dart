@@ -10,6 +10,8 @@ import 'app/app.dart';
 import 'app/home_tab.dart';
 import 'data/db/app_database.dart';
 import 'data/providers.dart';
+import 'data/backup/merge.dart' show currentProfileSetting;
+import 'data/repositories/profile_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'features/backup/backups.dart';
 import 'features/notifications/notification_planner.dart';
@@ -92,13 +94,21 @@ Future<Widget> bootstrap(
   NotificationService? notifications,
   List<Override> overrides = const [],
 }) async {
-  final profileId = await db.defaultProfileId();
+  final profiles = await ProfileRepository(db).active();
+  final lastUsed = await (db.select(
+    db.settings,
+  )..where((s) => s.key.equals(currentProfileSetting))).getSingleOrNull();
+  final lastId = int.tryParse(lastUsed?.value ?? '');
+  final profileId = profiles.any((p) => p.id == lastId)
+      ? lastId!
+      : profiles.first.id;
   final settings = await SettingsRepository(db).load();
   final service = notifications ?? LocalNotificationService();
   final container = ProviderContainer(
     overrides: [
       databaseProvider.overrideWithValue(db),
-      currentProfileIdProvider.overrideWithValue(profileId),
+      initialProfilesProvider.overrideWithValue(profiles),
+      initialProfileIdProvider.overrideWithValue(profileId),
       initialSettingsProvider.overrideWithValue(settings),
       notificationServiceProvider.overrideWithValue(service),
       ...overrides,

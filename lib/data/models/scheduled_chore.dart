@@ -9,6 +9,8 @@ class ScheduledChore {
     required DateTime? lastDone,
     required this.doneToday,
     required DateTime today,
+    this.person,
+    this.doneBy = const {},
   }) : today = dayOf(today),
        recurrence = chore.recurrence,
        lastDone = chore.countedLastDone(lastDone) {
@@ -24,6 +26,13 @@ class ScheduledChore {
   /// Completions today (including ones that do not count for the schedule).
   final int doneToday;
   final DateTime today;
+
+  /// Whose chore this is: `null` for anyone's (the household's), otherwise
+  /// the person it's scheduled for.
+  final int? person;
+
+  /// Who did it today (profile ids).
+  final Set<int> doneBy;
 
   /// Next due day; `null` when the chore is never due.
   late final DateTime? due;
@@ -66,4 +75,65 @@ class TodaySections {
     if (ad != null && bd == null) return -1;
     return a.chore.sortOrder.compareTo(b.chore.sortOrder);
   }
+}
+
+/// The chores' schedule state on [today], from the completions of everyone
+/// (docs/design/profiles.md):
+///
+/// * anyone's chores once, due from the household's latest completion;
+/// * chores for one or each person, due from that person's completions.
+///
+/// For a [person], only what they see: anyone's chores and their own. For
+/// the household (`person == null`), each personal chore once per assignee.
+List<ScheduledChore> schedule({
+  required List<Chore> chores,
+  required Map<int, Set<int>> assignees,
+  required Map<(int, int), DateTime> lastDone,
+  required Map<(int, int), int> doneToday,
+  required DateTime today,
+  int? person,
+}) {
+  final result = <ScheduledChore>[];
+  for (final chore in chores) {
+    final people = assignees[chore.id] ?? const <int>{};
+    if (chore.assignment == Assignment.anyone || people.isEmpty) {
+      DateTime? last;
+      var count = 0;
+      final by = <int>{};
+      for (final MapEntry(key: (c, _), value: t) in lastDone.entries) {
+        if (c == chore.id && (last == null || t.isAfter(last))) last = t;
+      }
+      for (final MapEntry(key: (c, p), value: n) in doneToday.entries) {
+        if (c == chore.id && n > 0) {
+          count += n;
+          by.add(p);
+        }
+      }
+      result.add(
+        ScheduledChore(
+          chore: chore,
+          lastDone: last,
+          doneToday: count,
+          today: today,
+          doneBy: by,
+        ),
+      );
+      continue;
+    }
+    for (final p in people) {
+      if (person != null && p != person) continue;
+      final count = doneToday[(chore.id, p)] ?? 0;
+      result.add(
+        ScheduledChore(
+          chore: chore,
+          lastDone: lastDone[(chore.id, p)],
+          doneToday: count,
+          today: today,
+          person: p,
+          doneBy: count > 0 ? {p} : const {},
+        ),
+      );
+    }
+  }
+  return result;
 }

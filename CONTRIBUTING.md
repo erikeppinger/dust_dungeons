@@ -48,7 +48,7 @@ minutes ahead to see a scheduled one fire (`adb shell dumpsys alarm` shows what 
 ## Art
 Pixel art lives in `assets/art` as PNG files with palettes and follows the [art guide](docs/ART_GUIDE.md):
 sizes, palettes, drawing rules and licensing. After changing art, regenerate and commit
-`lib/app/art/art.g.dart` (needs Python with Pillow):
+`lib/app/art/art_data.dart` (needs Python with Pillow):
 
 ```bash
 python tool/build_art.py

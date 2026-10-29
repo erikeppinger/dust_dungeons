@@ -8,6 +8,9 @@ import '../db/app_database.dart';
 class MergeReport {
   int profiles = 0;
   int chores = 0;
+
+  /// People added to chores' assignments.
+  int assignees = 0;
   int completions = 0;
 
   /// Completions undone in the backup that were still counted here.
@@ -22,6 +25,7 @@ class MergeReport {
   bool get isEmpty =>
       profiles +
           chores +
+          assignees +
           completions +
           undone +
           ledger +
@@ -38,8 +42,12 @@ class MergeReport {
 const deviceOnlySettings = {
   backupFolderSetting,
   backupLastAutoSetting,
+  currentProfileSetting,
   'fightLatencyMs',
 };
+
+/// Who was using the app last on this phone.
+const currentProfileSetting = 'currentProfile';
 
 /// Settings keys of the automatic backup (see `Backups`).
 const backupFolderSetting = 'backupFolder';
@@ -121,6 +129,28 @@ Future<void> _merge(
           .insert(c.toCompanion(false).copyWith(id: const Value.absent()));
       report.chores++;
     }
+  }
+
+  // Assignees: the union, for chores that are personal here (the phone's
+  // version of a chore wins, so an anyone's chore stays anyone's).
+  final personal = {
+    for (final c in await t.select(t.chores).get())
+      if (c.assignment != Assignment.anyone) c.id,
+  };
+  final localAssignees = {
+    for (final a in await t.select(t.choreAssignees).get())
+      (a.choreId, a.profileId),
+  };
+  for (final a in await s.select(s.choreAssignees).get()) {
+    final key = (choreIds[a.choreId]!, profileIds[a.profileId]!);
+    if (!personal.contains(key.$1) || localAssignees.contains(key)) continue;
+    await t
+        .into(t.choreAssignees)
+        .insert(
+          ChoreAssigneesCompanion.insert(choreId: key.$1, profileId: key.$2),
+        );
+    localAssignees.add(key);
+    report.assignees++;
   }
 
   // Completions: same chore, profile and moment. Rows that share all three

@@ -10,7 +10,7 @@ import '../../data/repositories/shop_repository.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/hero_art.dart';
-import '../settings/settings_controller.dart';
+import '../screen_time/screen_time_providers.dart';
 
 String itemName(AppLocalizations l10n, ShopItem item) => switch (item.key) {
   'sponge_shield' => l10n.itemShield,
@@ -96,7 +96,7 @@ class ShopScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final balance = ref.watch(balanceProvider).value ?? 0;
     final owned = ref.watch(inventoryProvider).value ?? const {};
-    final settings = ref.watch(settingsProvider);
+    final person = ref.watch(currentProfileProvider);
 
     Widget tile(ShopItem item, {Widget? leading}) {
       final count = owned[item.key] ?? 0;
@@ -158,7 +158,7 @@ class ShopScreen extends ConsumerWidget {
             (i) => i.kind == ItemKind.consumable && !screenVouchers.contains(i),
           ))
             tile(item),
-          if (settings.screenTime) ...[
+          if (ref.watch(screenTimeActiveProvider)) ...[
             SectionHeader(l10n.settingsScreenTime),
             for (final item in screenVouchers) tile(item),
           ],
@@ -167,9 +167,9 @@ class ShopScreen extends ConsumerWidget {
             tile(
               item,
               leading: HeroArt(
-                skin: settings.avatarSkin,
-                hair: settings.avatarHair,
-                cape: settings.avatarCape,
+                skin: person.avatarSkin,
+                hair: person.avatarHair,
+                cape: person.avatarCape,
                 hat: i + 1,
                 size: 36,
               ),

@@ -10,7 +10,8 @@ import '../../app/art/art.dart';
 import '../../domain/fight/overworld.dart';
 import '../fight/boss_art.dart';
 import '../fight/hero_art.dart';
-import '../settings/settings_controller.dart';
+import '../../data/db/app_database.dart' show Profile;
+import '../../data/providers.dart';
 
 /// The week's road to the Overlord as a 16-bit style overworld: tiles drawn
 /// pixel by pixel in code (no image assets), on a map generated for the week
@@ -37,9 +38,8 @@ class QuestMap extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsProvider);
     final reached = wins.length.clamp(0, overlordWinsNeeded);
-    final hero = HeroLook.of(settings);
+    final hero = HeroLook.of(ref.watch(currentProfileProvider));
     // Its own TalkBack node, so the progress is read on its own.
     return Semantics(
       container: true,
@@ -96,12 +96,12 @@ class HeroLook {
     required this.hat,
   });
 
-  /// The look chosen in the Wardrobe.
-  factory HeroLook.of(AppSettings settings) => HeroLook(
-    skin: avatarSkins[settings.avatarSkin.clamp(0, avatarSkins.length - 1)],
-    hair: avatarHair[settings.avatarHair.clamp(0, avatarHair.length - 1)],
-    cape: avatarCapes[settings.avatarCape.clamp(0, avatarCapes.length - 1)],
-    hat: settings.avatarHat,
+  /// The look [person] chose in the Wardrobe.
+  factory HeroLook.of(Profile person) => HeroLook(
+    skin: avatarSkins[person.avatarSkin.clamp(0, avatarSkins.length - 1)],
+    hair: avatarHair[person.avatarHair.clamp(0, avatarHair.length - 1)],
+    cape: avatarCapes[person.avatarCape.clamp(0, avatarCapes.length - 1)],
+    hat: person.avatarHat,
   );
 
   final Color skin, hair, cape;

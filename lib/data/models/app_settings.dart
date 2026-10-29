@@ -16,13 +16,7 @@ class AppSettings {
     this.monthlyRecap = true,
     this.fightSound = true,
     this.fightHaptics = true,
-    this.fightStoryMode = false,
-    this.fightSlowMode = false,
     this.fightLatencyMs = 0,
-    this.avatarSkin = 0,
-    this.avatarHair = 0,
-    this.avatarCape = 0,
-    this.avatarHat = 0,
     this.onboardingDone = false,
     this.screenTime = false,
     this.screenBaseMinutes = 60,
@@ -55,22 +49,8 @@ class AppSettings {
   /// Vibration on each beat.
   final bool fightHaptics;
 
-  /// Story mode: fights cannot be lost, wider timing.
-  final bool fightStoryMode;
-
-  /// Slow mode: fights play at 70 % tempo.
-  final bool fightSlowMode;
-
   /// Calibrated tap delay in ms, subtracted from every tap in fights.
   final int fightLatencyMs;
-
-  /// Avatar choices, as indexes into the avatar palettes.
-  final int avatarSkin;
-  final int avatarHair;
-  final int avatarCape;
-
-  /// 0 = no hat, otherwise 1 + the index in `hats` (shop).
-  final int avatarHat;
 
   /// Whether the first-start introduction was finished or skipped.
   final bool onboardingDone;
@@ -106,13 +86,7 @@ class AppSettings {
     bool? monthlyRecap,
     bool? fightSound,
     bool? fightHaptics,
-    bool? fightStoryMode,
-    bool? fightSlowMode,
     int? fightLatencyMs,
-    int? avatarSkin,
-    int? avatarHair,
-    int? avatarCape,
-    int? avatarHat,
     bool? onboardingDone,
     bool? screenTime,
     int? screenBaseMinutes,
@@ -133,13 +107,7 @@ class AppSettings {
     monthlyRecap: monthlyRecap ?? this.monthlyRecap,
     fightSound: fightSound ?? this.fightSound,
     fightHaptics: fightHaptics ?? this.fightHaptics,
-    fightStoryMode: fightStoryMode ?? this.fightStoryMode,
-    fightSlowMode: fightSlowMode ?? this.fightSlowMode,
     fightLatencyMs: fightLatencyMs ?? this.fightLatencyMs,
-    avatarSkin: avatarSkin ?? this.avatarSkin,
-    avatarHair: avatarHair ?? this.avatarHair,
-    avatarCape: avatarCape ?? this.avatarCape,
-    avatarHat: avatarHat ?? this.avatarHat,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     screenTime: screenTime ?? this.screenTime,
     screenBaseMinutes: screenBaseMinutes ?? this.screenBaseMinutes,
@@ -164,13 +132,7 @@ class AppSettings {
       other.monthlyRecap == monthlyRecap &&
       other.fightSound == fightSound &&
       other.fightHaptics == fightHaptics &&
-      other.fightStoryMode == fightStoryMode &&
-      other.fightSlowMode == fightSlowMode &&
       other.fightLatencyMs == fightLatencyMs &&
-      other.avatarSkin == avatarSkin &&
-      other.avatarHair == avatarHair &&
-      other.avatarCape == avatarCape &&
-      other.avatarHat == avatarHat &&
       other.onboardingDone == onboardingDone &&
       other.screenTime == screenTime &&
       other.screenBaseMinutes == screenBaseMinutes &&
@@ -193,13 +155,7 @@ class AppSettings {
     monthlyRecap,
     fightSound,
     fightHaptics,
-    fightStoryMode,
-    fightSlowMode,
     fightLatencyMs,
-    avatarSkin,
-    avatarHair,
-    avatarCape,
-    avatarHat,
     onboardingDone,
     screenTime,
     screenBaseMinutes,

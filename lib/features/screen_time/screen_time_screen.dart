@@ -44,7 +44,6 @@ class ScreenTimeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final settings = ref.watch(settingsProvider);
     final today = ref.watch(screenTodayProvider).value;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsScreenTime)),
@@ -56,7 +55,7 @@ class ScreenTimeScreen extends ConsumerWidget {
           16 + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
-          if (!settings.screenTime) ...[
+          if (!ref.watch(screenTimeActiveProvider)) ...[
             Text(l10n.screenIntro, style: theme.textTheme.bodyLarge),
             const SizedBox(height: 12),
             Text(l10n.screenEarnRule(pointsPerScreenMinute)),
@@ -70,8 +69,15 @@ class ScreenTimeScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 20),
+            // Usage is per phone: with several people it stays off.
+            if (ref.watch(profilesProvider).length > 1) ...[
+              Text(l10n.screenOnePersonOnly),
+              const SizedBox(height: 8),
+            ],
             FilledButton(
-              onPressed: () => _enable(ref),
+              onPressed: ref.watch(profilesProvider).length > 1
+                  ? null
+                  : () => _enable(ref),
               child: Text(l10n.screenEnable),
             ),
           ] else ...[
@@ -388,14 +394,18 @@ class _Settings extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final s = ref.watch(settingsProvider);
     final controller = ref.read(settingsProvider.notifier);
+    final single = ref.watch(profilesProvider).length == 1;
     return Card(
       child: Column(
         children: [
           SwitchListTile(
             title: Text(l10n.screenEnable),
-            value: s.screenTime,
-            onChanged: (v) =>
-                controller.update((x) => x.copyWith(screenTime: v)),
+            // Usage is per phone, so it needs a single person.
+            subtitle: single ? null : Text(l10n.screenOnePersonOnly),
+            value: s.screenTime && single,
+            onChanged: single
+                ? (v) => controller.update((x) => x.copyWith(screenTime: v))
+                : null,
           ),
           ListTile(
             title: Text(l10n.screenBaseBudget),

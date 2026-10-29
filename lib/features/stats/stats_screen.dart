@@ -14,6 +14,7 @@ import '../../l10n/app_localizations.dart';
 import '../chores/chore_icons.dart';
 import '../chores/chore_titles.dart';
 import '../chores/schedule_text.dart';
+import 'leaderboard_card.dart';
 import 'realm_card.dart';
 
 /// Level, streaks, point totals, the last 7 days and the most done chores.
@@ -36,6 +37,8 @@ class StatsScreen extends ConsumerWidget {
               16 + MediaQuery.paddingOf(context).bottom,
             ),
             children: [
+              if (ref.watch(profilesProvider).length > 1)
+                const LeaderboardCard(),
               LevelCard(stats: stats),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

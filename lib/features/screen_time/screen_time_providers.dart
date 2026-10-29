@@ -80,9 +80,17 @@ class ScreenToday {
   );
 }
 
+/// Screen time is on and works: usage is measured per phone, so it needs a
+/// single person (docs/design/profiles.md).
+final screenTimeActiveProvider = Provider<bool>(
+  (ref) =>
+      ref.watch(settingsProvider).screenTime &&
+      ref.watch(profilesProvider).length == 1,
+);
+
 final screenTodayProvider = FutureProvider<ScreenToday?>((ref) async {
   final settings = ref.watch(settingsProvider);
-  if (!settings.screenTime) return null;
+  if (!ref.watch(screenTimeActiveProvider)) return null;
   // Usage moves on while the app is away: fresh numbers on return.
   final listener = AppLifecycleListener(onResume: ref.invalidateSelf);
   ref.onDispose(listener.dispose);
@@ -126,7 +134,7 @@ final screenYesterdayProvider = Provider<ScreenDay?>((ref) {
 
 /// Over the budget yesterday: the hero starts today's fights tired.
 final tiredProvider = Provider<bool>((ref) {
-  if (!ref.watch(settingsProvider).screenTime) return false;
+  if (!ref.watch(screenTimeActiveProvider)) return false;
   final yesterday = ref.watch(screenYesterdayProvider);
   return yesterday != null &&
       yesterday.budgetMinutes > 0 &&

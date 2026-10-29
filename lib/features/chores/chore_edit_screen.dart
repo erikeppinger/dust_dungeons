@@ -45,6 +45,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   /// Reminder time in minutes after midnight; `null` = no reminder.
   int? _reminderMinutes;
   late BossFamily _family;
+
+  /// Who the chore is for, and the people for one/each.
+  late Assignment _assignment;
+  late Set<int> _people;
   bool _showErrors = false;
   bool _initialized = false;
   bool _saving = false;
@@ -66,6 +70,12 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
         chore?.recurrence ?? Recurrence.anytime(ref.read(todayProvider));
     _reminderMinutes = chore?.reminderMinutes;
     _family = chore?.family ?? BossFamily.clutter;
+    _assignment = chore?.assignment ?? Assignment.anyone;
+    _people = {
+      ...?(chore == null
+          ? null
+          : ref.read(choreAssigneesProvider).value?[chore.id]),
+    };
     _title.addListener(() => setState(() {}));
   }
 
@@ -96,9 +106,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
     // Store only a deviation from the default, so built-ins keep following
     // their default family.
     final family = _family == familyOfSeed(chore?.seedKey) ? null : _family;
-    await _run(
-      () => chore == null
-          ? repo.add(
+    final profiles = ref.read(profileRepositoryProvider);
+    await _run(() async {
+      final id = chore == null
+          ? await repo.add(
               title: title,
               iconKey: _iconKey,
               colorKey: _colorKey,
@@ -107,17 +118,21 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               reminderMinutes: reminder,
               bossFamily: family,
             )
-          : repo.update(
-              chore.id,
-              customTitle: title == builtIn ? null : title,
-              iconKey: _iconKey,
-              colorKey: _colorKey,
-              basePoints: _points,
-              recurrence: _recurrence,
-              reminderMinutes: reminder,
-              bossFamily: family,
-            ),
-    );
+          : chore.id;
+      if (chore != null) {
+        await repo.update(
+          chore.id,
+          customTitle: title == builtIn ? null : title,
+          iconKey: _iconKey,
+          colorKey: _colorKey,
+          basePoints: _points,
+          recurrence: _recurrence,
+          reminderMinutes: reminder,
+          bossFamily: family,
+        );
+      }
+      await profiles.assign(id, _assignment, _people);
+    });
   }
 
   Future<void> _toggleArchived() {
@@ -131,7 +146,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
 
   /// Runs a database write, closes the screen on success and shows an error
   /// (keeping the screen usable) on failure.
-  Future<void> _run(Future<Object?> Function() write) async {
+  Future<void> _run(Future<void> Function() write) async {
     setState(() => _saving = true);
     try {
       await write();
@@ -230,6 +245,18 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               showErrors: _showErrors,
               onChanged: (r) => setState(() => _recurrence = r),
             ),
+            // Who it's for only matters with several people.
+            if (ref.watch(profilesProvider).length > 1) ...[
+              const SizedBox(height: 16),
+              _AssignmentEditor(
+                assignment: _assignment,
+                people: _people,
+                onChanged: (a, people) => setState(() {
+                  _assignment = a;
+                  _people = people;
+                }),
+              ),
+            ],
             const SizedBox(height: 16),
             DropdownButtonFormField<BossFamily>(
               key: const ValueKey('boss-family'),
@@ -398,6 +425,90 @@ class _ReminderEditor extends ConsumerWidget {
             onTap: () => _pick(context),
           ),
         if (hint != null) Text(hint, style: theme.textTheme.bodySmall),
+      ],
+    );
+  }
+}
+
+/// Who a chore is for: anyone, one person, or each of several people.
+class _AssignmentEditor extends ConsumerWidget {
+  const _AssignmentEditor({
+    required this.assignment,
+    required this.people,
+    required this.onChanged,
+  });
+
+  final Assignment assignment;
+  final Set<int> people;
+  final void Function(Assignment, Set<int>) onChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final everyone = ref.watch(profilesProvider);
+    final current = ref.watch(currentProfileIdProvider);
+    final active = {
+      for (final p in everyone)
+        if (people.contains(p.id)) p.id,
+    };
+    void pick(Assignment a) {
+      // A personal chore needs someone: start with whoever is editing.
+      var chosen = active.isEmpty ? {current} : active;
+      if (a == Assignment.one) chosen = {chosen.first};
+      onChanged(a, a == Assignment.anyone ? const {} : chosen);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.assignTitle, style: theme.textTheme.titleSmall),
+        const SizedBox(height: 8),
+        SegmentedButton<Assignment>(
+          key: const ValueKey('assignment'),
+          segments: [
+            ButtonSegment(
+              value: Assignment.anyone,
+              label: Text(l10n.assignAnyone),
+            ),
+            ButtonSegment(value: Assignment.one, label: Text(l10n.assignOne)),
+            ButtonSegment(value: Assignment.each, label: Text(l10n.assignEach)),
+          ],
+          selected: {assignment},
+          showSelectedIcon: false,
+          onSelectionChanged: (s) => pick(s.first),
+        ),
+        const SizedBox(height: 4),
+        Text(switch (assignment) {
+          Assignment.anyone => l10n.assignAnyoneHint,
+          Assignment.one => l10n.assignOneHint,
+          Assignment.each => l10n.assignEachHint,
+        }, style: theme.textTheme.bodySmall),
+        if (assignment != Assignment.anyone) ...[
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              for (final p in everyone)
+                FilterChip(
+                  key: ValueKey('assignee-${p.id}'),
+                  label: Text(p.name),
+                  selected: active.contains(p.id),
+                  onSelected: (on) {
+                    if (assignment == Assignment.one) {
+                      onChanged(assignment, {p.id});
+                      return;
+                    }
+                    final next = {...active};
+                    on ? next.add(p.id) : next.remove(p.id);
+                    // Each needs at least one person.
+                    if (next.isNotEmpty) onChanged(assignment, next);
+                  },
+                ),
+            ],
+          ),
+        ],
       ],
     );
   }

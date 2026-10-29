@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-part 'art.g.dart';
+part 'art_data.dart';
 
 /// One picture of pixel art, generated from a PNG in `assets/art` by
 /// `tool/build_art.py`. Each row has one character per pixel: `.` is

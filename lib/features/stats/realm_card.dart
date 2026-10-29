@@ -12,7 +12,6 @@ import '../../domain/fight/boss.dart';
 import '../../domain/fight/overworld.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
-import '../settings/settings_controller.dart';
 import '../world/quest_map.dart';
 
 /// The realm: every week's quest map since the first chore, joined into one
@@ -70,7 +69,7 @@ class _RealmCardState extends ConsumerState<RealmCard> {
     if (progress == null) return const SizedBox.shrink();
     final weeks = progress.weekHistory(ref.watch(todayProvider));
     final maps = _maps(weeks);
-    final hero = HeroLook.of(ref.watch(settingsProvider));
+    final hero = HeroLook.of(ref.watch(currentProfileProvider));
     final crowns = weeks.where((w) => w.beaten).length;
     final lairs = weeks.fold(
       0,

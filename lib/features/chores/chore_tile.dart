@@ -16,6 +16,7 @@ class ChoreTile extends StatelessWidget {
     required this.points,
     this.bonus = 0,
     this.doneToday = 0,
+    this.doneBy,
     this.status,
     this.overdue = false,
     this.onTap,
@@ -30,6 +31,10 @@ class ChoreTile extends StatelessWidget {
   final int points;
   final int bonus;
   final int doneToday;
+
+  /// Who did it today, when several people share the phone ("Sam"); the
+  /// badge shows the names instead of a count.
+  final String? doneBy;
 
   /// Due status line ("Due today", "2 days overdue"); hidden when `null`.
   final String? status;
@@ -93,8 +98,16 @@ class ChoreTile extends StatelessWidget {
                           size: 26,
                         ),
                       ),
-                      const Spacer(),
-                      if (doneToday > 0) _DoneBadge(count: doneToday),
+                      const SizedBox(width: 8),
+                      // Names can be long: the badge shrinks, never overflows.
+                      Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.topEnd,
+                          child: doneToday > 0
+                              ? _DoneBadge(count: doneToday, by: doneBy)
+                              : null,
+                        ),
+                      ),
                     ],
                   ),
                   const Spacer(),
@@ -148,15 +161,18 @@ class ChoreTile extends StatelessWidget {
 
 /// Compact "✓ 2" badge; the tooltip/semantics carry the full "2× today".
 class _DoneBadge extends StatelessWidget {
-  const _DoneBadge({required this.count});
+  const _DoneBadge({required this.count, this.by});
 
   final int count;
+  final String? by;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Tooltip(
-      message: AppLocalizations.of(context).doneTodayCount(count),
+      message: by == null
+          ? AppLocalizations.of(context).doneTodayCount(count)
+          : AppLocalizations.of(context).doneTodayBy(by!),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: ShapeDecoration(
@@ -173,11 +189,15 @@ class _DoneBadge extends StatelessWidget {
           children: [
             Icon(Icons.check, size: 16, color: scheme.onSecondaryContainer),
             const SizedBox(width: 2),
-            Text(
-              '$count',
-              style: TextStyle(
-                color: scheme.onSecondaryContainer,
-                fontWeight: FontWeight.bold,
+            Flexible(
+              child: Text(
+                by ?? '$count',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: scheme.onSecondaryContainer,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

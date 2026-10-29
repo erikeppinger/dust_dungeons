@@ -6,12 +6,40 @@ import '../../domain/recurrence.dart';
 export '../../domain/fight/boss.dart' show BossFamily;
 export '../../domain/recurrence.dart' show RepeatType;
 
-/// A person using the app. 0.1 uses a single default profile; switching arrives in 0.8.
+/// A person using the app (several share a phone since 0.9, schema v7).
 class Profiles extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get name => text()();
   IntColumn get colorKey => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  // The hero's look, as indexes into the avatar palettes (schema v7; were
+  // app settings before).
+  IntColumn get avatarSkin => integer().withDefault(const Constant(0))();
+  IntColumn get avatarHair => integer().withDefault(const Constant(0))();
+  IntColumn get avatarCape => integer().withDefault(const Constant(0))();
+  IntColumn get avatarHat => integer().withDefault(const Constant(0))();
+
+  /// Story mode: fights cannot be lost, wider timing.
+  BoolColumn get storyMode => boolean().withDefault(const Constant(false))();
+
+  /// Slow mode: fights play at 70 % tempo.
+  BoolColumn get slowMode => boolean().withDefault(const Constant(false))();
+
+  /// Removed people are hidden but keep their history.
+  DateTimeColumn get archivedAt => dateTime().nullable()();
+}
+
+/// Who a chore is for. Stored by name: only ever add values.
+enum Assignment {
+  /// Done once for the household; whoever does it gets the points.
+  anyone,
+
+  /// Only the one person in [ChoreAssignees].
+  one,
+
+  /// Every person in [ChoreAssignees] does their own.
+  each,
 }
 
 /// A chore definition. Built-in chores have a [seedKey] and a localized title
@@ -50,6 +78,20 @@ class Chores extends Table {
   /// Boss family for fight tokens (schema v4); `null` = the default for the
   /// built-in chore, or the Clutter Imp for user chores.
   TextColumn get bossFamily => textEnum<BossFamily>().nullable()();
+
+  /// Who the chore is for (schema v7); the people are in [ChoreAssignees].
+  TextColumn get assignment =>
+      textEnum<Assignment>().withDefault(const Constant('anyone'))();
+}
+
+/// The people a chore with [Assignment.one] or [Assignment.each] is for
+/// (schema v7).
+class ChoreAssignees extends Table {
+  IntColumn get choreId => integer().references(Chores, #id)();
+  IntColumn get profileId => integer().references(Profiles, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {choreId, profileId};
 }
 
 /// One time a chore was done. Undo sets [undoneAt] instead of deleting the row.

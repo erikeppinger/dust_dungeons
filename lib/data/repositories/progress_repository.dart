@@ -133,10 +133,62 @@ class ProgressRepository {
     );
   }
 
-  /// All completions (not undone), oldest first.
-  Stream<List<Completion>> watchAllCompletions(int profileId) =>
+  /// Latest completion (not undone) per (chore id, profile id), for every
+  /// person: anyone's chores are due from the household's latest, personal
+  /// ones from their person's.
+  Stream<Map<(int, int), DateTime>> watchLastDoneByPerson() {
+    final last = _db.completions.completedAt.unixepoch.max();
+    final query = _db.selectOnly(_db.completions)
+      ..addColumns([_db.completions.choreId, _db.completions.profileId, last])
+      ..where(_db.completions.undoneAt.isNull())
+      ..groupBy([_db.completions.choreId, _db.completions.profileId]);
+    return query.watch().map(
+      (rows) => {
+        for (final row in rows)
+          (
+            row.read(_db.completions.choreId)!,
+            row.read(_db.completions.profileId)!,
+          ): DateTime.fromMillisecondsSinceEpoch(
+            row.read(last)! * 1000,
+          ),
+      },
+    );
+  }
+
+  /// Completions (not undone) since [since] per (chore id, profile id).
+  Stream<Map<(int, int), int>> watchCountsByPerson(DateTime since) {
+    final count = _db.completions.id.count();
+    final query = _db.selectOnly(_db.completions)
+      ..addColumns([_db.completions.choreId, _db.completions.profileId, count])
+      ..where(
+        _db.completions.undoneAt.isNull() &
+            _db.completions.completedAt.isBiggerOrEqualValue(since),
+      )
+      ..groupBy([_db.completions.choreId, _db.completions.profileId]);
+    return query.watch().map(
+      (rows) => {
+        for (final row in rows)
+          (
+            row.read(_db.completions.choreId)!,
+            row.read(_db.completions.profileId)!,
+          ): row.read(
+            count,
+          )!,
+      },
+    );
+  }
+
+  /// All completions (not undone) of [profileId], or of everyone for
+  /// `null`, oldest first.
+  Stream<List<Completion>> watchAllCompletions(int? profileId) =>
       (_db.select(_db.completions)
-            ..where((c) => c.profileId.equals(profileId) & c.undoneAt.isNull())
+            ..where(
+              (c) =>
+                  (profileId == null
+                      ? const Constant(true)
+                      : c.profileId.equals(profileId)) &
+                  c.undoneAt.isNull(),
+            )
             ..orderBy([(c) => OrderingTerm.asc(c.completedAt)]))
           .watch();
 

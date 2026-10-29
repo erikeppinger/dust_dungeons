@@ -116,6 +116,18 @@ person, assigning chores, and the household-wide parts.
 - **On the emulator:** two people, an anyone/one/each chore each, switching, the leaderboard, and
   screen time turning off.
 
+## As built (changes to the plan)
+- **People page:** only name, rename and remove. A person's hero is edited in the Wardrobe after
+  switching to them. The planned color choice was left out: nothing uses a person's color yet.
+- **Weekly recap:** it doesn't name the leader. It's scheduled days ahead, so it would name
+  whoever leads now; the streak is left out of it for the same reason. Recaps count the
+  household's quests.
+- **Screen time:** gated by one rule, "on and a single person" (`screenTimeActiveProvider`),
+  so it also stays off if a backup's settings switch it back on.
+- **Quest Log filter:** "Everyone's quests" covers today and coming days. Past days show the
+  current person's history.
+- **Leaderboard crown:** a new sprite (`icons/crown.png`), added through the art pipeline.
+
 ## Order of work
 1. Schema v7, migration and the profile repository. Current profile as a persisted notifier.
 2. Assignment model, due logic and the Quests tab (visibility, "✓ name").

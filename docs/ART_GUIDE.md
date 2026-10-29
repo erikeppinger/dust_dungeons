@@ -36,7 +36,7 @@ variants. A new sprite needs a line there.
 | What | Size | Palette | Files |
 |---|---|---|---|
 | Tab icons | 12×12 | `mask` | `icons/tab_*.png`. One color: draw in black, the app tints them. |
-| Coin, hearts | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png` |
+| Coin, hearts, crown | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png`, `icons/crown.png` (the leaderboard's leader) |
 | Launcher icon | 16×16 | `app` | `icons/app_shield.png`; run `python tool/generate_icon.py` after changing it |
 | Ground tiles | 16×16 | `map` | `map/grass_0..3`, `map/water_0..3`, `map/sand_0..3`: fill the whole tile |
 | Overlays | 16×16 | `map` | `map/forest_0..1`, `map/hill`, `map/mountain`: transparent background, drawn on grass |
@@ -90,7 +90,7 @@ python tool/build_art.py
 ```
 (Needs Python with Pillow: `pip install pillow`, and Flutter on the PATH.) It checks every PNG
 against `art.json` and the palettes, with errors naming the file and pixel, then regenerates
-`lib/app/art/art.g.dart`. **Commit the PNGs and the generated file together.** `flutter test`
+`lib/app/art/art_data.dart`. **Commit the PNGs and the generated file together.** `flutter test`
 fails if they don't match.
 
 Then run the app in debug mode (`flutter run`) and open **Settings → About → Art gallery**.

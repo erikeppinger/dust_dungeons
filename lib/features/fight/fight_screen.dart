@@ -95,6 +95,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
   void initState() {
     super.initState();
     final settings = ref.read(settingsProvider);
+    final person = ref.read(currentProfileProvider);
     final level = ref.read(progressStatsProvider).value?.level ?? 1;
     final sounds = ref.read(fightSoundsProvider);
     if (sounds is PooledFightSounds && settings.fightSound) {
@@ -109,7 +110,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
       profileId: _profileId,
       family: widget.family,
       tier: widget.tier,
-      storyMode: settings.fightStoryMode,
+      storyMode: person.storyMode,
     );
     final base = HeroStats.forLevel(level);
     final hero = HeroStats(
@@ -124,8 +125,8 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               hero: hero,
               motifs: widget.motifs,
               loadout: widget.loadout,
-              storyMode: settings.fightStoryMode,
-              slowMode: settings.fightSlowMode,
+              storyMode: person.storyMode,
+              slowMode: person.slowMode,
               seed: seed,
             )
           : EchoDuel(
@@ -133,8 +134,8 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               tier: widget.tier,
               hero: hero,
               loadout: widget.loadout,
-              storyMode: settings.fightStoryMode,
-              slowMode: settings.fightSlowMode,
+              storyMode: person.storyMode,
+              slowMode: person.slowMode,
               seed: seed,
             ),
       sounds: sounds,

@@ -473,6 +473,21 @@ abstract final class Sprites {
     '............',
   ]);
 
+  static const crown = Sprite([
+    '............',
+    '............',
+    '0....00....0',
+    '01..0110..10',
+    '011011110110',
+    '011111111110',
+    '011311113110',
+    '011111111110',
+    '022222222220',
+    '000000000000',
+    '............',
+    '............',
+  ]);
+
   static const appShield = Sprite([
     '................',
     '.00000000000000.',
@@ -937,6 +952,7 @@ abstract final class Sprites {
     'icons/coin': ([coin], 'ui'),
     'icons/heart': ([heart], 'ui'),
     'icons/heart_empty': ([heartEmpty], 'ui'),
+    'icons/crown': ([crown], 'ui'),
     'icons/app_shield': ([appShield], 'app'),
     'map/grass': (grass, 'map'),
     'map/forest': (forest, 'map'),

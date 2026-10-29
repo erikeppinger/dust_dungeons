@@ -30,10 +30,21 @@ class PlanScreen extends ConsumerStatefulWidget {
 class _PlanScreenState extends ConsumerState<PlanScreen> {
   var _view = _PlanView.week;
 
+  /// With several people: everyone's quests instead of just your own.
+  var _everyone = false;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheduled = ref.watch(scheduledChoresProvider);
+    final people = ref.watch(profilesProvider);
+    final everyone = _everyone && people.length > 1;
+    final scheduled = ref.watch(
+      everyone ? householdScheduleProvider : scheduledChoresProvider,
+    );
+    // Whose quest it is, in everyone's view.
+    final names = everyone
+        ? {for (final p in people) p.id: p.name}
+        : const <int, String>{};
     return Column(
       children: [
         Padding(
@@ -55,13 +66,26 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
             onSelectionChanged: (s) => setState(() => _view = s.first),
           ),
         ),
+        if (people.length > 1)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: FilterChip(
+                key: const ValueKey('plan-everyone'),
+                label: Text(l10n.planEveryone),
+                selected: everyone,
+                onSelected: (v) => setState(() => _everyone = v),
+              ),
+            ),
+          ),
         Expanded(
           child: scheduled.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (_, _) => Center(child: Text(l10n.errorGeneric)),
             data: (list) => switch (_view) {
-              _PlanView.week => _WeekView(list),
-              _PlanView.month => _MonthView(list),
+              _PlanView.week => _WeekView(list, names),
+              _PlanView.month => _MonthView(list, names),
             },
           ),
         ),
@@ -72,9 +96,10 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
 
 /// Today (overdue + due + done) and the next six days.
 class _WeekView extends ConsumerWidget {
-  const _WeekView(this.chores);
+  const _WeekView(this.chores, this.names);
 
   final List<ScheduledChore> chores;
+  final Map<int, String> names;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -87,7 +112,14 @@ class _WeekView extends ConsumerWidget {
       children: [
         for (var i = 0; i < 7; i++) ...[
           SectionHeader(dayTitle(context, addDays(today, i), today)),
-          ..._dayEntries(context, plan, addDays(today, i), today, const []),
+          ..._dayEntries(
+            context,
+            plan,
+            addDays(today, i),
+            today,
+            const [],
+            names,
+          ),
         ],
       ],
     );
@@ -96,9 +128,10 @@ class _WeekView extends ConsumerWidget {
 
 /// Calendar grid for one month with done/due counts; tap a day for details.
 class _MonthView extends ConsumerStatefulWidget {
-  const _MonthView(this.chores);
+  const _MonthView(this.chores, this.names);
 
   final List<ScheduledChore> chores;
+  final Map<int, String> names;
 
   @override
   ConsumerState<_MonthView> createState() => _MonthViewState();
@@ -230,6 +263,7 @@ class _MonthViewState extends ConsumerState<_MonthView> {
           _selected,
           today,
           doneByDay[_selected] ?? const [],
+          widget.names,
         ),
       ],
     );
@@ -334,6 +368,7 @@ List<Widget> _dayEntries(
   DateTime day,
   DateTime today,
   List<Completion> doneThatDay,
+  Map<int, String> names,
 ) {
   final l10n = AppLocalizations.of(context);
   final rows = <Widget>[];
@@ -342,17 +377,18 @@ List<Widget> _dayEntries(
       rows.add(
         _ChoreRow(
           chore: s.chore,
+          who: names[s.person],
           trailing: dueLabel(l10n, s.due, today),
           overdue: s.isOverdue,
         ),
       );
     }
     for (final s in plan.doneToday) {
-      rows.add(_ChoreRow(chore: s.chore, done: true));
+      rows.add(_ChoreRow(chore: s.chore, who: names[s.person], done: true));
     }
   } else if (day.isAfter(today)) {
     for (final s in plan.dueOn(day)) {
-      rows.add(_ChoreRow(chore: s.chore));
+      rows.add(_ChoreRow(chore: s.chore, who: names[s.person]));
     }
   } else {
     for (final c in doneThatDay) {
@@ -379,12 +415,16 @@ List<Widget> _dayEntries(
 class _ChoreRow extends StatelessWidget {
   const _ChoreRow({
     required this.chore,
+    this.who,
     this.trailing,
     this.overdue = false,
     this.done = false,
   });
 
   final Chore chore;
+
+  /// Whose quest it is, in everyone's view.
+  final String? who;
   final String? trailing;
   final bool overdue;
   final bool done;
@@ -406,7 +446,9 @@ class _ChoreRow extends StatelessWidget {
         ),
       ),
       title: Text(
-        choreTitle(chore, l10n),
+        who == null
+            ? choreTitle(chore, l10n)
+            : l10n.notifChoreOf(choreTitle(chore, l10n), who!),
         style: done
             ? const TextStyle(decoration: TextDecoration.lineThrough)
             : null,

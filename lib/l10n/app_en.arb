@@ -1111,5 +1111,139 @@
   "backupAutoFailed": "The last automatic backup failed.",
   "backupNow": "Back up now",
   "backupStop": "Stop automatic backups",
-  "backupSubtitleLost": "Folder can't be reached"
+  "backupSubtitleLost": "Folder can't be reached",
+  "assignTitle": "Who is it for?",
+  "assignAnyone": "Anyone",
+  "assignOne": "One person",
+  "assignEach": "Each",
+  "assignAnyoneHint": "Done once for everyone; whoever does it gets the points.",
+  "assignOneHint": "Only this person sees the quest.",
+  "assignEachHint": "Everyone chosen does their own.",
+  "leaderboardTitle": "This week",
+  "leaderboardRow": "Rank {rank}: {name}, {points} points, {quests}",
+  "@leaderboardRow": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      },
+      "quests": {
+        "type": "String"
+      }
+    }
+  },
+  "leaderboardQuests": "{count, plural, =1{1 quest} other{{count} quests}}",
+  "@leaderboardQuests": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "leaderboardLastWeek": "Last week: {name} won with {points} points",
+  "@leaderboardLastWeek": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "leaderboardLastWeekTie": "Last week: a tie between {names}, {points} points each",
+  "@leaderboardLastWeekTie": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "peopleTitle": "People",
+  "peopleSubtitle": "{count, plural, =1{1 person} other{{count} people}}",
+  "@peopleSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "peopleIntro": "Everyone sharing this phone gets their own points, level, hero and fights. Switch person with the hero at the top.",
+  "peopleManage": "Manage people",
+  "peopleAdd": "Add a person",
+  "peopleName": "Name",
+  "peopleNameEmpty": "Enter a name.",
+  "peopleNameTaken": "Someone here already has that name.",
+  "peopleRename": "Rename",
+  "peopleRemove": "Remove",
+  "peopleRemoveTitle": "Remove {name}?",
+  "@peopleRemoveTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "peopleRemoveBody": "{name}'s history stays and comes back if you add {name} again. Quests only for {name} become anyone's.",
+  "@peopleRemoveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "peopleScreenTimeOff": "Screen time works with one person on this phone, so it will turn off.",
+  "switchPerson": "Switch person, now: {name}",
+  "@switchPerson": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "planEveryone": "Everyone's quests",
+  "screenOnePersonOnly": "Screen time works with one person on this phone.",
+  "backupCountPeople": "{count, plural, =1{1 person} other{{count} people}}",
+  "@backupCountPeople": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "doneTodayBy": "Done today by {names}",
+  "@doneTodayBy": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "fightModesFor": "For {name}:",
+  "@fightModesFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifChoreOf": "{chore} ({name})",
+  "@notifChoreOf": {
+    "placeholders": {
+      "chore": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

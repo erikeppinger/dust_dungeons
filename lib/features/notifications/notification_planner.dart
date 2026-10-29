@@ -74,7 +74,17 @@ List<PlannedNotification> planNotifications({
 
   /// Yesterday's screen time (used, budget) for today's summary.
   (int, int)? screenYesterday,
+
+  /// Names by profile id when several people share the phone: their own
+  /// chores are named, as in "Trash (Sam)".
+  Map<int, String> people = const {},
 }) {
+  String titleOf(ScheduledChore c) {
+    final title = choreTitle(c.chore, l10n);
+    final who = c.person == null ? null : people[c.person];
+    return who == null ? title : l10n.notifChoreOf(title, who);
+  }
+
   if (!settings.notificationsEnabled) return const [];
   final today = dayOf(now);
   final lastDay = addDays(today, planDays - 1);
@@ -120,7 +130,7 @@ List<PlannedNotification> planNotifications({
     if (settings.dailySummary) {
       final open = [...overdue, ...due];
       if (open.isNotEmpty) {
-        final names = open.take(3).map((c) => choreTitle(c.chore, l10n));
+        final names = open.take(3).map(titleOf);
         final list = open.length > 3
             ? '${names.join(', ')}, …'
             : names.join(', ');
@@ -154,7 +164,7 @@ List<PlannedNotification> planNotifications({
         add(
           _at(day, minutes),
           NotificationChannel.reminder,
-          choreTitle(c.chore, l10n),
+          titleOf(c),
           c.isOverdue
               ? l10n.notifReminderOverdue(basePointsOf(c.chore.basePoints))
               : l10n.notifReminderDue(basePointsOf(c.chore.basePoints)),

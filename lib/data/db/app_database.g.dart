@@ -54,8 +54,109 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _avatarSkinMeta = const VerificationMeta(
+    'avatarSkin',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name, colorKey, createdAt];
+  late final GeneratedColumn<int> avatarSkin = GeneratedColumn<int>(
+    'avatar_skin',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _avatarHairMeta = const VerificationMeta(
+    'avatarHair',
+  );
+  @override
+  late final GeneratedColumn<int> avatarHair = GeneratedColumn<int>(
+    'avatar_hair',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _avatarCapeMeta = const VerificationMeta(
+    'avatarCape',
+  );
+  @override
+  late final GeneratedColumn<int> avatarCape = GeneratedColumn<int>(
+    'avatar_cape',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _avatarHatMeta = const VerificationMeta(
+    'avatarHat',
+  );
+  @override
+  late final GeneratedColumn<int> avatarHat = GeneratedColumn<int>(
+    'avatar_hat',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _storyModeMeta = const VerificationMeta(
+    'storyMode',
+  );
+  @override
+  late final GeneratedColumn<bool> storyMode = GeneratedColumn<bool>(
+    'story_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("story_mode" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _slowModeMeta = const VerificationMeta(
+    'slowMode',
+  );
+  @override
+  late final GeneratedColumn<bool> slowMode = GeneratedColumn<bool>(
+    'slow_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("slow_mode" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _archivedAtMeta = const VerificationMeta(
+    'archivedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> archivedAt = GeneratedColumn<DateTime>(
+    'archived_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    colorKey,
+    createdAt,
+    avatarSkin,
+    avatarHair,
+    avatarCape,
+    avatarHat,
+    storyMode,
+    slowMode,
+    archivedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -91,6 +192,48 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('avatar_skin')) {
+      context.handle(
+        _avatarSkinMeta,
+        avatarSkin.isAcceptableOrUnknown(data['avatar_skin']!, _avatarSkinMeta),
+      );
+    }
+    if (data.containsKey('avatar_hair')) {
+      context.handle(
+        _avatarHairMeta,
+        avatarHair.isAcceptableOrUnknown(data['avatar_hair']!, _avatarHairMeta),
+      );
+    }
+    if (data.containsKey('avatar_cape')) {
+      context.handle(
+        _avatarCapeMeta,
+        avatarCape.isAcceptableOrUnknown(data['avatar_cape']!, _avatarCapeMeta),
+      );
+    }
+    if (data.containsKey('avatar_hat')) {
+      context.handle(
+        _avatarHatMeta,
+        avatarHat.isAcceptableOrUnknown(data['avatar_hat']!, _avatarHatMeta),
+      );
+    }
+    if (data.containsKey('story_mode')) {
+      context.handle(
+        _storyModeMeta,
+        storyMode.isAcceptableOrUnknown(data['story_mode']!, _storyModeMeta),
+      );
+    }
+    if (data.containsKey('slow_mode')) {
+      context.handle(
+        _slowModeMeta,
+        slowMode.isAcceptableOrUnknown(data['slow_mode']!, _slowModeMeta),
+      );
+    }
+    if (data.containsKey('archived_at')) {
+      context.handle(
+        _archivedAtMeta,
+        archivedAt.isAcceptableOrUnknown(data['archived_at']!, _archivedAtMeta),
+      );
+    }
     return context;
   }
 
@@ -116,6 +259,34 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      avatarSkin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}avatar_skin'],
+      )!,
+      avatarHair: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}avatar_hair'],
+      )!,
+      avatarCape: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}avatar_cape'],
+      )!,
+      avatarHat: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}avatar_hat'],
+      )!,
+      storyMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}story_mode'],
+      )!,
+      slowMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}slow_mode'],
+      )!,
+      archivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}archived_at'],
+      ),
     );
   }
 
@@ -130,11 +301,31 @@ class Profile extends DataClass implements Insertable<Profile> {
   final String name;
   final int colorKey;
   final DateTime createdAt;
+  final int avatarSkin;
+  final int avatarHair;
+  final int avatarCape;
+  final int avatarHat;
+
+  /// Story mode: fights cannot be lost, wider timing.
+  final bool storyMode;
+
+  /// Slow mode: fights play at 70 % tempo.
+  final bool slowMode;
+
+  /// Removed people are hidden but keep their history.
+  final DateTime? archivedAt;
   const Profile({
     required this.id,
     required this.name,
     required this.colorKey,
     required this.createdAt,
+    required this.avatarSkin,
+    required this.avatarHair,
+    required this.avatarCape,
+    required this.avatarHat,
+    required this.storyMode,
+    required this.slowMode,
+    this.archivedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -143,6 +334,15 @@ class Profile extends DataClass implements Insertable<Profile> {
     map['name'] = Variable<String>(name);
     map['color_key'] = Variable<int>(colorKey);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['avatar_skin'] = Variable<int>(avatarSkin);
+    map['avatar_hair'] = Variable<int>(avatarHair);
+    map['avatar_cape'] = Variable<int>(avatarCape);
+    map['avatar_hat'] = Variable<int>(avatarHat);
+    map['story_mode'] = Variable<bool>(storyMode);
+    map['slow_mode'] = Variable<bool>(slowMode);
+    if (!nullToAbsent || archivedAt != null) {
+      map['archived_at'] = Variable<DateTime>(archivedAt);
+    }
     return map;
   }
 
@@ -152,6 +352,15 @@ class Profile extends DataClass implements Insertable<Profile> {
       name: Value(name),
       colorKey: Value(colorKey),
       createdAt: Value(createdAt),
+      avatarSkin: Value(avatarSkin),
+      avatarHair: Value(avatarHair),
+      avatarCape: Value(avatarCape),
+      avatarHat: Value(avatarHat),
+      storyMode: Value(storyMode),
+      slowMode: Value(slowMode),
+      archivedAt: archivedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAt),
     );
   }
 
@@ -165,6 +374,13 @@ class Profile extends DataClass implements Insertable<Profile> {
       name: serializer.fromJson<String>(json['name']),
       colorKey: serializer.fromJson<int>(json['colorKey']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      avatarSkin: serializer.fromJson<int>(json['avatarSkin']),
+      avatarHair: serializer.fromJson<int>(json['avatarHair']),
+      avatarCape: serializer.fromJson<int>(json['avatarCape']),
+      avatarHat: serializer.fromJson<int>(json['avatarHat']),
+      storyMode: serializer.fromJson<bool>(json['storyMode']),
+      slowMode: serializer.fromJson<bool>(json['slowMode']),
+      archivedAt: serializer.fromJson<DateTime?>(json['archivedAt']),
     );
   }
   @override
@@ -175,6 +391,13 @@ class Profile extends DataClass implements Insertable<Profile> {
       'name': serializer.toJson<String>(name),
       'colorKey': serializer.toJson<int>(colorKey),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'avatarSkin': serializer.toJson<int>(avatarSkin),
+      'avatarHair': serializer.toJson<int>(avatarHair),
+      'avatarCape': serializer.toJson<int>(avatarCape),
+      'avatarHat': serializer.toJson<int>(avatarHat),
+      'storyMode': serializer.toJson<bool>(storyMode),
+      'slowMode': serializer.toJson<bool>(slowMode),
+      'archivedAt': serializer.toJson<DateTime?>(archivedAt),
     };
   }
 
@@ -183,11 +406,25 @@ class Profile extends DataClass implements Insertable<Profile> {
     String? name,
     int? colorKey,
     DateTime? createdAt,
+    int? avatarSkin,
+    int? avatarHair,
+    int? avatarCape,
+    int? avatarHat,
+    bool? storyMode,
+    bool? slowMode,
+    Value<DateTime?> archivedAt = const Value.absent(),
   }) => Profile(
     id: id ?? this.id,
     name: name ?? this.name,
     colorKey: colorKey ?? this.colorKey,
     createdAt: createdAt ?? this.createdAt,
+    avatarSkin: avatarSkin ?? this.avatarSkin,
+    avatarHair: avatarHair ?? this.avatarHair,
+    avatarCape: avatarCape ?? this.avatarCape,
+    avatarHat: avatarHat ?? this.avatarHat,
+    storyMode: storyMode ?? this.storyMode,
+    slowMode: slowMode ?? this.slowMode,
+    archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
     return Profile(
@@ -195,6 +432,21 @@ class Profile extends DataClass implements Insertable<Profile> {
       name: data.name.present ? data.name.value : this.name,
       colorKey: data.colorKey.present ? data.colorKey.value : this.colorKey,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      avatarSkin: data.avatarSkin.present
+          ? data.avatarSkin.value
+          : this.avatarSkin,
+      avatarHair: data.avatarHair.present
+          ? data.avatarHair.value
+          : this.avatarHair,
+      avatarCape: data.avatarCape.present
+          ? data.avatarCape.value
+          : this.avatarCape,
+      avatarHat: data.avatarHat.present ? data.avatarHat.value : this.avatarHat,
+      storyMode: data.storyMode.present ? data.storyMode.value : this.storyMode,
+      slowMode: data.slowMode.present ? data.slowMode.value : this.slowMode,
+      archivedAt: data.archivedAt.present
+          ? data.archivedAt.value
+          : this.archivedAt,
     );
   }
 
@@ -204,13 +456,32 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('colorKey: $colorKey, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('avatarSkin: $avatarSkin, ')
+          ..write('avatarHair: $avatarHair, ')
+          ..write('avatarCape: $avatarCape, ')
+          ..write('avatarHat: $avatarHat, ')
+          ..write('storyMode: $storyMode, ')
+          ..write('slowMode: $slowMode, ')
+          ..write('archivedAt: $archivedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, colorKey, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    colorKey,
+    createdAt,
+    avatarSkin,
+    avatarHair,
+    avatarCape,
+    avatarHat,
+    storyMode,
+    slowMode,
+    archivedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -218,7 +489,14 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.id == this.id &&
           other.name == this.name &&
           other.colorKey == this.colorKey &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.avatarSkin == this.avatarSkin &&
+          other.avatarHair == this.avatarHair &&
+          other.avatarCape == this.avatarCape &&
+          other.avatarHat == this.avatarHat &&
+          other.storyMode == this.storyMode &&
+          other.slowMode == this.slowMode &&
+          other.archivedAt == this.archivedAt);
 }
 
 class ProfilesCompanion extends UpdateCompanion<Profile> {
@@ -226,29 +504,64 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<String> name;
   final Value<int> colorKey;
   final Value<DateTime> createdAt;
+  final Value<int> avatarSkin;
+  final Value<int> avatarHair;
+  final Value<int> avatarCape;
+  final Value<int> avatarHat;
+  final Value<bool> storyMode;
+  final Value<bool> slowMode;
+  final Value<DateTime?> archivedAt;
   const ProfilesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.colorKey = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.avatarSkin = const Value.absent(),
+    this.avatarHair = const Value.absent(),
+    this.avatarCape = const Value.absent(),
+    this.avatarHat = const Value.absent(),
+    this.storyMode = const Value.absent(),
+    this.slowMode = const Value.absent(),
+    this.archivedAt = const Value.absent(),
   });
   ProfilesCompanion.insert({
     this.id = const Value.absent(),
     required String name,
     this.colorKey = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.avatarSkin = const Value.absent(),
+    this.avatarHair = const Value.absent(),
+    this.avatarCape = const Value.absent(),
+    this.avatarHat = const Value.absent(),
+    this.storyMode = const Value.absent(),
+    this.slowMode = const Value.absent(),
+    this.archivedAt = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Profile> custom({
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? colorKey,
     Expression<DateTime>? createdAt,
+    Expression<int>? avatarSkin,
+    Expression<int>? avatarHair,
+    Expression<int>? avatarCape,
+    Expression<int>? avatarHat,
+    Expression<bool>? storyMode,
+    Expression<bool>? slowMode,
+    Expression<DateTime>? archivedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (colorKey != null) 'color_key': colorKey,
       if (createdAt != null) 'created_at': createdAt,
+      if (avatarSkin != null) 'avatar_skin': avatarSkin,
+      if (avatarHair != null) 'avatar_hair': avatarHair,
+      if (avatarCape != null) 'avatar_cape': avatarCape,
+      if (avatarHat != null) 'avatar_hat': avatarHat,
+      if (storyMode != null) 'story_mode': storyMode,
+      if (slowMode != null) 'slow_mode': slowMode,
+      if (archivedAt != null) 'archived_at': archivedAt,
     });
   }
 
@@ -257,12 +570,26 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<String>? name,
     Value<int>? colorKey,
     Value<DateTime>? createdAt,
+    Value<int>? avatarSkin,
+    Value<int>? avatarHair,
+    Value<int>? avatarCape,
+    Value<int>? avatarHat,
+    Value<bool>? storyMode,
+    Value<bool>? slowMode,
+    Value<DateTime?>? archivedAt,
   }) {
     return ProfilesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       colorKey: colorKey ?? this.colorKey,
       createdAt: createdAt ?? this.createdAt,
+      avatarSkin: avatarSkin ?? this.avatarSkin,
+      avatarHair: avatarHair ?? this.avatarHair,
+      avatarCape: avatarCape ?? this.avatarCape,
+      avatarHat: avatarHat ?? this.avatarHat,
+      storyMode: storyMode ?? this.storyMode,
+      slowMode: slowMode ?? this.slowMode,
+      archivedAt: archivedAt ?? this.archivedAt,
     );
   }
 
@@ -281,6 +608,27 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (avatarSkin.present) {
+      map['avatar_skin'] = Variable<int>(avatarSkin.value);
+    }
+    if (avatarHair.present) {
+      map['avatar_hair'] = Variable<int>(avatarHair.value);
+    }
+    if (avatarCape.present) {
+      map['avatar_cape'] = Variable<int>(avatarCape.value);
+    }
+    if (avatarHat.present) {
+      map['avatar_hat'] = Variable<int>(avatarHat.value);
+    }
+    if (storyMode.present) {
+      map['story_mode'] = Variable<bool>(storyMode.value);
+    }
+    if (slowMode.present) {
+      map['slow_mode'] = Variable<bool>(slowMode.value);
+    }
+    if (archivedAt.present) {
+      map['archived_at'] = Variable<DateTime>(archivedAt.value);
+    }
     return map;
   }
 
@@ -290,7 +638,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('colorKey: $colorKey, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('avatarSkin: $avatarSkin, ')
+          ..write('avatarHair: $avatarHair, ')
+          ..write('avatarCape: $avatarCape, ')
+          ..write('avatarHat: $avatarHat, ')
+          ..write('storyMode: $storyMode, ')
+          ..write('slowMode: $slowMode, ')
+          ..write('archivedAt: $archivedAt')
           ..write(')'))
         .toString();
   }
@@ -497,6 +852,16 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         requiredDuringInsert: false,
       ).withConverter<BossFamily?>($ChoresTable.$converterbossFamilyn);
   @override
+  late final GeneratedColumnWithTypeConverter<Assignment, String> assignment =
+      GeneratedColumn<String>(
+        'assignment',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('anyone'),
+      ).withConverter<Assignment>($ChoresTable.$converterassignment);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     seedKey,
@@ -515,6 +880,7 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     repeatSetAt,
     reminderMinutes,
     bossFamily,
+    assignment,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -723,6 +1089,12 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
           data['${effectivePrefix}boss_family'],
         ),
       ),
+      assignment: $ChoresTable.$converterassignment.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}assignment'],
+        )!,
+      ),
     );
   }
 
@@ -737,6 +1109,8 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
       const EnumNameConverter<BossFamily>(BossFamily.values);
   static JsonTypeConverter2<BossFamily?, String?, String?>
   $converterbossFamilyn = JsonTypeConverter2.asNullable($converterbossFamily);
+  static JsonTypeConverter2<Assignment, String, String> $converterassignment =
+      const EnumNameConverter<Assignment>(Assignment.values);
 }
 
 class Chore extends DataClass implements Insertable<Chore> {
@@ -769,6 +1143,9 @@ class Chore extends DataClass implements Insertable<Chore> {
   /// Boss family for fight tokens (schema v4); `null` = the default for the
   /// built-in chore, or the Clutter Imp for user chores.
   final BossFamily? bossFamily;
+
+  /// Who the chore is for (schema v7); the people are in [ChoreAssignees].
+  final Assignment assignment;
   const Chore({
     required this.id,
     this.seedKey,
@@ -787,6 +1164,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     this.repeatSetAt,
     this.reminderMinutes,
     this.bossFamily,
+    required this.assignment,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -828,6 +1206,11 @@ class Chore extends DataClass implements Insertable<Chore> {
         $ChoresTable.$converterbossFamilyn.toSql(bossFamily),
       );
     }
+    {
+      map['assignment'] = Variable<String>(
+        $ChoresTable.$converterassignment.toSql(assignment),
+      );
+    }
     return map;
   }
 
@@ -864,6 +1247,7 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: bossFamily == null && nullToAbsent
           ? const Value.absent()
           : Value(bossFamily),
+      assignment: Value(assignment),
     );
   }
 
@@ -894,6 +1278,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: $ChoresTable.$converterbossFamilyn.fromJson(
         serializer.fromJson<String?>(json['bossFamily']),
       ),
+      assignment: $ChoresTable.$converterassignment.fromJson(
+        serializer.fromJson<String>(json['assignment']),
+      ),
     );
   }
   @override
@@ -921,6 +1308,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       'bossFamily': serializer.toJson<String?>(
         $ChoresTable.$converterbossFamilyn.toJson(bossFamily),
       ),
+      'assignment': serializer.toJson<String>(
+        $ChoresTable.$converterassignment.toJson(assignment),
+      ),
     };
   }
 
@@ -942,6 +1332,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     Value<DateTime?> repeatSetAt = const Value.absent(),
     Value<int?> reminderMinutes = const Value.absent(),
     Value<BossFamily?> bossFamily = const Value.absent(),
+    Assignment? assignment,
   }) => Chore(
     id: id ?? this.id,
     seedKey: seedKey.present ? seedKey.value : this.seedKey,
@@ -964,6 +1355,7 @@ class Chore extends DataClass implements Insertable<Chore> {
         ? reminderMinutes.value
         : this.reminderMinutes,
     bossFamily: bossFamily.present ? bossFamily.value : this.bossFamily,
+    assignment: assignment ?? this.assignment,
   );
   Chore copyWithCompanion(ChoresCompanion data) {
     return Chore(
@@ -1006,6 +1398,9 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: data.bossFamily.present
           ? data.bossFamily.value
           : this.bossFamily,
+      assignment: data.assignment.present
+          ? data.assignment.value
+          : this.assignment,
     );
   }
 
@@ -1028,7 +1423,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           ..write('repeatStart: $repeatStart, ')
           ..write('repeatSetAt: $repeatSetAt, ')
           ..write('reminderMinutes: $reminderMinutes, ')
-          ..write('bossFamily: $bossFamily')
+          ..write('bossFamily: $bossFamily, ')
+          ..write('assignment: $assignment')
           ..write(')'))
         .toString();
   }
@@ -1052,6 +1448,7 @@ class Chore extends DataClass implements Insertable<Chore> {
     repeatSetAt,
     reminderMinutes,
     bossFamily,
+    assignment,
   );
   @override
   bool operator ==(Object other) =>
@@ -1073,7 +1470,8 @@ class Chore extends DataClass implements Insertable<Chore> {
           other.repeatStart == this.repeatStart &&
           other.repeatSetAt == this.repeatSetAt &&
           other.reminderMinutes == this.reminderMinutes &&
-          other.bossFamily == this.bossFamily);
+          other.bossFamily == this.bossFamily &&
+          other.assignment == this.assignment);
 }
 
 class ChoresCompanion extends UpdateCompanion<Chore> {
@@ -1094,6 +1492,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
   final Value<DateTime?> repeatSetAt;
   final Value<int?> reminderMinutes;
   final Value<BossFamily?> bossFamily;
+  final Value<Assignment> assignment;
   const ChoresCompanion({
     this.id = const Value.absent(),
     this.seedKey = const Value.absent(),
@@ -1112,6 +1511,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     this.bossFamily = const Value.absent(),
+    this.assignment = const Value.absent(),
   });
   ChoresCompanion.insert({
     this.id = const Value.absent(),
@@ -1131,6 +1531,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     this.bossFamily = const Value.absent(),
+    this.assignment = const Value.absent(),
   }) : iconKey = Value(iconKey),
        colorKey = Value(colorKey),
        basePoints = Value(basePoints);
@@ -1152,6 +1553,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Expression<DateTime>? repeatSetAt,
     Expression<int>? reminderMinutes,
     Expression<String>? bossFamily,
+    Expression<String>? assignment,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1171,6 +1573,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       if (repeatSetAt != null) 'repeat_set_at': repeatSetAt,
       if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
       if (bossFamily != null) 'boss_family': bossFamily,
+      if (assignment != null) 'assignment': assignment,
     });
   }
 
@@ -1192,6 +1595,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Value<DateTime?>? repeatSetAt,
     Value<int?>? reminderMinutes,
     Value<BossFamily?>? bossFamily,
+    Value<Assignment>? assignment,
   }) {
     return ChoresCompanion(
       id: id ?? this.id,
@@ -1211,6 +1615,7 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       repeatSetAt: repeatSetAt ?? this.repeatSetAt,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       bossFamily: bossFamily ?? this.bossFamily,
+      assignment: assignment ?? this.assignment,
     );
   }
 
@@ -1272,6 +1677,11 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
         $ChoresTable.$converterbossFamilyn.toSql(bossFamily.value),
       );
     }
+    if (assignment.present) {
+      map['assignment'] = Variable<String>(
+        $ChoresTable.$converterassignment.toSql(assignment.value),
+      );
+    }
     return map;
   }
 
@@ -1294,7 +1704,8 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
           ..write('repeatStart: $repeatStart, ')
           ..write('repeatSetAt: $repeatSetAt, ')
           ..write('reminderMinutes: $reminderMinutes, ')
-          ..write('bossFamily: $bossFamily')
+          ..write('bossFamily: $bossFamily, ')
+          ..write('assignment: $assignment')
           ..write(')'))
         .toString();
   }
@@ -3643,6 +4054,229 @@ class ScreenDaysCompanion extends UpdateCompanion<ScreenDay> {
   }
 }
 
+class $ChoreAssigneesTable extends ChoreAssignees
+    with TableInfo<$ChoreAssigneesTable, ChoreAssignee> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ChoreAssigneesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _choreIdMeta = const VerificationMeta(
+    'choreId',
+  );
+  @override
+  late final GeneratedColumn<int> choreId = GeneratedColumn<int>(
+    'chore_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES chores (id)',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [choreId, profileId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'chore_assignees';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ChoreAssignee> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('chore_id')) {
+      context.handle(
+        _choreIdMeta,
+        choreId.isAcceptableOrUnknown(data['chore_id']!, _choreIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_choreIdMeta);
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {choreId, profileId};
+  @override
+  ChoreAssignee map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ChoreAssignee(
+      choreId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}chore_id'],
+      )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+    );
+  }
+
+  @override
+  $ChoreAssigneesTable createAlias(String alias) {
+    return $ChoreAssigneesTable(attachedDatabase, alias);
+  }
+}
+
+class ChoreAssignee extends DataClass implements Insertable<ChoreAssignee> {
+  final int choreId;
+  final int profileId;
+  const ChoreAssignee({required this.choreId, required this.profileId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['chore_id'] = Variable<int>(choreId);
+    map['profile_id'] = Variable<int>(profileId);
+    return map;
+  }
+
+  ChoreAssigneesCompanion toCompanion(bool nullToAbsent) {
+    return ChoreAssigneesCompanion(
+      choreId: Value(choreId),
+      profileId: Value(profileId),
+    );
+  }
+
+  factory ChoreAssignee.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ChoreAssignee(
+      choreId: serializer.fromJson<int>(json['choreId']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'choreId': serializer.toJson<int>(choreId),
+      'profileId': serializer.toJson<int>(profileId),
+    };
+  }
+
+  ChoreAssignee copyWith({int? choreId, int? profileId}) => ChoreAssignee(
+    choreId: choreId ?? this.choreId,
+    profileId: profileId ?? this.profileId,
+  );
+  ChoreAssignee copyWithCompanion(ChoreAssigneesCompanion data) {
+    return ChoreAssignee(
+      choreId: data.choreId.present ? data.choreId.value : this.choreId,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChoreAssignee(')
+          ..write('choreId: $choreId, ')
+          ..write('profileId: $profileId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(choreId, profileId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ChoreAssignee &&
+          other.choreId == this.choreId &&
+          other.profileId == this.profileId);
+}
+
+class ChoreAssigneesCompanion extends UpdateCompanion<ChoreAssignee> {
+  final Value<int> choreId;
+  final Value<int> profileId;
+  final Value<int> rowid;
+  const ChoreAssigneesCompanion({
+    this.choreId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ChoreAssigneesCompanion.insert({
+    required int choreId,
+    required int profileId,
+    this.rowid = const Value.absent(),
+  }) : choreId = Value(choreId),
+       profileId = Value(profileId);
+  static Insertable<ChoreAssignee> custom({
+    Expression<int>? choreId,
+    Expression<int>? profileId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (choreId != null) 'chore_id': choreId,
+      if (profileId != null) 'profile_id': profileId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ChoreAssigneesCompanion copyWith({
+    Value<int>? choreId,
+    Value<int>? profileId,
+    Value<int>? rowid,
+  }) {
+    return ChoreAssigneesCompanion(
+      choreId: choreId ?? this.choreId,
+      profileId: profileId ?? this.profileId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (choreId.present) {
+      map['chore_id'] = Variable<int>(choreId.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ChoreAssigneesCompanion(')
+          ..write('choreId: $choreId, ')
+          ..write('profileId: $profileId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3654,6 +4288,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FightsTable fights = $FightsTable(this);
   late final $InventoryTable inventory = $InventoryTable(this);
   late final $ScreenDaysTable screenDays = $ScreenDaysTable(this);
+  late final $ChoreAssigneesTable choreAssignees = $ChoreAssigneesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3667,6 +4302,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     fights,
     inventory,
     screenDays,
+    choreAssignees,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -3678,12 +4314,26 @@ typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
   required String name,
   Value<int> colorKey,
   Value<DateTime> createdAt,
+  Value<int> avatarSkin,
+  Value<int> avatarHair,
+  Value<int> avatarCape,
+  Value<int> avatarHat,
+  Value<bool> storyMode,
+  Value<bool> slowMode,
+  Value<DateTime?> archivedAt,
 });
 typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<int> colorKey,
   Value<DateTime> createdAt,
+  Value<int> avatarSkin,
+  Value<int> avatarHair,
+  Value<int> avatarCape,
+  Value<int> avatarHat,
+  Value<bool> storyMode,
+  Value<bool> slowMode,
+  Value<DateTime?> archivedAt,
 });
 
 final class $$ProfilesTableReferences
@@ -3780,6 +4430,24 @@ final class $$ProfilesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ChoreAssigneesTable, List<ChoreAssignee>>
+  _choreAssigneesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.choreAssignees,
+    aliasName: 'profiles__id__chore_assignees__profile_id',
+  );
+
+  $$ChoreAssigneesTableProcessedTableManager get choreAssigneesRefs {
+    final manager = $$ChoreAssigneesTableTableManager(
+      $_db,
+      $_db.choreAssignees,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_choreAssigneesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ProfilesTableFilterComposer
@@ -3808,6 +4476,41 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get avatarSkin => $composableBuilder(
+    column: $table.avatarSkin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get avatarHair => $composableBuilder(
+    column: $table.avatarHair,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get avatarCape => $composableBuilder(
+    column: $table.avatarCape,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get avatarHat => $composableBuilder(
+    column: $table.avatarHat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get storyMode => $composableBuilder(
+    column: $table.storyMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get slowMode => $composableBuilder(
+    column: $table.slowMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3935,6 +4638,31 @@ class $$ProfilesTableFilterComposer
     );
     return f(composer);
   }
+
+  Expression<bool> choreAssigneesRefs(
+    Expression<bool> Function($$ChoreAssigneesTableFilterComposer f) f,
+  ) {
+    final $$ChoreAssigneesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.choreAssignees,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoreAssigneesTableFilterComposer(
+            $db: $db,
+            $table: $db.choreAssignees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableOrderingComposer
@@ -3965,6 +4693,41 @@ class $$ProfilesTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get avatarSkin => $composableBuilder(
+    column: $table.avatarSkin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get avatarHair => $composableBuilder(
+    column: $table.avatarHair,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get avatarCape => $composableBuilder(
+    column: $table.avatarCape,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get avatarHat => $composableBuilder(
+    column: $table.avatarHat,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get storyMode => $composableBuilder(
+    column: $table.storyMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get slowMode => $composableBuilder(
+    column: $table.slowMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProfilesTableAnnotationComposer
@@ -3987,6 +4750,35 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get avatarSkin => $composableBuilder(
+    column: $table.avatarSkin,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get avatarHair => $composableBuilder(
+    column: $table.avatarHair,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get avatarCape => $composableBuilder(
+    column: $table.avatarCape,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get avatarHat =>
+      $composableBuilder(column: $table.avatarHat, builder: (column) => column);
+
+  GeneratedColumn<bool> get storyMode =>
+      $composableBuilder(column: $table.storyMode, builder: (column) => column);
+
+  GeneratedColumn<bool> get slowMode =>
+      $composableBuilder(column: $table.slowMode, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get archivedAt => $composableBuilder(
+    column: $table.archivedAt,
+    builder: (column) => column,
+  );
 
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
@@ -4112,6 +4904,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> choreAssigneesRefs<T extends Object>(
+    Expression<T> Function($$ChoreAssigneesTableAnnotationComposer a) f,
+  ) {
+    final $$ChoreAssigneesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.choreAssignees,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoreAssigneesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.choreAssignees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -4133,6 +4950,7 @@ class $$ProfilesTableTableManager
             bool fightsRefs,
             bool inventoryRefs,
             bool screenDaysRefs,
+            bool choreAssigneesRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -4152,11 +4970,25 @@ class $$ProfilesTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<int> colorKey = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> avatarSkin = const Value.absent(),
+                Value<int> avatarHair = const Value.absent(),
+                Value<int> avatarCape = const Value.absent(),
+                Value<int> avatarHat = const Value.absent(),
+                Value<bool> storyMode = const Value.absent(),
+                Value<bool> slowMode = const Value.absent(),
+                Value<DateTime?> archivedAt = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
                 name: name,
                 colorKey: colorKey,
                 createdAt: createdAt,
+                avatarSkin: avatarSkin,
+                avatarHair: avatarHair,
+                avatarCape: avatarCape,
+                avatarHat: avatarHat,
+                storyMode: storyMode,
+                slowMode: slowMode,
+                archivedAt: archivedAt,
               ),
           createCompanionCallback:
               ({
@@ -4164,11 +4996,25 @@ class $$ProfilesTableTableManager
                 required String name,
                 Value<int> colorKey = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<int> avatarSkin = const Value.absent(),
+                Value<int> avatarHair = const Value.absent(),
+                Value<int> avatarCape = const Value.absent(),
+                Value<int> avatarHat = const Value.absent(),
+                Value<bool> storyMode = const Value.absent(),
+                Value<bool> slowMode = const Value.absent(),
+                Value<DateTime?> archivedAt = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
                 name: name,
                 colorKey: colorKey,
                 createdAt: createdAt,
+                avatarSkin: avatarSkin,
+                avatarHair: avatarHair,
+                avatarCape: avatarCape,
+                avatarHat: avatarHat,
+                storyMode: storyMode,
+                slowMode: slowMode,
+                archivedAt: archivedAt,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4185,6 +5031,7 @@ class $$ProfilesTableTableManager
                 fightsRefs = false,
                 inventoryRefs = false,
                 screenDaysRefs = false,
+                choreAssigneesRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4194,6 +5041,7 @@ class $$ProfilesTableTableManager
                     if (fightsRefs) db.fights,
                     if (inventoryRefs) db.inventory,
                     if (screenDaysRefs) db.screenDays,
+                    if (choreAssigneesRefs) db.choreAssignees,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -4298,6 +5146,26 @@ class $$ProfilesTableTableManager
                           referencedColumn: 'profile_id',
                           typedResults: items,
                         ),
+                      if (choreAssigneesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Profile,
+                          $ProfilesTable,
+                          ChoreAssignee,
+                          $ChoreAssigneesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._choreAssigneesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).choreAssigneesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'profile_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4324,6 +5192,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool fightsRefs,
         bool inventoryRefs,
         bool screenDaysRefs,
+        bool choreAssigneesRefs,
       })
     >;
 typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
@@ -4344,6 +5213,7 @@ typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
   Value<BossFamily?> bossFamily,
+  Value<Assignment> assignment,
 });
 typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<int> id,
@@ -4363,6 +5233,7 @@ typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
   Value<BossFamily?> bossFamily,
+  Value<Assignment> assignment,
 });
 
 final class $$ChoresTableReferences
@@ -4382,6 +5253,24 @@ final class $$ChoresTableReferences
     ).filter((f) => f.choreId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_completionsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ChoreAssigneesTable, List<ChoreAssignee>>
+  _choreAssigneesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.choreAssignees,
+    aliasName: 'chores__id__chore_assignees__chore_id',
+  );
+
+  $$ChoreAssigneesTableProcessedTableManager get choreAssigneesRefs {
+    final manager = $$ChoreAssigneesTableTableManager(
+      $_db,
+      $_db.choreAssignees,
+    ).filter((f) => f.choreId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_choreAssigneesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4484,6 +5373,12 @@ class $$ChoresTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnWithTypeConverterFilters<Assignment, Assignment, String>
+  get assignment => $composableBuilder(
+    column: $table.assignment,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   Expression<bool> completionsRefs(
     Expression<bool> Function($$CompletionsTableFilterComposer f) f,
   ) {
@@ -4500,6 +5395,31 @@ class $$ChoresTableFilterComposer
           }) => $$CompletionsTableFilterComposer(
             $db: $db,
             $table: $db.completions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> choreAssigneesRefs(
+    Expression<bool> Function($$ChoreAssigneesTableFilterComposer f) f,
+  ) {
+    final $$ChoreAssigneesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.choreAssignees,
+      getReferencedColumn: (t) => t.choreId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoreAssigneesTableFilterComposer(
+            $db: $db,
+            $table: $db.choreAssignees,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4603,6 +5523,11 @@ class $$ChoresTableOrderingComposer
     column: $table.bossFamily,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get assignment => $composableBuilder(
+    column: $table.assignment,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ChoresTableAnnotationComposer
@@ -4689,6 +5614,12 @@ class $$ChoresTableAnnotationComposer
         builder: (column) => column,
       );
 
+  GeneratedColumnWithTypeConverter<Assignment, String> get assignment =>
+      $composableBuilder(
+        column: $table.assignment,
+        builder: (column) => column,
+      );
+
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
   ) {
@@ -4713,6 +5644,31 @@ class $$ChoresTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> choreAssigneesRefs<T extends Object>(
+    Expression<T> Function($$ChoreAssigneesTableAnnotationComposer a) f,
+  ) {
+    final $$ChoreAssigneesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.choreAssignees,
+      getReferencedColumn: (t) => t.choreId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoreAssigneesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.choreAssignees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ChoresTableTableManager
@@ -4728,7 +5684,10 @@ class $$ChoresTableTableManager
           $$ChoresTableUpdateCompanionBuilder,
           (Chore, $$ChoresTableReferences),
           Chore,
-          PrefetchHooks Function({bool completionsRefs})
+          PrefetchHooks Function({
+            bool completionsRefs,
+            bool choreAssigneesRefs,
+          })
         > {
   $$ChoresTableTableManager(_$AppDatabase db, $ChoresTable table)
     : super(
@@ -4760,6 +5719,7 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
                 Value<BossFamily?> bossFamily = const Value.absent(),
+                Value<Assignment> assignment = const Value.absent(),
               }) => ChoresCompanion(
                 id: id,
                 seedKey: seedKey,
@@ -4778,6 +5738,7 @@ class $$ChoresTableTableManager
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
                 bossFamily: bossFamily,
+                assignment: assignment,
               ),
           createCompanionCallback:
               ({
@@ -4798,6 +5759,7 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
                 Value<BossFamily?> bossFamily = const Value.absent(),
+                Value<Assignment> assignment = const Value.absent(),
               }) => ChoresCompanion.insert(
                 id: id,
                 seedKey: seedKey,
@@ -4816,6 +5778,7 @@ class $$ChoresTableTableManager
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
                 bossFamily: bossFamily,
+                assignment: assignment,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4825,36 +5788,61 @@ class $$ChoresTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({completionsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (completionsRefs) db.completions],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (completionsRefs)
-                    await $_getPrefetchedDataByColumns<
-                      Chore,
-                      $ChoresTable,
-                      Completion,
-                      $CompletionsTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ChoresTableReferences
-                          ._completionsRefsTable(db),
-                      managerFromTypedResult: (p0) => $$ChoresTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).completionsRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'chore_id',
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({completionsRefs = false, choreAssigneesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (completionsRefs) db.completions,
+                    if (choreAssigneesRefs) db.choreAssignees,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (completionsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Chore,
+                          $ChoresTable,
+                          Completion,
+                          $CompletionsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ChoresTableReferences
+                              ._completionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ChoresTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).completionsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'chore_id',
+                          typedResults: items,
+                        ),
+                      if (choreAssigneesRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Chore,
+                          $ChoresTable,
+                          ChoreAssignee,
+                          $ChoreAssigneesTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ChoresTableReferences
+                              ._choreAssigneesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ChoresTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).choreAssigneesRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'chore_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4871,7 +5859,7 @@ typedef $$ChoresTableProcessedTableManager =
       $$ChoresTableUpdateCompanionBuilder,
       (Chore, $$ChoresTableReferences),
       Chore,
-      PrefetchHooks Function({bool completionsRefs})
+      PrefetchHooks Function({bool completionsRefs, bool choreAssigneesRefs})
     >;
 typedef $$CompletionsTableCreateCompanionBuilder =
     CompletionsCompanion Function({
@@ -6960,6 +7948,354 @@ typedef $$ScreenDaysTableProcessedTableManager =
       ScreenDay,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$ChoreAssigneesTableCreateCompanionBuilder =
+    ChoreAssigneesCompanion Function({
+      required int choreId,
+      required int profileId,
+      Value<int> rowid,
+    });
+typedef $$ChoreAssigneesTableUpdateCompanionBuilder =
+    ChoreAssigneesCompanion Function({
+      Value<int> choreId,
+      Value<int> profileId,
+      Value<int> rowid,
+    });
+
+final class $$ChoreAssigneesTableReferences
+    extends BaseReferences<_$AppDatabase, $ChoreAssigneesTable, ChoreAssignee> {
+  $$ChoreAssigneesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ChoresTable _choreIdTable(_$AppDatabase db) =>
+      db.chores.createAlias('chore_assignees__chore_id__chores__id');
+
+  $$ChoresTableProcessedTableManager get choreId {
+    final $_column = $_itemColumn<int>('chore_id')!;
+
+    final manager = $$ChoresTableTableManager(
+      $_db,
+      $_db.chores,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_choreIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('chore_assignees__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ChoreAssigneesTableFilterComposer
+    extends Composer<_$AppDatabase, $ChoreAssigneesTable> {
+  $$ChoreAssigneesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$ChoresTableFilterComposer get choreId {
+    final $$ChoresTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.choreId,
+      referencedTable: $db.chores,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoresTableFilterComposer(
+            $db: $db,
+            $table: $db.chores,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChoreAssigneesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ChoreAssigneesTable> {
+  $$ChoreAssigneesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$ChoresTableOrderingComposer get choreId {
+    final $$ChoresTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.choreId,
+      referencedTable: $db.chores,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoresTableOrderingComposer(
+            $db: $db,
+            $table: $db.chores,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChoreAssigneesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ChoreAssigneesTable> {
+  $$ChoreAssigneesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$ChoresTableAnnotationComposer get choreId {
+    final $$ChoresTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.choreId,
+      referencedTable: $db.chores,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ChoresTableAnnotationComposer(
+            $db: $db,
+            $table: $db.chores,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ChoreAssigneesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ChoreAssigneesTable,
+          ChoreAssignee,
+          $$ChoreAssigneesTableFilterComposer,
+          $$ChoreAssigneesTableOrderingComposer,
+          $$ChoreAssigneesTableAnnotationComposer,
+          $$ChoreAssigneesTableCreateCompanionBuilder,
+          $$ChoreAssigneesTableUpdateCompanionBuilder,
+          (ChoreAssignee, $$ChoreAssigneesTableReferences),
+          ChoreAssignee,
+          PrefetchHooks Function({bool choreId, bool profileId})
+        > {
+  $$ChoreAssigneesTableTableManager(
+    _$AppDatabase db,
+    $ChoreAssigneesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChoreAssigneesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChoreAssigneesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChoreAssigneesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> choreId = const Value.absent(),
+                Value<int> profileId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ChoreAssigneesCompanion(
+                choreId: choreId,
+                profileId: profileId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int choreId,
+                required int profileId,
+                Value<int> rowid = const Value.absent(),
+              }) => ChoreAssigneesCompanion.insert(
+                choreId: choreId,
+                profileId: profileId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ChoreAssigneesTable, ChoreAssignee>(table),
+                  $$ChoreAssigneesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({choreId = false, profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (choreId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.choreId,
+                        referencedTable: $$ChoreAssigneesTableReferences
+                            ._choreIdTable(db),
+                        referencedColumn: $$ChoreAssigneesTableReferences
+                            ._choreIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (profileId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.profileId,
+                        referencedTable: $$ChoreAssigneesTableReferences
+                            ._profileIdTable(db),
+                        referencedColumn: $$ChoreAssigneesTableReferences
+                            ._profileIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ChoreAssigneesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ChoreAssigneesTable,
+      ChoreAssignee,
+      $$ChoreAssigneesTableFilterComposer,
+      $$ChoreAssigneesTableOrderingComposer,
+      $$ChoreAssigneesTableAnnotationComposer,
+      $$ChoreAssigneesTableCreateCompanionBuilder,
+      $$ChoreAssigneesTableUpdateCompanionBuilder,
+      (ChoreAssignee, $$ChoreAssigneesTableReferences),
+      ChoreAssignee,
+      PrefetchHooks Function({bool choreId, bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6980,4 +8316,6 @@ class $AppDatabaseManager {
       $$InventoryTableTableManager(_db, _db.inventory);
   $$ScreenDaysTableTableManager get screenDays =>
       $$ScreenDaysTableTableManager(_db, _db.screenDays);
+  $$ChoreAssigneesTableTableManager get choreAssignees =>
+      $$ChoreAssigneesTableTableManager(_db, _db.choreAssignees);
 }

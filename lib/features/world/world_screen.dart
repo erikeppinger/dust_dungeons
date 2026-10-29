@@ -16,7 +16,6 @@ import '../fight/boss_art.dart';
 import '../fight/fight_screen.dart';
 import '../fight/fight_settings.dart';
 import '../fight/hero_art.dart';
-import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
 import '../../domain/screen_time.dart';
 import '../screen_time/screen_time_providers.dart';
@@ -109,7 +108,7 @@ class _HeroCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final settings = ref.watch(settingsProvider);
+    final person = ref.watch(currentProfileProvider);
     final stats = ref.watch(progressStatsProvider).value;
     final level = stats?.level ?? 1;
     final loadout = Loadout.fromInventory(
@@ -125,10 +124,10 @@ class _HeroCard extends ConsumerWidget {
         child: Row(
           children: [
             HeroArt(
-              skin: settings.avatarSkin,
-              hair: settings.avatarHair,
-              cape: settings.avatarCape,
-              hat: settings.avatarHat,
+              skin: person.avatarSkin,
+              hair: person.avatarHair,
+              cape: person.avatarCape,
+              hat: person.avatarHat,
               semanticLabel: l10n.worldHeroLevel(level),
             ),
             const SizedBox(width: 16),

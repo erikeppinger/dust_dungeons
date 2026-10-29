@@ -9,17 +9,18 @@ import 'generated_migrations/schema_v2.dart' as v2;
 import 'generated_migrations/schema_v3.dart' as v3;
 import 'generated_migrations/schema_v4.dart' as v4;
 import 'generated_migrations/schema_v5.dart' as v5;
+import 'generated_migrations/schema_v6.dart' as v6;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4, 5]) {
-    test('v$from -> v6 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5, 6]) {
+    test('v$from -> v7 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 6);
+      await verifier.migrateAndValidate(db, 7);
       await db.close();
     });
   }
@@ -153,5 +154,52 @@ void main() {
     final items = await db.select(db.inventory).get();
     expect(items.single.count, 2);
     expect(await db.select(db.screenDays).get(), isEmpty);
+  });
+
+  test('v6 -> v7 moves the hero and fight modes onto the profile; '
+      'chores are for anyone', () async {
+    final schema = await verifier.schemaAt(6);
+    final old = v6.DatabaseAtV6(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO chores (custom_title, icon_key, color_key, base_points) '
+      "VALUES ('Trash', 'delete', 3, 5)",
+    );
+    for (final (key, value) in [
+      ('avatarSkin', '2'),
+      ('avatarHair', '3'),
+      ('avatarCape', '4'),
+      ('avatarHat', '1'),
+      ('fightStoryMode', 'true'),
+      ('fightSlowMode', 'false'),
+      ('fightSound', 'false'),
+    ]) {
+      await old.customStatement(
+        'INSERT INTO settings (key, value) VALUES (?, ?)',
+        [key, value],
+      );
+    }
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final me = await db.select(db.profiles).getSingle();
+    expect(
+      (me.avatarSkin, me.avatarHair, me.avatarCape, me.avatarHat),
+      (2, 3, 4, 1),
+    );
+    expect(me.storyMode, isTrue);
+    expect(me.slowMode, isFalse);
+    expect(me.archivedAt, isNull);
+    final trash = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.customTitle == 'Trash',
+    );
+    expect(trash.assignment, Assignment.anyone);
+    expect(await db.select(db.choreAssignees).get(), isEmpty);
+    // Moved settings are gone; the rest stay.
+    final keys = {for (final e in await db.select(db.settings).get()) e.key};
+    expect(keys, contains('fightSound'));
+    expect(keys, isNot(contains('avatarSkin')));
+    expect(keys, isNot(contains('fightStoryMode')));
   });
 }

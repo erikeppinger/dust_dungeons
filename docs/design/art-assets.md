@@ -28,9 +28,9 @@ assets/art/
   CREDITS.md
 lib/app/art/
   art.dart          Sprite: paints one sprite in a palette (recorded once, then replayed)
-  art.g.dart        GENERATED: palettes and sprites as Dart constants
+  art_data.dart        GENERATED: palettes and sprites as Dart constants
   art_gallery.dart  debug-only screen showing every sprite on day and night
-tool/build_art.py   checks assets/art and writes art.g.dart (--check: only check)
+tool/build_art.py   checks assets/art and writes art_data.dart (--check: only check)
 ```
 
 ## How the code uses the files
@@ -42,7 +42,7 @@ reads every PNG listed in `art.json` and checks:
 - that every color name matches across the palettes of a group
 - that no PNG is left unlisted
 
-It then writes `art.g.dart`, where each sprite is a list of rows with one character per pixel,
+It then writes `art_data.dart` (deliberately not `*.g.dart`, which `build_runner` deletes as its own), where each sprite is a list of rows with one character per pixel,
 holding the palette index. This works like Drift's generated code, and it was chosen over
 decoding PNGs at runtime:
 - **Drawing stays synchronous:** widgets and painters draw a sprite like before, with no

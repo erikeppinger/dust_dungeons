@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../backup/backup_screen.dart';
 import '../backup/backups.dart';
 import '../chores/manage_chores_screen.dart';
 import '../fight/fight_settings.dart';
 import '../notifications/notification_settings.dart';
+import '../people/people_screen.dart';
+import '../screen_time/screen_time_providers.dart';
 import '../screen_time/screen_time_screen.dart';
 import 'settings_controller.dart';
 import 'settings_pages.dart';
@@ -36,7 +39,7 @@ class SettingsScreen extends ConsumerWidget {
     final fights = [
       if (settings.fightSound) l10n.fightSettingSound,
       if (settings.fightHaptics) l10n.fightSettingHaptics,
-      if (settings.fightStoryMode) l10n.fightSettingStory,
+      if (ref.watch(currentProfileProvider).storyMode) l10n.fightSettingStory,
     ];
     final backupOn = ref.watch(backupStateProvider).value?.folder != null;
     final backupName = ref.watch(backupFolderNameProvider);
@@ -55,6 +58,12 @@ class SettingsScreen extends ConsumerWidget {
           title: l10n.manageChores,
           subtitle: l10n.manageChoresSubtitle,
           onTap: () => ManageChoresScreen.open(context),
+        ),
+        _Entry(
+          icon: Icons.group_outlined,
+          title: l10n.peopleTitle,
+          subtitle: l10n.peopleSubtitle(ref.watch(profilesProvider).length),
+          onTap: () => PeopleScreen.open(context),
         ),
         _Entry(
           icon: Icons.palette_outlined,
@@ -91,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
         _Entry(
           icon: Icons.phone_android,
           title: l10n.settingsScreenTime,
-          subtitle: settings.screenTime
+          subtitle: ref.watch(screenTimeActiveProvider)
               ? l10n.screenOnSubtitle(settings.screenBaseMinutes)
               : l10n.stateOff,
           onTap: () => ScreenTimeScreen.open(context),

@@ -84,10 +84,14 @@ final notificationPlanProvider = Provider<NotificationPlan?>((ref) {
     return NotificationPlan(const [], channelNames(l10n));
   }
   ref.watch(todayProvider);
-  final chores = ref.watch(scheduledChoresProvider).value;
-  final completions = ref.watch(allCompletionsProvider).value;
+  // The phone is shared: everyone's chores and the household's totals.
+  final chores = ref.watch(householdScheduleProvider).value;
+  final completions = ref.watch(householdCompletionsProvider).value;
+  final people = ref.watch(profilesProvider);
   if (chores == null || completions == null) return null;
-  final screen = ref.watch(screenYesterdayProvider);
+  final screen = ref.watch(screenTimeActiveProvider)
+      ? ref.watch(screenYesterdayProvider)
+      : null;
   return NotificationPlan(
     planNotifications(
       now: DateTime.now(),
@@ -98,6 +102,9 @@ final notificationPlanProvider = Provider<NotificationPlan?>((ref) {
       screenYesterday: screen == null
           ? null
           : (screen.usedMinutes, screen.budgetMinutes),
+      people: people.length > 1
+          ? {for (final p in people) p.id: p.name}
+          : const {},
     ),
     channelNames(l10n),
   );
