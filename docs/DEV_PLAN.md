@@ -268,8 +268,8 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.7.0** ✅ | Screen time | Soft screen-time budget: chores earn minutes, vouchers in the Armory, reminders, Tired in the Arena ([design](design/screen-time.md)) |
 | **0.7.1** ✅ | 16-bit look | Day/night palettes, pixel font headings, framed panels, segmented bars, pixel tab icons, new launcher icon and splash |
 | **0.7.2** | Art as files | Pixel art moved from code into PNG files with palettes, palette swap for seasons and avatar, art checker and gallery, [art guide](ART_GUIDE.md) ([design](design/art-assets.md)); hero and bosses redrawn as sprites later |
-| **0.8.0** | Data safety | Export, import that merges, daily auto-backup to a chosen folder, undo of an import ([design](design/data-safety.md)) |
-| **0.9.0** | Profiles | Multiple people on one device, per-profile stats, chore assignment |
+| **0.8.0** ✅ | Data safety | Export, import that merges, daily auto-backup to a chosen folder, undo of an import ([design](design/data-safety.md)) |
+| **0.9.0** | Profiles | Several people on one device (free switching), chores for anyone / one / each, per-person hero and fights, weekly leaderboard; screen time only with one person ([design](design/profiles.md)) |
 | **0.10.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) |
 | **1.0.0** | Release | Final name, icon, store/F-Droid listing, chosen genre theme |
 | later | | macOS/iOS, home screen widget, more themes, device-to-device sync without a server |
