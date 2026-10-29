@@ -108,6 +108,27 @@ class Inventory extends Table {
   Set<Column<Object>> get primaryKey => {profileId, itemKey};
 }
 
+/// Screen time per day (soft budget): saved so history, the Tired effect
+/// and the daily summary survive Android dropping old usage after ~a week.
+class ScreenDays extends Table {
+  IntColumn get profileId => integer().references(Profiles, #id)();
+
+  /// Local midnight of the day.
+  DateTimeColumn get day => dateTime()();
+
+  /// Foreground minutes of the chosen apps (last known for today).
+  IntColumn get usedMinutes => integer().withDefault(const Constant(0))();
+
+  /// The day's whole budget: base + earned by quests + vouchers.
+  IntColumn get budgetMinutes => integer().withDefault(const Constant(0))();
+
+  /// Minutes added by vouchers that day (part of [budgetMinutes]).
+  IntColumn get voucherMinutes => integer().withDefault(const Constant(0))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId, day};
+}
+
 /// Simple key/value store for app settings.
 @DataClassName('SettingEntry')
 class Settings extends Table {

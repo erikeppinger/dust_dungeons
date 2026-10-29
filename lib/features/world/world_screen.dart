@@ -15,6 +15,8 @@ import '../fight/fight_settings.dart';
 import '../fight/hero_art.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
+import '../../domain/screen_time.dart';
+import '../screen_time/screen_time_providers.dart';
 import 'avatar_editor.dart';
 import 'quest_map.dart';
 import 'shop_screen.dart';
@@ -111,7 +113,9 @@ class _HeroCard extends ConsumerWidget {
       ref.watch(inventoryProvider).value ?? const {},
     );
     final hero = HeroStats.forLevel(level);
-    final hearts = hero.maxHp + (loadout.gloves ? 1 : 0);
+    final tired = ref.watch(tiredProvider);
+    final hearts =
+        tiredMaxHp(hero.maxHp, tired: tired) + (loadout.gloves ? 1 : 0);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -145,6 +149,20 @@ class _HeroCard extends ConsumerWidget {
                     l10n.worldHeroStats(hearts, hero.damage),
                     style: theme.textTheme.bodySmall,
                   ),
+                  if (tired)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Tooltip(
+                        message: l10n.screenTiredHelp,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Chip(
+                          key: const ValueKey('tired'),
+                          avatar: const Icon(Icons.bedtime_outlined, size: 18),
+                          label: Text(l10n.screenTired),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                    ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,

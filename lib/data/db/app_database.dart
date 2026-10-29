@@ -20,6 +20,7 @@ part 'app_database.g.dart';
     Settings,
     Fights,
     Inventory,
+    ScreenDays,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -44,7 +45,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +81,10 @@ class AppDatabase extends _$AppDatabase {
         // v5: the shop's inventory. The ledger gains the "spend" reason,
         // which needs no schema change (stored as text).
         await m.createTable(inventory);
+      }
+      if (from < 6) {
+        // v6: the soft screen-time budget's daily totals.
+        await m.createTable(screenDays);
       }
     },
     beforeOpen: (details) async {

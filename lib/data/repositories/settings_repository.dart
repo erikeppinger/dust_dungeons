@@ -28,6 +28,13 @@ class SettingsRepository {
   static const _avatarCape = 'avatarCape';
   static const _avatarHat = 'avatarHat';
   static const _onboardingDone = 'onboardingDone';
+  static const _screenTime = 'screenTime';
+  static const _screenBaseMinutes = 'screenBaseMinutes';
+  static const _screenEarnCap = 'screenEarnCap';
+  static const _screenApps = 'screenApps';
+  static const _screenWarn = 'screenWarn';
+  static const _screenOver = 'screenOver';
+  static const _screenSummary = 'screenSummary';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -71,6 +78,19 @@ class SettingsRepository {
       avatarCape: int.tryParse(map[_avatarCape] ?? '') ?? defaults.avatarCape,
       avatarHat: int.tryParse(map[_avatarHat] ?? '') ?? defaults.avatarHat,
       onboardingDone: onboardingDone,
+      screenTime: flag(_screenTime, defaults.screenTime),
+      screenBaseMinutes:
+          int.tryParse(map[_screenBaseMinutes] ?? '') ??
+          defaults.screenBaseMinutes,
+      screenEarnCap:
+          int.tryParse(map[_screenEarnCap] ?? '') ?? defaults.screenEarnCap,
+      screenApps: (map[_screenApps] ?? '')
+          .split('\n')
+          .where((p) => p.isNotEmpty)
+          .toList(),
+      screenWarn: flag(_screenWarn, defaults.screenWarn),
+      screenOver: flag(_screenOver, defaults.screenOver),
+      screenSummary: flag(_screenSummary, defaults.screenSummary),
     );
   }
 
@@ -101,6 +121,13 @@ class SettingsRepository {
     await _put(_avatarCape, '${settings.avatarCape}');
     await _put(_avatarHat, '${settings.avatarHat}');
     await _put(_onboardingDone, '${settings.onboardingDone}');
+    await _put(_screenTime, '${settings.screenTime}');
+    await _put(_screenBaseMinutes, '${settings.screenBaseMinutes}');
+    await _put(_screenEarnCap, '${settings.screenEarnCap}');
+    await _put(_screenApps, settings.screenApps.join('\n'));
+    await _put(_screenWarn, '${settings.screenWarn}');
+    await _put(_screenOver, '${settings.screenOver}');
+    await _put(_screenSummary, '${settings.screenSummary}');
   });
 
   Future<void> _put(String key, String value) => _db

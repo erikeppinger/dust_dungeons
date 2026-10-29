@@ -33,12 +33,26 @@ const hats = [
   ShopItem('hat_crown', ItemKind.hat, 250),
 ];
 
+/// Screen-time vouchers: extra minutes for one day (soft budget).
+const screenVouchers = [
+  ShopItem('screen_15', ItemKind.consumable, 40),
+  ShopItem('screen_30', ItemKind.consumable, 75),
+];
+
+/// Minutes a screen-time voucher adds.
+int voucherMinutes(ShopItem item) => switch (item.key) {
+  'screen_15' => 15,
+  'screen_30' => 30,
+  _ => 0,
+};
+
 const shopItems = [
   shieldItem,
   mopItem,
   charmItem,
   glovesItem,
   secondWindItem,
+  ...screenVouchers,
   ...hats,
 ];
 

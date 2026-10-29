@@ -6,6 +6,8 @@ This app does not collect, transmit or share any data.
 - The release app does **not request internet access**. It cannot send anything anywhere.
 - No account, no analytics, no crash reporting, no advertising, no third-party tracking libraries.
 - Notifications are scheduled locally on the device and are off until you turn them on.
+- Screen time (optional, off by default): with Android's usage access, the app reads how long the apps
+  **you** chose were open. Only daily totals for those apps are kept, on this device.
 - Backups/exports (planned) are files that **you** choose where to save.
 
 Uninstalling the app deletes all of its data unless you exported a backup first.

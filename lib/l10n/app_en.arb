@@ -872,5 +872,159 @@
         "type": "int"
       }
     }
+  },
+  "settingsScreenTime": "Screen time",
+  "screenOnSubtitle": "On · {minutes} min a day",
+  "@screenOnSubtitle": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenIntro": "Set yourself a daily budget for the apps that eat your time. Finished quests earn extra minutes, and the Armory sells more. It only reminds you; it never blocks an app.",
+  "screenEarnRule": "Every {points} quest points earn 1 minute.",
+  "@screenEarnRule": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "screenPrivacy": "To see how long the chosen apps were open, Android's usage access is needed. Only daily totals are kept, and they never leave this phone.",
+  "screenEnable": "Use a screen-time budget",
+  "screenGrantAccess": "Allow usage access",
+  "screenAccessMissing": "Usage access is off, so screen time can't be measured.",
+  "screenAccessMissingShort": "Usage access is off",
+  "screenLeft": "{minutes} min left",
+  "@screenLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenOverBy": "{minutes} min over",
+  "@screenOverBy": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenUsedOf": "{used} of {total} min used",
+  "@screenUsedOf": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "screenBase": "Base",
+  "screenQuests": "Quests (up to {cap} min)",
+  "@screenQuests": {
+    "placeholders": {
+      "cap": {
+        "type": "int"
+      }
+    }
+  },
+  "screenVouchers": "Vouchers",
+  "screenMinutes": "{minutes} min",
+  "@screenMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenUseVoucher": "Use +{minutes} min · {count} left",
+  "@screenUseVoucher": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "screenUsedToday": "Used today",
+  "screenNoUse": "None of the chosen apps used yet today.",
+  "screenNoHistory": "The last days show up here once screen time has run for a day.",
+  "screenDayResult": "{day}: {used} of {total} min",
+  "@screenDayResult": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "screenSettings": "Settings",
+  "screenBaseBudget": "Daily budget",
+  "screenEarnCapSetting": "Most minutes quests earn per day",
+  "screenApps": "Apps that count",
+  "screenAppsCount": "{count, plural, =0{No apps chosen yet} =1{1 app} other{{count} apps}}",
+  "@screenAppsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "screenPickerHint": "Tick the apps that eat your time. Messaging, maps or school apps can stay unticked.",
+  "screenNotifyWarn": "Warn when {minutes} minutes are left",
+  "@screenNotifyWarn": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenNotifyOver": "Remind me when the budget is used up",
+  "screenNotifySummary": "Yesterday's result in the daily summary",
+  "screenTired": "Tired · one heart less today",
+  "screenTiredHelp": "Over the screen-time budget yesterday. A day within budget clears it.",
+  "itemScreenTime": "Screen time +{minutes} min",
+  "@itemScreenTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "itemScreenTimeDesc": "Extra minutes for one day, used on the screen-time page",
+  "channelScreenTime": "Screen time",
+  "screenWarnTitle": "Screen time almost up",
+  "screenWarnBody": "Screen time left today: {minutes} min",
+  "@screenWarnBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "screenOverTitle": "Screen time used up",
+  "screenOverEarnMore": "Your screen time for today is used up. Each finished quest earns a few more minutes.",
+  "screenOverCapped": "Your screen time for today is used up.",
+  "notifScreenYesterday": "Screen time yesterday: {used} of {total} min",
+  "@notifScreenYesterday": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }

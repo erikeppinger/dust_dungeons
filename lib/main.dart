@@ -13,6 +13,7 @@ import 'data/repositories/settings_repository.dart';
 import 'features/notifications/notification_planner.dart';
 import 'features/notifications/notification_service.dart';
 import 'features/notifications/notification_sync.dart';
+import 'features/screen_time/screen_time_providers.dart';
 import 'features/settings/settings_controller.dart';
 import 'l10n/app_localizations.dart';
 
@@ -124,15 +125,20 @@ class _AppRootState extends State<_AppRoot> {
   /// Keeps scheduled notifications in line with the data.
   late final ProviderSubscription<Object?> _sync;
 
+  /// Keeps the screen-time background check and daily totals up to date.
+  late final ProviderSubscription<Object?> _screenSync;
+
   @override
   void initState() {
     super.initState();
     _sync = syncNotifications(widget.container);
+    _screenSync = syncScreenTime(widget.container);
   }
 
   @override
   void dispose() {
     _sync.close();
+    _screenSync.close();
     widget.container.dispose();
     super.dispose();
   }

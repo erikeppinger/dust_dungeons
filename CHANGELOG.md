@@ -8,6 +8,18 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-29
+### Added
+- **Soft screen-time budget** (Settings → Screen time, off by default):
+  - A daily budget for the apps you choose. Quests earn 1 minute per 5 points (with a daily cap), and the
+    Armory sells +15 and +30 minute vouchers.
+  - A bar on the Quests tab, and a page with today's breakdown, use per app and the last 7 days.
+  - Reminders, never blocking: a warning at 10 minutes left, a notification when used up (checked about
+    every 15 minutes), and yesterday's result in the daily summary.
+  - Tired: after a day over budget, the hero starts fights with one heart less.
+  - Uses Android's usage access; only daily totals of the chosen apps are kept, on the device.
+- Database schema v6 (daily screen-time totals) with tested migrations.
+
 ## [0.6.1] - 2026-10-28
 ### Added
 - **A new quest map every week.** The map is generated from the week number, so it stays the same Monday
@@ -188,6 +200,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.7.0]: #
 [0.6.1]: #
 [0.6.0]: #
 [0.5.2]: #

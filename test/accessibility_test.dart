@@ -88,6 +88,7 @@ void main() {
     ('about', 'Settings', ['About'], ['Über']),
     ('manage chores', 'Settings', ['Manage chores'], ['Aufgaben verwalten']),
     ('add chore', 'Quests', ['Add chore'], ['Aufgabe hinzufügen']),
+    ('screen time', 'Settings', ['Screen time'], ['Bildschirmzeit']),
   ];
 
   for (final (name, tab, steps, _) in screens) {

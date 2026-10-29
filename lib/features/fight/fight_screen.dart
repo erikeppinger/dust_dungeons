@@ -14,6 +14,8 @@ import '../../domain/fight/echo_duel.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
+import '../../domain/screen_time.dart';
+import '../screen_time/screen_time_providers.dart';
 import 'boss_art.dart';
 import 'fight_controller.dart';
 import 'fight_sounds.dart';
@@ -104,7 +106,11 @@ class _FightScreenState extends ConsumerState<FightScreen> {
       tier: widget.tier,
       storyMode: settings.fightStoryMode,
     );
-    final hero = HeroStats.forLevel(level);
+    final base = HeroStats.forLevel(level);
+    final hero = HeroStats(
+      maxHp: tiredMaxHp(base.maxHp, tired: ref.read(tiredProvider)),
+      damage: base.damage,
+    );
     final seed = DateTime.now().microsecondsSinceEpoch;
     _controller = FightController(
       duel: widget.overlord

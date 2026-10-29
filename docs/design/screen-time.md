@@ -105,8 +105,8 @@ per-channel settings work too.
   - `launcherApps()`, which returns the package, label and icon (PNG bytes) of each launcher app
   - `usage(packages, from, to)`, which returns foreground time per package from
     `UsageStatsManager.queryEvents`
-- **Background checks:** `androidx.work` `PeriodicWorkRequest` every 15 minutes, which is Android's
-  minimum. The worker is native Kotlin, so no Dart runs in the background.
+- **Background checks** *(as built)*: an inexact `AlarmManager` repeat every 15 minutes with a small
+  receiver, re-armed after a reboot. It adds no library and is native Kotlin, so no Dart runs in the background.
   - The app writes a small **budget snapshot** to `SharedPreferences` whenever something changes: date,
     today's budget, chosen packages, the localized notification texts, and the switches.
   - The worker reads today's usage, compares it with the snapshot (on a new day: the base budget only),
@@ -134,7 +134,7 @@ per-channel settings work too.
 
 - Nothing new leaves the phone; the app still has no INTERNET permission.
 - `PRIVACY.md` will name usage access and exactly what is stored (daily totals of the chosen apps).
-- **F-Droid:** fine. `androidx.work` is Apache-2.0, and there are no trackers.
+- **F-Droid:** fine. No new library, and there are no trackers.
 - **Google Play (later):** usage access is sensitive. Before a Play release, check Play's current policy for
   `PACKAGE_USAGE_STATS` and fill in the declaration. Using `<queries>` instead of `QUERY_ALL_PACKAGES`
   keeps the app on the safe side.

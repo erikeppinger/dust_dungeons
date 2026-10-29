@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/progress_repository.dart';
+import 'package:homework_and_chores/data/repositories/screen_time_repository.dart';
 import 'package:homework_and_chores/data/repositories/shop_repository.dart';
 import 'package:homework_and_chores/domain/fight/shop.dart';
 
@@ -80,5 +81,42 @@ void main() {
     expect(keys.toSet(), hasLength(keys.length));
     expect(shopItem('turbo_mop'), mopItem);
     expect(shopItem('nope'), isNull);
+  });
+
+  group('screen-time vouchers', () {
+    final day = DateTime(2026, 10, 29);
+
+    test(
+      'using one takes it from the inventory and books its minutes',
+      () async {
+        final screen = ScreenTimeRepository(db);
+        final voucher = screenVouchers.first;
+        expect(await screen.useVoucher(profile, voucher, day), isFalse);
+        await earn(2); // 80 points
+        expect(await shop.buy(profile, voucher), PurchaseResult.bought);
+        expect(await shop.buy(profile, voucher), PurchaseResult.bought);
+        expect(await screen.useVoucher(profile, voucher, day), isTrue);
+        expect(await screen.useVoucher(profile, voucher, day), isTrue);
+        expect(await screen.useVoucher(profile, voucher, day), isFalse);
+        final days = await screen.watchDays(profile).first;
+        expect(days.single.voucherMinutes, 30);
+
+        // Saving the day's use keeps the voucher minutes.
+        await screen.saveDay(profile, day, usedMinutes: 50, budgetMinutes: 90);
+        final saved = (await screen.watchDays(profile).first).single;
+        expect(
+          (saved.usedMinutes, saved.budgetMinutes, saved.voucherMinutes),
+          (50, 90, 30),
+        );
+      },
+    );
+
+    test('vouchers are consumables that add 15 or 30 minutes', () {
+      expect(screenVouchers.map(voucherMinutes), [15, 30]);
+      expect(
+        screenVouchers.every((v) => v.kind == ItemKind.consumable),
+        isTrue,
+      );
+    });
   });
 }

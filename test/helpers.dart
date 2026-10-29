@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,7 @@ import 'package:homework_and_chores/core/day_clock.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/fight/fight_sounds.dart';
+import 'package:homework_and_chores/features/screen_time/screen_time_service.dart';
 import 'package:homework_and_chores/features/notifications/notification_planner.dart';
 import 'package:homework_and_chores/features/notifications/notification_service.dart';
 import 'package:homework_and_chores/main.dart';
@@ -67,12 +70,57 @@ class FakeNotificationService implements NotificationService {
   ) async => shown.add(notification);
 }
 
+/// Usage per day and app, an app list and recorded snapshots, instead of
+/// Android's usage access.
+class FakeScreenTimeService implements ScreenTimeService {
+  bool access = true;
+  int settingsOpened = 0;
+  List<LauncherApp> apps = [
+    LauncherApp('com.example.video', 'Video', _pixel),
+    LauncherApp('com.example.game', 'Game', _pixel),
+    LauncherApp('com.example.chat', 'Chat', _pixel),
+  ];
+
+  /// Minutes per app, by local day.
+  final usage = <DateTime, Map<String, int>>{};
+  final snapshots = <Map<String, Object?>>[];
+
+  @override
+  Future<bool> hasAccess() async => access;
+
+  @override
+  Future<void> openAccessSettings() async => settingsOpened++;
+
+  @override
+  Future<List<LauncherApp>> launcherApps() async => apps;
+
+  @override
+  Future<Map<String, int>> usageMinutes(
+    Set<String> packages,
+    DateTime from,
+    DateTime to,
+  ) async => {
+    for (final e in (usage[startOfDay(from)] ?? const {}).entries)
+      if (packages.contains(e.key)) e.key: e.value,
+  };
+
+  @override
+  Future<void> writeSnapshot(Map<String, Object?> snapshot) async =>
+      snapshots.add(snapshot);
+}
+
+/// A 1×1 transparent PNG, as an app icon.
+final _pixel = base64Decode(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+);
+
 /// Pumps the full app on an in-memory database with a fixed device [locale].
 Future<AppDatabase> pumpApp(
   WidgetTester tester, {
   Locale locale = const Locale('en'),
   AppDatabase? db,
   FakeNotificationService? notifications,
+  FakeScreenTimeService? screenTime,
   bool onboarding = false,
 }) async {
   // A tap that misses its widget means the test checks nothing: fail loudly.
@@ -96,6 +144,9 @@ Future<AppDatabase> pumpApp(
       overrides: [
         todayProvider.overrideWith(FixedToday.new),
         fightSoundsProvider.overrideWithValue(SilentFightSounds()),
+        screenTimeServiceProvider.overrideWithValue(
+          screenTime ?? FakeScreenTimeService(),
+        ),
       ],
     ),
   );

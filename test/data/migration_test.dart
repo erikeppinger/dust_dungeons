@@ -8,17 +8,18 @@ import 'generated_migrations/schema_v1.dart' as v1;
 import 'generated_migrations/schema_v2.dart' as v2;
 import 'generated_migrations/schema_v3.dart' as v3;
 import 'generated_migrations/schema_v4.dart' as v4;
+import 'generated_migrations/schema_v5.dart' as v5;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4]) {
-    test('v$from -> v5 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5]) {
+    test('v$from -> v6 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 5);
+      await verifier.migrateAndValidate(db, 6);
       await db.close();
     });
   }
@@ -137,4 +138,20 @@ void main() {
       expect((await db.select(db.pointLedger).get()).single.delta, 40);
     },
   );
+
+  test('v5 -> v6 keeps the inventory; screen days start empty', () async {
+    final schema = await verifier.schemaAt(5);
+    final old = v5.DatabaseAtV5(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      "INSERT INTO inventory (profile_id, item_key, count) VALUES (1, 'second_wind', 2)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final items = await db.select(db.inventory).get();
+    expect(items.single.count, 2);
+    expect(await db.select(db.screenDays).get(), isEmpty);
+  });
 }

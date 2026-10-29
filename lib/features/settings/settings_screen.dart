@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../chores/manage_chores_screen.dart';
 import '../fight/fight_settings.dart';
 import '../notifications/notification_settings.dart';
+import '../screen_time/screen_time_screen.dart';
 import 'settings_controller.dart';
 import 'settings_pages.dart';
 
@@ -81,6 +82,14 @@ class SettingsScreen extends ConsumerWidget {
             (l) => l.settingsFights,
             const FightSettings(),
           ),
+        ),
+        _Entry(
+          icon: Icons.phone_android,
+          title: l10n.settingsScreenTime,
+          subtitle: settings.screenTime
+              ? l10n.screenOnSubtitle(settings.screenBaseMinutes)
+              : l10n.stateOff,
+          onTap: () => ScreenTimeScreen.open(context),
         ),
         _Entry(
           icon: Icons.language,

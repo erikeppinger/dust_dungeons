@@ -11,6 +11,7 @@ import '../../domain/points.dart';
 import '../../domain/progress.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_edit_screen.dart';
+import '../screen_time/screen_time_screen.dart';
 import 'chore_tile.dart';
 import 'chore_titles.dart';
 import 'schedule_text.dart';
@@ -220,6 +221,7 @@ class _BalanceHeader extends ConsumerWidget {
                 ],
               ),
             ),
+          const ScreenTimeBar(),
           const SizedBox(height: 4),
           Text(l10n.tapToComplete, style: theme.textTheme.bodyMedium),
         ],

@@ -71,6 +71,9 @@ List<PlannedNotification> planNotifications({
   required List<ScheduledChore> chores,
   required List<Completion> completions,
   required AppLocalizations l10n,
+
+  /// Yesterday's screen time (used, budget) for today's summary.
+  (int, int)? screenYesterday,
 }) {
   if (!settings.notificationsEnabled) return const [];
   final today = dayOf(now);
@@ -121,13 +124,19 @@ List<PlannedNotification> planNotifications({
         final list = open.length > 3
             ? '${names.join(', ')}, …'
             : names.join(', ');
+        final screen = d == 0 && settings.screenTime && settings.screenSummary
+            ? screenYesterday
+            : null;
+        final body = overdue.isEmpty
+            ? list
+            : '${l10n.notifOverdueCount(overdue.length)} · $list';
         add(
           _at(day, settings.dailySummaryMinutes),
           NotificationChannel.summary,
           l10n.notifSummaryTitle(open.length),
-          overdue.isEmpty
-              ? list
-              : '${l10n.notifOverdueCount(overdue.length)} · $list',
+          screen == null
+              ? body
+              : '$body\n${l10n.notifScreenYesterday(screen.$1, screen.$2)}',
           NotificationTarget.today,
         );
       }

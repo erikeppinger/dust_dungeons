@@ -15,6 +15,7 @@ String itemName(AppLocalizations l10n, ShopItem item) => switch (item.key) {
   'metronome_charm' => l10n.itemCharm,
   'rubber_gloves' => l10n.itemGloves,
   'second_wind' => l10n.itemSecondWind,
+  'screen_15' || 'screen_30' => l10n.itemScreenTime(voucherMinutes(item)),
   'hat_cap' => l10n.hatCap,
   'hat_bandana' => l10n.hatBandana,
   'hat_wizard' => l10n.hatWizard,
@@ -29,6 +30,7 @@ String itemDescription(AppLocalizations l10n, ShopItem item) =>
       'metronome_charm' => l10n.itemCharmDesc,
       'rubber_gloves' => l10n.itemGlovesDesc,
       'second_wind' => l10n.itemSecondWindDesc,
+      'screen_15' || 'screen_30' => l10n.itemScreenTimeDesc,
       _ => l10n.hatDesc,
     };
 
@@ -38,6 +40,7 @@ IconData _icon(ShopItem item) => switch (item.key) {
   'metronome_charm' => Icons.av_timer,
   'rubber_gloves' => Icons.back_hand_outlined,
   'second_wind' => Icons.air,
+  'screen_15' || 'screen_30' => Icons.hourglass_bottom,
   _ => Icons.checkroom,
 };
 
@@ -149,9 +152,13 @@ class ShopScreen extends ConsumerWidget {
             tile(item),
           SectionHeader(l10n.shopConsumables),
           for (final item in shopItems.where(
-            (i) => i.kind == ItemKind.consumable,
+            (i) => i.kind == ItemKind.consumable && !screenVouchers.contains(i),
           ))
             tile(item),
+          if (settings.screenTime) ...[
+            SectionHeader(l10n.settingsScreenTime),
+            for (final item in screenVouchers) tile(item),
+          ],
           SectionHeader(l10n.shopHats),
           for (final (i, item) in hats.indexed)
             tile(

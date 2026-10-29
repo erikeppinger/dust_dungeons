@@ -3257,6 +3257,392 @@ class InventoryCompanion extends UpdateCompanion<InventoryEntry> {
   }
 }
 
+class $ScreenDaysTable extends ScreenDays
+    with TableInfo<$ScreenDaysTable, ScreenDay> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScreenDaysTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  static const VerificationMeta _dayMeta = const VerificationMeta('day');
+  @override
+  late final GeneratedColumn<DateTime> day = GeneratedColumn<DateTime>(
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _usedMinutesMeta = const VerificationMeta(
+    'usedMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> usedMinutes = GeneratedColumn<int>(
+    'used_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _budgetMinutesMeta = const VerificationMeta(
+    'budgetMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> budgetMinutes = GeneratedColumn<int>(
+    'budget_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _voucherMinutesMeta = const VerificationMeta(
+    'voucherMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> voucherMinutes = GeneratedColumn<int>(
+    'voucher_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    profileId,
+    day,
+    usedMinutes,
+    budgetMinutes,
+    voucherMinutes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'screen_days';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ScreenDay> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('day')) {
+      context.handle(
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dayMeta);
+    }
+    if (data.containsKey('used_minutes')) {
+      context.handle(
+        _usedMinutesMeta,
+        usedMinutes.isAcceptableOrUnknown(
+          data['used_minutes']!,
+          _usedMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('budget_minutes')) {
+      context.handle(
+        _budgetMinutesMeta,
+        budgetMinutes.isAcceptableOrUnknown(
+          data['budget_minutes']!,
+          _budgetMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('voucher_minutes')) {
+      context.handle(
+        _voucherMinutesMeta,
+        voucherMinutes.isAcceptableOrUnknown(
+          data['voucher_minutes']!,
+          _voucherMinutesMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId, day};
+  @override
+  ScreenDay map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ScreenDay(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}day'],
+      )!,
+      usedMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}used_minutes'],
+      )!,
+      budgetMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}budget_minutes'],
+      )!,
+      voucherMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}voucher_minutes'],
+      )!,
+    );
+  }
+
+  @override
+  $ScreenDaysTable createAlias(String alias) {
+    return $ScreenDaysTable(attachedDatabase, alias);
+  }
+}
+
+class ScreenDay extends DataClass implements Insertable<ScreenDay> {
+  final int profileId;
+
+  /// Local midnight of the day.
+  final DateTime day;
+
+  /// Foreground minutes of the chosen apps (last known for today).
+  final int usedMinutes;
+
+  /// The day's whole budget: base + earned by quests + vouchers.
+  final int budgetMinutes;
+
+  /// Minutes added by vouchers that day (part of [budgetMinutes]).
+  final int voucherMinutes;
+  const ScreenDay({
+    required this.profileId,
+    required this.day,
+    required this.usedMinutes,
+    required this.budgetMinutes,
+    required this.voucherMinutes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<int>(profileId);
+    map['day'] = Variable<DateTime>(day);
+    map['used_minutes'] = Variable<int>(usedMinutes);
+    map['budget_minutes'] = Variable<int>(budgetMinutes);
+    map['voucher_minutes'] = Variable<int>(voucherMinutes);
+    return map;
+  }
+
+  ScreenDaysCompanion toCompanion(bool nullToAbsent) {
+    return ScreenDaysCompanion(
+      profileId: Value(profileId),
+      day: Value(day),
+      usedMinutes: Value(usedMinutes),
+      budgetMinutes: Value(budgetMinutes),
+      voucherMinutes: Value(voucherMinutes),
+    );
+  }
+
+  factory ScreenDay.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ScreenDay(
+      profileId: serializer.fromJson<int>(json['profileId']),
+      day: serializer.fromJson<DateTime>(json['day']),
+      usedMinutes: serializer.fromJson<int>(json['usedMinutes']),
+      budgetMinutes: serializer.fromJson<int>(json['budgetMinutes']),
+      voucherMinutes: serializer.fromJson<int>(json['voucherMinutes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<int>(profileId),
+      'day': serializer.toJson<DateTime>(day),
+      'usedMinutes': serializer.toJson<int>(usedMinutes),
+      'budgetMinutes': serializer.toJson<int>(budgetMinutes),
+      'voucherMinutes': serializer.toJson<int>(voucherMinutes),
+    };
+  }
+
+  ScreenDay copyWith({
+    int? profileId,
+    DateTime? day,
+    int? usedMinutes,
+    int? budgetMinutes,
+    int? voucherMinutes,
+  }) => ScreenDay(
+    profileId: profileId ?? this.profileId,
+    day: day ?? this.day,
+    usedMinutes: usedMinutes ?? this.usedMinutes,
+    budgetMinutes: budgetMinutes ?? this.budgetMinutes,
+    voucherMinutes: voucherMinutes ?? this.voucherMinutes,
+  );
+  ScreenDay copyWithCompanion(ScreenDaysCompanion data) {
+    return ScreenDay(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      day: data.day.present ? data.day.value : this.day,
+      usedMinutes: data.usedMinutes.present
+          ? data.usedMinutes.value
+          : this.usedMinutes,
+      budgetMinutes: data.budgetMinutes.present
+          ? data.budgetMinutes.value
+          : this.budgetMinutes,
+      voucherMinutes: data.voucherMinutes.present
+          ? data.voucherMinutes.value
+          : this.voucherMinutes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScreenDay(')
+          ..write('profileId: $profileId, ')
+          ..write('day: $day, ')
+          ..write('usedMinutes: $usedMinutes, ')
+          ..write('budgetMinutes: $budgetMinutes, ')
+          ..write('voucherMinutes: $voucherMinutes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(profileId, day, usedMinutes, budgetMinutes, voucherMinutes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ScreenDay &&
+          other.profileId == this.profileId &&
+          other.day == this.day &&
+          other.usedMinutes == this.usedMinutes &&
+          other.budgetMinutes == this.budgetMinutes &&
+          other.voucherMinutes == this.voucherMinutes);
+}
+
+class ScreenDaysCompanion extends UpdateCompanion<ScreenDay> {
+  final Value<int> profileId;
+  final Value<DateTime> day;
+  final Value<int> usedMinutes;
+  final Value<int> budgetMinutes;
+  final Value<int> voucherMinutes;
+  final Value<int> rowid;
+  const ScreenDaysCompanion({
+    this.profileId = const Value.absent(),
+    this.day = const Value.absent(),
+    this.usedMinutes = const Value.absent(),
+    this.budgetMinutes = const Value.absent(),
+    this.voucherMinutes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ScreenDaysCompanion.insert({
+    required int profileId,
+    required DateTime day,
+    this.usedMinutes = const Value.absent(),
+    this.budgetMinutes = const Value.absent(),
+    this.voucherMinutes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       day = Value(day);
+  static Insertable<ScreenDay> custom({
+    Expression<int>? profileId,
+    Expression<DateTime>? day,
+    Expression<int>? usedMinutes,
+    Expression<int>? budgetMinutes,
+    Expression<int>? voucherMinutes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (day != null) 'day': day,
+      if (usedMinutes != null) 'used_minutes': usedMinutes,
+      if (budgetMinutes != null) 'budget_minutes': budgetMinutes,
+      if (voucherMinutes != null) 'voucher_minutes': voucherMinutes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ScreenDaysCompanion copyWith({
+    Value<int>? profileId,
+    Value<DateTime>? day,
+    Value<int>? usedMinutes,
+    Value<int>? budgetMinutes,
+    Value<int>? voucherMinutes,
+    Value<int>? rowid,
+  }) {
+    return ScreenDaysCompanion(
+      profileId: profileId ?? this.profileId,
+      day: day ?? this.day,
+      usedMinutes: usedMinutes ?? this.usedMinutes,
+      budgetMinutes: budgetMinutes ?? this.budgetMinutes,
+      voucherMinutes: voucherMinutes ?? this.voucherMinutes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (day.present) {
+      map['day'] = Variable<DateTime>(day.value);
+    }
+    if (usedMinutes.present) {
+      map['used_minutes'] = Variable<int>(usedMinutes.value);
+    }
+    if (budgetMinutes.present) {
+      map['budget_minutes'] = Variable<int>(budgetMinutes.value);
+    }
+    if (voucherMinutes.present) {
+      map['voucher_minutes'] = Variable<int>(voucherMinutes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScreenDaysCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('day: $day, ')
+          ..write('usedMinutes: $usedMinutes, ')
+          ..write('budgetMinutes: $budgetMinutes, ')
+          ..write('voucherMinutes: $voucherMinutes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3267,6 +3653,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTable settings = $SettingsTable(this);
   late final $FightsTable fights = $FightsTable(this);
   late final $InventoryTable inventory = $InventoryTable(this);
+  late final $ScreenDaysTable screenDays = $ScreenDaysTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3279,6 +3666,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settings,
     fights,
     inventory,
+    screenDays,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -3370,6 +3758,24 @@ final class $$ProfilesTableReferences
     ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_inventoryRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ScreenDaysTable, List<ScreenDay>>
+  _screenDaysRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.screenDays,
+    aliasName: 'profiles__id__screen_days__profile_id',
+  );
+
+  $$ScreenDaysTableProcessedTableManager get screenDaysRefs {
+    final manager = $$ScreenDaysTableTableManager(
+      $_db,
+      $_db.screenDays,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_screenDaysRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3496,6 +3902,31 @@ class $$ProfilesTableFilterComposer
           }) => $$InventoryTableFilterComposer(
             $db: $db,
             $table: $db.inventory,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> screenDaysRefs(
+    Expression<bool> Function($$ScreenDaysTableFilterComposer f) f,
+  ) {
+    final $$ScreenDaysTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.screenDays,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ScreenDaysTableFilterComposer(
+            $db: $db,
+            $table: $db.screenDays,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3656,6 +4087,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> screenDaysRefs<T extends Object>(
+    Expression<T> Function($$ScreenDaysTableAnnotationComposer a) f,
+  ) {
+    final $$ScreenDaysTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.screenDays,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ScreenDaysTableAnnotationComposer(
+            $db: $db,
+            $table: $db.screenDays,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -3676,6 +4132,7 @@ class $$ProfilesTableTableManager
             bool pointLedgerRefs,
             bool fightsRefs,
             bool inventoryRefs,
+            bool screenDaysRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -3727,6 +4184,7 @@ class $$ProfilesTableTableManager
                 pointLedgerRefs = false,
                 fightsRefs = false,
                 inventoryRefs = false,
+                screenDaysRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -3735,6 +4193,7 @@ class $$ProfilesTableTableManager
                     if (pointLedgerRefs) db.pointLedger,
                     if (fightsRefs) db.fights,
                     if (inventoryRefs) db.inventory,
+                    if (screenDaysRefs) db.screenDays,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3819,6 +4278,26 @@ class $$ProfilesTableTableManager
                           referencedColumn: 'profile_id',
                           typedResults: items,
                         ),
+                      if (screenDaysRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Profile,
+                          $ProfilesTable,
+                          ScreenDay,
+                          $ScreenDaysTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._screenDaysRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).screenDaysRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'profile_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3844,6 +4323,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool pointLedgerRefs,
         bool fightsRefs,
         bool inventoryRefs,
+        bool screenDaysRefs,
       })
     >;
 typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
@@ -6161,6 +6641,325 @@ typedef $$InventoryTableProcessedTableManager =
       InventoryEntry,
       PrefetchHooks Function({bool profileId})
     >;
+typedef $$ScreenDaysTableCreateCompanionBuilder = ScreenDaysCompanion Function({
+  required int profileId,
+  required DateTime day,
+  Value<int> usedMinutes,
+  Value<int> budgetMinutes,
+  Value<int> voucherMinutes,
+  Value<int> rowid,
+});
+typedef $$ScreenDaysTableUpdateCompanionBuilder = ScreenDaysCompanion Function({
+  Value<int> profileId,
+  Value<DateTime> day,
+  Value<int> usedMinutes,
+  Value<int> budgetMinutes,
+  Value<int> voucherMinutes,
+  Value<int> rowid,
+});
+
+final class $$ScreenDaysTableReferences
+    extends BaseReferences<_$AppDatabase, $ScreenDaysTable, ScreenDay> {
+  $$ScreenDaysTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('screen_days__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ScreenDaysTableFilterComposer
+    extends Composer<_$AppDatabase, $ScreenDaysTable> {
+  $$ScreenDaysTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<DateTime> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get usedMinutes => $composableBuilder(
+    column: $table.usedMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get budgetMinutes => $composableBuilder(
+    column: $table.budgetMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get voucherMinutes => $composableBuilder(
+    column: $table.voucherMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ScreenDaysTableOrderingComposer
+    extends Composer<_$AppDatabase, $ScreenDaysTable> {
+  $$ScreenDaysTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<DateTime> get day => $composableBuilder(
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get usedMinutes => $composableBuilder(
+    column: $table.usedMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get budgetMinutes => $composableBuilder(
+    column: $table.budgetMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get voucherMinutes => $composableBuilder(
+    column: $table.voucherMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ScreenDaysTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ScreenDaysTable> {
+  $$ScreenDaysTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<DateTime> get day =>
+      $composableBuilder(column: $table.day, builder: (column) => column);
+
+  GeneratedColumn<int> get usedMinutes => $composableBuilder(
+    column: $table.usedMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get budgetMinutes => $composableBuilder(
+    column: $table.budgetMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get voucherMinutes => $composableBuilder(
+    column: $table.voucherMinutes,
+    builder: (column) => column,
+  );
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ScreenDaysTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ScreenDaysTable,
+          ScreenDay,
+          $$ScreenDaysTableFilterComposer,
+          $$ScreenDaysTableOrderingComposer,
+          $$ScreenDaysTableAnnotationComposer,
+          $$ScreenDaysTableCreateCompanionBuilder,
+          $$ScreenDaysTableUpdateCompanionBuilder,
+          (ScreenDay, $$ScreenDaysTableReferences),
+          ScreenDay,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$ScreenDaysTableTableManager(_$AppDatabase db, $ScreenDaysTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScreenDaysTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ScreenDaysTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ScreenDaysTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> profileId = const Value.absent(),
+                Value<DateTime> day = const Value.absent(),
+                Value<int> usedMinutes = const Value.absent(),
+                Value<int> budgetMinutes = const Value.absent(),
+                Value<int> voucherMinutes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScreenDaysCompanion(
+                profileId: profileId,
+                day: day,
+                usedMinutes: usedMinutes,
+                budgetMinutes: budgetMinutes,
+                voucherMinutes: voucherMinutes,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int profileId,
+                required DateTime day,
+                Value<int> usedMinutes = const Value.absent(),
+                Value<int> budgetMinutes = const Value.absent(),
+                Value<int> voucherMinutes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ScreenDaysCompanion.insert(
+                profileId: profileId,
+                day: day,
+                usedMinutes: usedMinutes,
+                budgetMinutes: budgetMinutes,
+                voucherMinutes: voucherMinutes,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ScreenDaysTable, ScreenDay>(table),
+                  $$ScreenDaysTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.profileId,
+                        referencedTable: $$ScreenDaysTableReferences
+                            ._profileIdTable(db),
+                        referencedColumn: $$ScreenDaysTableReferences
+                            ._profileIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ScreenDaysTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ScreenDaysTable,
+      ScreenDay,
+      $$ScreenDaysTableFilterComposer,
+      $$ScreenDaysTableOrderingComposer,
+      $$ScreenDaysTableAnnotationComposer,
+      $$ScreenDaysTableCreateCompanionBuilder,
+      $$ScreenDaysTableUpdateCompanionBuilder,
+      (ScreenDay, $$ScreenDaysTableReferences),
+      ScreenDay,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6179,4 +6978,6 @@ class $AppDatabaseManager {
       $$FightsTableTableManager(_db, _db.fights);
   $$InventoryTableTableManager get inventory =>
       $$InventoryTableTableManager(_db, _db.inventory);
+  $$ScreenDaysTableTableManager get screenDays =>
+      $$ScreenDaysTableTableManager(_db, _db.screenDays);
 }

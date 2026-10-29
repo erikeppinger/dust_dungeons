@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// User-facing app settings, stored by `SettingsRepository`.
@@ -23,6 +24,13 @@ class AppSettings {
     this.avatarCape = 0,
     this.avatarHat = 0,
     this.onboardingDone = false,
+    this.screenTime = false,
+    this.screenBaseMinutes = 60,
+    this.screenEarnCap = 30,
+    this.screenApps = const [],
+    this.screenWarn = true,
+    this.screenOver = true,
+    this.screenSummary = true,
   });
 
   final ThemeMode themeMode;
@@ -67,6 +75,25 @@ class AppSettings {
   /// Whether the first-start introduction was finished or skipped.
   final bool onboardingDone;
 
+  /// Soft screen-time budget (see docs/design/screen-time.md).
+  final bool screenTime;
+
+  /// Daily base budget in minutes, before quests and vouchers.
+  final int screenBaseMinutes;
+
+  /// Most minutes quests can earn in one day.
+  final int screenEarnCap;
+
+  /// Package names of the apps that count against the budget.
+  final List<String> screenApps;
+
+  /// Notify when 10 minutes are left / when the budget is used up.
+  final bool screenWarn;
+  final bool screenOver;
+
+  /// Yesterday's result in the daily summary.
+  final bool screenSummary;
+
   AppSettings copyWith({
     ThemeMode? themeMode,
     bool? colorblindSafe,
@@ -87,6 +114,13 @@ class AppSettings {
     int? avatarCape,
     int? avatarHat,
     bool? onboardingDone,
+    bool? screenTime,
+    int? screenBaseMinutes,
+    int? screenEarnCap,
+    List<String>? screenApps,
+    bool? screenWarn,
+    bool? screenOver,
+    bool? screenSummary,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     colorblindSafe: colorblindSafe ?? this.colorblindSafe,
@@ -107,6 +141,13 @@ class AppSettings {
     avatarCape: avatarCape ?? this.avatarCape,
     avatarHat: avatarHat ?? this.avatarHat,
     onboardingDone: onboardingDone ?? this.onboardingDone,
+    screenTime: screenTime ?? this.screenTime,
+    screenBaseMinutes: screenBaseMinutes ?? this.screenBaseMinutes,
+    screenEarnCap: screenEarnCap ?? this.screenEarnCap,
+    screenApps: screenApps ?? this.screenApps,
+    screenWarn: screenWarn ?? this.screenWarn,
+    screenOver: screenOver ?? this.screenOver,
+    screenSummary: screenSummary ?? this.screenSummary,
   );
 
   @override
@@ -130,7 +171,14 @@ class AppSettings {
       other.avatarHair == avatarHair &&
       other.avatarCape == avatarCape &&
       other.avatarHat == avatarHat &&
-      other.onboardingDone == onboardingDone;
+      other.onboardingDone == onboardingDone &&
+      other.screenTime == screenTime &&
+      other.screenBaseMinutes == screenBaseMinutes &&
+      other.screenEarnCap == screenEarnCap &&
+      listEquals(other.screenApps, screenApps) &&
+      other.screenWarn == screenWarn &&
+      other.screenOver == screenOver &&
+      other.screenSummary == screenSummary;
 
   @override
   int get hashCode => Object.hashAll([
@@ -153,5 +201,12 @@ class AppSettings {
     avatarCape,
     avatarHat,
     onboardingDone,
+    screenTime,
+    screenBaseMinutes,
+    screenEarnCap,
+    Object.hashAll(screenApps),
+    screenWarn,
+    screenOver,
+    screenSummary,
   ]);
 }

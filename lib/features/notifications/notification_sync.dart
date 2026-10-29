@@ -9,6 +9,7 @@ import '../../core/day_clock.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
+import '../screen_time/screen_time_providers.dart';
 import 'notification_planner.dart';
 import 'notification_service.dart';
 
@@ -86,6 +87,7 @@ final notificationPlanProvider = Provider<NotificationPlan?>((ref) {
   final chores = ref.watch(scheduledChoresProvider).value;
   final completions = ref.watch(allCompletionsProvider).value;
   if (chores == null || completions == null) return null;
+  final screen = ref.watch(screenYesterdayProvider);
   return NotificationPlan(
     planNotifications(
       now: DateTime.now(),
@@ -93,6 +95,9 @@ final notificationPlanProvider = Provider<NotificationPlan?>((ref) {
       chores: chores,
       completions: completions,
       l10n: l10n,
+      screenYesterday: screen == null
+          ? null
+          : (screen.usedMinutes, screen.budgetMinutes),
     ),
     channelNames(l10n),
   );

@@ -52,12 +52,14 @@ List<PlannedNotification> plan({
   List<ScheduledChore> chores = const [],
   List<Completion> completions = const [],
   DateTime? at,
+  (int, int)? screenYesterday,
 }) => planNotifications(
   now: at ?? now,
   settings: settings,
   chores: chores,
   completions: completions,
   l10n: l10n,
+  screenYesterday: screenYesterday,
 );
 
 void main() {
@@ -184,6 +186,25 @@ void main() {
       plan(chores: many)
           .where((n) => n.channel == NotificationChannel.reminder),
       hasLength(maxChoreReminders),
+    );
+  });
+
+  test("today's summary adds yesterday's screen time when it is on", () {
+    List<PlannedNotification> summaries(AppSettings settings) => plan(
+      settings: settings,
+      chores: [dishes],
+      screenYesterday: (74, 90),
+    ).where((n) => n.channel == NotificationChannel.summary).toList();
+    final withScreen = summaries(on.copyWith(screenTime: true));
+    expect(
+      withScreen.first.body,
+      'Dishes\nScreen time yesterday: 74 of 90 min',
+    );
+    expect(withScreen[1].body, 'Dishes', reason: 'later days are unknown yet');
+    expect(summaries(on).first.body, 'Dishes', reason: 'screen time off');
+    expect(
+      summaries(on.copyWith(screenTime: true, screenSummary: false)).first.body,
+      'Dishes',
     );
   });
 }

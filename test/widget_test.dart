@@ -36,6 +36,8 @@ Finder get _editScrollable => find
 /// Opens Settings, then the category [entry] (e.g. 'Appearance').
 Future<void> _openSettingsPage(WidgetTester tester, String entry) async {
   await _openSettings(tester);
+  await tester.ensureVisible(find.text(entry));
+  await tester.pumpAndSettle();
   await tester.tap(find.text(entry));
   await tester.pumpAndSettle();
 }
@@ -1132,13 +1134,14 @@ void main() {
       'Manage chores',
       'Appearance',
       'Notifications',
+      'Screen time',
       'Language',
       'About',
     ]) {
       expect(find.text(entry), findsOneWidget);
     }
     expect(find.text('System'), findsOneWidget); // theme
-    expect(find.text('Off'), findsOneWidget); // notifications
+    expect(find.text('Off'), findsNWidgets(2)); // notifications, screen time
     expect(find.text('System default'), findsOneWidget); // language
   });
 
