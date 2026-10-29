@@ -1030,5 +1030,86 @@
         "type": "int"
       }
     }
-  }
+  },
+  "settingsBackup": "Backup",
+  "backupSubtitleOff": "No automatic backup",
+  "backupSubtitleOn": "Daily to {folder}",
+  "@backupSubtitleOn": {
+    "placeholders": {
+      "folder": {
+        "type": "String"
+      }
+    }
+  },
+  "backupIntro": "Everything is stored only on this phone. Save a backup to keep your quests, history and trophies safe, or to take them to a new phone.",
+  "backupExport": "Save a backup",
+  "backupExportSubtitle": "Choose where to save the file",
+  "backupExported": "Backup saved",
+  "backupImport": "Import a backup",
+  "backupImportSubtitle": "Adds its history to what's on this phone",
+  "backupNotABackup": "This file isn't a Homework & Chores backup.",
+  "backupTooNew": "This backup is from a newer version of the app. Update the app first.",
+  "backupFailed": "That didn't work. Please try again.",
+  "backupPreviewTitle": "Import this backup?",
+  "backupPreviewNothing": "This backup has nothing that isn't on this phone already.",
+  "backupPreviewAdds": "It adds:",
+  "backupCountChores": "{count, plural, =1{1 quest} other{{count} quests}}",
+  "@backupCountChores": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupCountCompletions": "{count, plural, =1{1 completed quest} other{{count} completed quests}}",
+  "@backupCountCompletions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupCountFights": "{count, plural, =1{1 boss fight} other{{count} boss fights}}",
+  "@backupCountFights": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupPreviewMore": "Points, items and screen-time days that are missing here",
+  "backupPreviewKeeps": "Nothing on this phone is deleted, and you can undo the import.",
+  "backupUseSettings": "Also use the backup's settings",
+  "backupUseSettingsHint": "Look, language, notifications, screen time",
+  "backupImportConfirm": "Import",
+  "backupImported": "Backup imported",
+  "backupUndo": "Undo last import",
+  "backupUndoSubtitle": "Puts everything back as it was before",
+  "backupUndone": "Import undone",
+  "backupAuto": "Automatic backup",
+  "backupAutoIntro": "Once a day the app saves a backup to a folder you choose and keeps the last 7. If a sync app copies that folder to a computer, your data is safe even if the phone is lost.",
+  "backupChooseFolder": "Choose a folder",
+  "backupChangeFolder": "Change folder",
+  "backupFolder": "Folder: {name}",
+  "@backupFolder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "backupLast": "Last backup: {when}",
+  "@backupLast": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "backupNever": "No backup yet",
+  "backupFolderLost": "The folder can't be reached any more. Choose it again.",
+  "backupAutoFailed": "The last automatic backup failed.",
+  "backupNow": "Back up now",
+  "backupStop": "Stop automatic backups",
+  "backupSubtitleLost": "Folder can't be reached"
 }

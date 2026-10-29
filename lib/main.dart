@@ -11,6 +11,7 @@ import 'app/home_tab.dart';
 import 'data/db/app_database.dart';
 import 'data/providers.dart';
 import 'data/repositories/settings_repository.dart';
+import 'features/backup/backups.dart';
 import 'features/notifications/notification_planner.dart';
 import 'features/notifications/notification_service.dart';
 import 'features/notifications/notification_sync.dart';
@@ -135,17 +136,22 @@ class _AppRootState extends State<_AppRoot> {
   /// Keeps the screen-time background check and daily totals up to date.
   late final ProviderSubscription<Object?> _screenSync;
 
+  /// Writes the daily automatic backup, if a folder is chosen.
+  late final void Function() _stopBackups;
+
   @override
   void initState() {
     super.initState();
     _sync = syncNotifications(widget.container);
     _screenSync = syncScreenTime(widget.container);
+    _stopBackups = scheduleAutoBackups(widget.container);
   }
 
   @override
   void dispose() {
     _sync.close();
     _screenSync.close();
+    _stopBackups();
     widget.container.dispose();
     super.dispose();
   }

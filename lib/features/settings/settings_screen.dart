@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../backup/backup_screen.dart';
+import '../backup/backups.dart';
 import '../chores/manage_chores_screen.dart';
 import '../fight/fight_settings.dart';
 import '../notifications/notification_settings.dart';
@@ -36,6 +38,9 @@ class SettingsScreen extends ConsumerWidget {
       if (settings.fightHaptics) l10n.fightSettingHaptics,
       if (settings.fightStoryMode) l10n.fightSettingStory,
     ];
+    final backupOn = ref.watch(backupStateProvider).value?.folder != null;
+    final backupName = ref.watch(backupFolderNameProvider);
+    final backupFolder = backupName.value;
     final language =
         languageNames[settings.locale?.languageCode] ?? l10n.languageSystem;
 
@@ -100,6 +105,18 @@ class SettingsScreen extends ConsumerWidget {
             (l) => l.settingsLanguage,
             const LanguageSettings(),
           ),
+        ),
+        _Entry(
+          icon: Icons.save_outlined,
+          title: l10n.settingsBackup,
+          subtitle: !backupOn
+              ? l10n.backupSubtitleOff
+              : backupFolder != null
+              ? l10n.backupSubtitleOn(backupFolder)
+              : backupName.hasValue
+              ? l10n.backupSubtitleLost
+              : '…',
+          onTap: () => BackupScreen.open(context),
         ),
         _Entry(
           icon: Icons.info_outline,

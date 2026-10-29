@@ -8,6 +8,19 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-29
+### Added
+- **Backups** (Settings → Backup, [design](docs/design/data-safety.md)):
+  - **Save a backup** anywhere with Android's file picker. A backup is a copy of the app's database.
+  - **Import a backup** from this or another phone. It **merges**: history that's missing here is
+    added, nothing is deleted, and importing the same file twice changes nothing. A preview shows
+    what will be added. On a new phone, the backup's settings are taken over too.
+  - **Undo last import.**
+  - **Automatic backups**, daily to a folder you choose, keeping the last 7. A warning shows if the
+    folder can no longer be reached.
+  - Files that aren't backups, and backups from a newer app version, are refused with a clear message.
+  - No storage permission is needed.
+
 ## [0.7.2] - 2026-10-29
 ### Changed
 - **Pixel art is now in files.** Icons, map tiles, landmarks and the launcher shield are PNGs with
@@ -224,6 +237,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.8.0]: #
 [0.7.2]: #
 [0.7.1]: #
 [0.7.0]: #

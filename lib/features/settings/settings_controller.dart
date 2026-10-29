@@ -24,6 +24,11 @@ class SettingsController extends Notifier<AppSettings> {
 
   void setLocale(Locale? locale) => _set(state.copyWith(locale: () => locale));
 
+  /// Loads the settings again, after a backup import or undo changed them
+  /// in the database.
+  Future<void> reload() async =>
+      state = await ref.read(settingsRepositoryProvider).load();
+
   /// Applies any change, e.g. `update((s) => s.copyWith(weeklyRecap: false))`.
   void update(AppSettings Function(AppSettings) change) => _set(change(state));
 
