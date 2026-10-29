@@ -1,10 +1,10 @@
-# Art as files (0.7.2) — migration plan
+# Art as files (0.7.2)
 
 **Goal:** someone who draws pixel art, but does not write Dart, can add or change the app's art.
 The drawing rules are in [ART_GUIDE.md](../ART_GUIDE.md); this document covers the code side and
 the order of work.
 
-## Where the art is today (0.7.1)
+## Where the art was before (0.7.1)
 | Art | Where | How it's drawn | Editable by an artist? |
 |---|---|---|---|
 | Tab icons, coin, hearts | `lib/app/theme/pixel.dart` (`PixelArt`) | Text grids (`'.kkyyyyyykk.'`) | Barely: it's a code file |
@@ -16,66 +16,72 @@ the order of work.
 
 The hero and bosses still look like 0.5.0: they predate the 16-bit look and stand out next to it.
 
-## Target layout
+## Layout (as built)
 ```
 assets/art/
-  palettes/   ui_day.gpl  ui_night.gpl  map_meadow.gpl  map_autumn.gpl  map_snow.gpl
-              map_desert.gpl  hero_keys.gpl  bosses.gpl
-  icons/      tab_quests.png  tab_quest_log.png  …  coin.png  heart.png  heart_empty.png
-  map/        tile_grass_0..3.png  tile_forest_0..3.png  tile_hill_*.png  tile_mountain_*.png
-              tile_water_*.png  tile_sand_*.png  tile_path.png  tile_bridge.png
-              camp.png  lair_closed.png  lair_open.png  castle.png
-  hero/       hero_base.png  hat_<id>.png
-  bosses/     boss_dust.png  …  boss_overlord.png      (frame strips)
+  art.json    every sprite: size, palette group, variants or frames
+  palettes/   map_meadow.gpl (source)  map_autumn.gpl  map_snow.gpl  map_desert.gpl
+              ui_day.gpl (source)  ui_night.gpl  mask.gpl  app.gpl
+  icons/      tab_*.png  coin.png  heart.png  heart_empty.png  app_shield.png
+  map/        grass_0..3  water_0..3  sand_0..3  forest_0..1  hill  mountain
+              bridge_across  bridge_along  camp  lair  lair_sign  castle  castle_won
   CREDITS.md
 lib/app/art/
-  sprites.dart        names of all sprites, sizes and frame counts (one table)
-  sprite_cache.dart   loads PNGs, swaps palettes, caches ui.Image per (sprite, palette)
-  art_gallery.dart    debug-only screen showing every sprite on day and night
-tool/check_art.py     validates assets against the table and palettes
+  art.dart          Sprite: paints one sprite in a palette (recorded once, then replayed)
+  art.g.dart        GENERATED: palettes and sprites as Dart constants
+  art_gallery.dart  debug-only screen showing every sprite on day and night
+tool/build_art.py   checks assets/art and writes art.g.dart (--check: only check)
 ```
 
 ## How the code uses the files
-- **Loading:** PNGs are decoded once with `dart:ui` and kept as `ui.Image`, then drawn with
-  `drawImageRect` and `FilterQuality.none` (sharp pixels). Screens load only what they show.
-  That's under 100 files of a few hundred bytes each, so startup time does not change.
-- **Palette swap:** recoloring works on the raw RGBA bytes. Each color in the source palette is
-  mapped to the same position in the target palette, then the bytes become a `ui.Image` again
-  (`decodeImageFromPixels`), cached per (sprite, palette). This handles:
-  - the four map seasons, from tiles drawn once in meadow colors
-  - the hero's skin, hair and cape from the Wardrobe (replacing today's `avatarSkins` / `avatarHair` / `avatarCapes` color lists)
+**Decision: the PNGs are the source, turned into Dart at build time.** `tool/build_art.py`
+reads every PNG listed in `art.json` and checks:
+- the size, frame count and variant count
+- that every color is in the group's source palette
+- that alpha is 0 or 255
+- that every color name matches across the palettes of a group
+- that no PNG is left unlisted
+
+It then writes `art.g.dart`, where each sprite is a list of rows with one character per pixel,
+holding the palette index. This works like Drift's generated code, and it was chosen over
+decoding PNGs at runtime:
+- **Drawing stays synchronous:** widgets and painters draw a sprite like before, with no
+  loading state.
+- **No test changes:** widget tests need no `runAsync` image decoding.
+- **Nothing extra in the APK:** the PNGs are not bundled.
+- **Readable diffs:** each changed pixel shows up in the generated file.
+
+- **Palette swap:** a sprite is painted with any palette of its group. The index in each row picks
+  the color, so meadow tiles become autumn, snow or desert, and the coin and hearts follow day and
+  night. Each (sprite, palette) pair is recorded once into a `Picture` and replayed after that.
+- **Generated palette classes** (`MapPalette`, `UiPalette`, …) have one getter per color name.
+  They replace the old `_Palette` class in `quest_map.dart` and the color fields of `PixelColors`.
 - **What stays in code:**
-  - map generation, routing, fog of war, seam dithering between weeks, and the plain (simplified) map
-  - layout and animation timing
+  - map generation, roads, shore foam, fog of war, seam dithering between weeks, and the plain map
+  - which tile variant goes where (picked from the tile position, so maps never flicker)
   - frames, bars and badges
-  - which tile variant goes where (from the existing week seed, so maps stay the same)
+  - the hero on the map, until step 5
 - **Accessibility does not change:** sprites stay `ExcludeSemantics` with the same labels on
   the widgets around them.
 
 ## Tests
-- **`tool/check_art.py`** (for contributors, and later in CI): checks every sprite listed in
-  `sprites.dart` for the right size and frame count, palette colors only, alpha 0 or 255, and
-  that no PNG in the folder is unused.
-- **`test/art_test.dart`** checks the same table from the Dart side: every listed asset exists and
-  decodes to the listed size, and the palette swap maps every source color.
-- **Golden comparison for the move:** a test renders a fixed week map and the tab icons before and
-  after the move and compares the pixels. Icons and tiles are exported from today's code, so the
-  first step must change nothing visible.
-- The accessibility audit and the integration test run as usual.
+- `test/art_test.dart` decodes every PNG with `dart:ui` and checks the generated rows and palettes
+  match. So a forgotten `build_art.py` run fails `flutter test`, even without Python.
+- `python tool/build_art.py --check` does the same from Python, and later CI can run it.
+- The move was checked by eye: the icons and all single tiles (hill, mountain, bridges and
+  landmarks) were exported from the old code pixel for pixel. Grass, water and sand now use four
+  fixed variants instead of random detail per tile, so the maps look the same in style but not
+  pixel for pixel.
 
 ## Order of work
-1. **Infrastructure:** the sprite table, cache, palette swap, `check_art.py` and the debug gallery.
-   Export today's Dart colors into the `.gpl` palettes.
-2. **Icons:** a script turns the `PixelArt` grids into PNGs, and the code switches to the files.
-   The goldens must match.
-3. **Map:** a script renders each tile type once from today's painter (four variants where tiles
-   have random detail), in meadow colors. `WeekPainter` switches to drawing tiles from the cache.
-   The goldens must match except for variant choice.
-4. **Launcher icon:** `generate_icon.py` reads `icons/app_shield.png` instead of its grid.
-5. **Hero and bosses, redrawn as pixel sprites:** this is new art, not a conversion, so it's the
-   biggest step and the natural first job for an art contributor. It can ship later (0.7.3) without
-   blocking steps 1–4: until a sprite exists, the current vector painter is used as the fallback.
-6. **Docs:** ART_GUIDE status note removed; ARCHITECTURE and CONTRIBUTING updated.
+1. ✅ Infrastructure: `art.json`, palettes, `build_art.py`, `Sprite`, the gallery (0.7.2).
+2. ✅ Icons from files (0.7.2).
+3. ✅ Map tiles and landmarks from files (0.7.2).
+4. ✅ Launcher icon: `generate_icon.py` reads `icons/app_shield.png` (0.7.2).
+5. **Hero and bosses, redrawn as pixel sprites.** This is new art, not a conversion. Until a
+   sprite exists, the current vector painter stays. It needs the `hero_keys` and `bosses` palette
+   groups, strips with frames, and a sprite cache for the Wardrobe colors.
+6. ✅ Docs: the art guide and CONTRIBUTING updated (0.7.2).
 
 ## Open questions
 - Should step 5 (redrawing hero and bosses) be done by us in 0.7.2, or left for 0.7.3 or for a contributor?

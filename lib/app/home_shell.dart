@@ -7,6 +7,7 @@ import '../features/settings/settings_screen.dart';
 import '../features/stats/stats_screen.dart';
 import '../features/world/world_screen.dart';
 import '../l10n/app_localizations.dart';
+import 'art/art.dart';
 import 'home_tab.dart';
 import 'theme/pixel.dart';
 
@@ -55,23 +56,23 @@ class HomeShell extends ConsumerWidget {
               ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
           destinations: [
             NavigationDestination(
-              icon: const PixelIcon(PixelArt.quests),
+              icon: const PixelIcon(Sprites.tabQuests),
               label: titles[0],
             ),
             NavigationDestination(
-              icon: const PixelIcon(PixelArt.questLog),
+              icon: const PixelIcon(Sprites.tabQuestLog),
               label: titles[1],
             ),
             NavigationDestination(
-              icon: const PixelIcon(PixelArt.arena),
+              icon: const PixelIcon(Sprites.tabArena),
               label: titles[2],
             ),
             NavigationDestination(
-              icon: const PixelIcon(PixelArt.hallOfFame),
+              icon: const PixelIcon(Sprites.tabHallOfFame),
               label: titles[3],
             ),
             NavigationDestination(
-              icon: const PixelIcon(PixelArt.settings),
+              icon: const PixelIcon(Sprites.tabSettings),
               label: titles[4],
             ),
           ],

@@ -1,0 +1,35 @@
+{
+  "palettes": {
+    "map": {
+      "source": "map_meadow",
+      "variants": ["map_meadow", "map_autumn", "map_snow", "map_desert"]
+    },
+    "ui": { "source": "ui_day", "variants": ["ui_day", "ui_night"] },
+    "mask": { "source": "mask", "variants": ["mask"] },
+    "app": { "source": "app", "variants": ["app"] }
+  },
+  "sprites": {
+    "icons/tab_quests": { "size": [12, 12], "palette": "mask" },
+    "icons/tab_quest_log": { "size": [12, 12], "palette": "mask" },
+    "icons/tab_arena": { "size": [12, 12], "palette": "mask" },
+    "icons/tab_hall_of_fame": { "size": [12, 12], "palette": "mask" },
+    "icons/tab_settings": { "size": [12, 12], "palette": "mask" },
+    "icons/coin": { "size": [12, 12], "palette": "ui" },
+    "icons/heart": { "size": [12, 12], "palette": "ui" },
+    "icons/heart_empty": { "size": [12, 12], "palette": "ui" },
+    "icons/app_shield": { "size": [16, 16], "palette": "app" },
+    "map/grass": { "size": [16, 16], "palette": "map", "variants": 4 },
+    "map/forest": { "size": [16, 16], "palette": "map", "variants": 2 },
+    "map/hill": { "size": [16, 16], "palette": "map" },
+    "map/mountain": { "size": [16, 16], "palette": "map" },
+    "map/water": { "size": [16, 16], "palette": "map", "variants": 4 },
+    "map/sand": { "size": [16, 16], "palette": "map", "variants": 4 },
+    "map/bridge_across": { "size": [16, 16], "palette": "map" },
+    "map/bridge_along": { "size": [16, 16], "palette": "map" },
+    "map/camp": { "size": [16, 16], "palette": "map" },
+    "map/lair": { "size": [16, 16], "palette": "map" },
+    "map/lair_sign": { "size": [16, 16], "palette": "map" },
+    "map/castle": { "size": [16, 16], "palette": "map" },
+    "map/castle_won": { "size": [16, 16], "palette": "map" }
+  }
+}

@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../art/art.dart';
+
 /// The 16-bit look: frames like game menus, pixel icons and segmented bars.
 /// One "pixel" is [pixelUnit] logical pixels.
 const pixelUnit = 2.0;
@@ -11,52 +13,29 @@ const pixelUnit = 2.0;
 /// headings only: body text stays in the system font for readability.
 const pixelFont = 'PressStart2P';
 
-/// Colors of the pixel frames, available via
-/// `Theme.of(context).extension<PixelColors>()`.
+/// The day or night UI palette (from `assets/art/palettes/ui_*.gpl`),
+/// available via `PixelColors.of(context)`: the frame color for panels and
+/// bars, and the colors the coin and hearts are painted in.
 @immutable
 class PixelColors extends ThemeExtension<PixelColors> {
-  const PixelColors({
-    required this.frame,
-    required this.coin,
-    required this.coinShade,
-    required this.heart,
-    required this.heartEmpty,
-  });
+  const PixelColors(this.palette);
+
+  final UiPalette palette;
 
   /// The dark outline around panels, buttons and bars.
-  final Color frame;
-  final Color coin, coinShade;
-  final Color heart, heartEmpty;
+  Color get frame => palette.frame;
 
   static PixelColors of(BuildContext context) =>
       Theme.of(context).extension<PixelColors>()!;
 
   @override
-  PixelColors copyWith({
-    Color? frame,
-    Color? coin,
-    Color? coinShade,
-    Color? heart,
-    Color? heartEmpty,
-  }) => PixelColors(
-    frame: frame ?? this.frame,
-    coin: coin ?? this.coin,
-    coinShade: coinShade ?? this.coinShade,
-    heart: heart ?? this.heart,
-    heartEmpty: heartEmpty ?? this.heartEmpty,
-  );
+  PixelColors copyWith({UiPalette? palette}) =>
+      PixelColors(palette ?? this.palette);
 
+  // Palettes swap whole: sprites are painted with one or the other.
   @override
-  PixelColors lerp(PixelColors? other, double t) {
-    if (other == null) return this;
-    return PixelColors(
-      frame: Color.lerp(frame, other.frame, t)!,
-      coin: Color.lerp(coin, other.coin, t)!,
-      coinShade: Color.lerp(coinShade, other.coinShade, t)!,
-      heart: Color.lerp(heart, other.heart, t)!,
-      heartEmpty: Color.lerp(heartEmpty, other.heartEmpty, t)!,
-    );
-  }
+  PixelColors lerp(PixelColors? other, double t) =>
+      other == null || t < 0.5 ? this : other;
 }
 
 /// A pixel frame: an outline with the corner pixels cut off, a light edge
@@ -169,23 +148,23 @@ class PixelBorder extends OutlinedBorder {
   int get hashCode => Object.hash(side, depth, bevel);
 }
 
-/// A small pixel-art picture from rows of characters. `#` takes the icon
-/// color (from [IconTheme] unless [color] is given), `.` is empty, and other
-/// characters are looked up in [colors].
+/// A pixel-art sprite from `assets/art`, scaled by whole pixels and
+/// centered. Without a [palette] the sprite is a mask painted in one color:
+/// [color], or the [IconTheme]'s (for tab icons).
 class PixelIcon extends StatelessWidget {
   const PixelIcon(
-    this.rows, {
+    this.sprite, {
     super.key,
     this.size,
     this.color,
-    this.colors = const {},
+    this.palette,
     this.semanticLabel,
   });
 
-  final List<String> rows;
+  final Sprite sprite;
   final double? size;
   final Color? color;
-  final Map<String, Color> colors;
+  final List<Color>? palette;
   final String? semanticLabel;
 
   @override
@@ -195,9 +174,9 @@ class PixelIcon extends StatelessWidget {
     final picture = CustomPaint(
       size: Size.square(size),
       painter: _PixelPainter(
-        rows,
-        color ?? icon.color ?? Theme.of(context).colorScheme.onSurface,
-        colors,
+        sprite,
+        palette ??
+            [color ?? icon.color ?? Theme.of(context).colorScheme.onSurface],
       ),
     );
     return semanticLabel == null
@@ -207,39 +186,28 @@ class PixelIcon extends StatelessWidget {
 }
 
 class _PixelPainter extends CustomPainter {
-  _PixelPainter(this.rows, this.color, this.colors);
+  _PixelPainter(this.sprite, this.palette);
 
-  final List<String> rows;
-  final Color color;
-  final Map<String, Color> colors;
+  final Sprite sprite;
+  final List<Color> palette;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final n = rows.fold(0, (w, r) => max(w, r.length));
+    final n = max(sprite.width, sprite.height);
     // Whole pixels, centered: no blurry half pixels.
     final cell = max(1, (size.width / n).floorToDouble()).toDouble();
-    final dx = ((size.width - cell * n) / 2).roundToDouble();
-    final dy = ((size.height - cell * rows.length) / 2).roundToDouble();
-    final paint = Paint()..isAntiAlias = false;
-    for (var y = 0; y < rows.length; y++) {
-      final row = rows[y];
-      for (var x = 0; x < row.length; x++) {
-        final ch = row[x];
-        if (ch == '.') continue;
-        final c = ch == '#' ? color : colors[ch];
-        if (c == null) continue;
-        paint.color = c;
-        canvas.drawRect(
-          Rect.fromLTWH(dx + x * cell, dy + y * cell, cell, cell),
-          paint,
-        );
-      }
-    }
+    canvas
+      ..translate(
+        ((size.width - cell * sprite.width) / 2).roundToDouble(),
+        ((size.height - cell * sprite.height) / 2).roundToDouble(),
+      )
+      ..scale(cell);
+    sprite.paint(canvas, palette);
   }
 
   @override
   bool shouldRepaint(_PixelPainter old) =>
-      old.rows != rows || old.color != color || !mapEquals(old.colors, colors);
+      !identical(old.sprite, sprite) || !listEquals(old.palette, palette);
 }
 
 /// A segmented bar like a game's health bar: [segments] blocks inside a
@@ -336,131 +304,6 @@ class _BarPainter extends CustomPainter {
       old.track != track;
 }
 
-/// The pixel pictures used across the app, 12×12.
-abstract final class PixelArt {
-  static const quests = [
-    '..########..',
-    '.#........#.',
-    '.##########.',
-    '..#......#..',
-    '..#.####.#..',
-    '..#......#..',
-    '..#.####.#..',
-    '..#......#..',
-    '..#.###..#..',
-    '.##########.',
-    '.#........#.',
-    '..########..',
-  ];
-
-  static const questLog = [
-    '............',
-    '.####..####.',
-    '#....##....#',
-    '#.##.##.##.#',
-    '#....##....#',
-    '#.##.##.##.#',
-    '#....##....#',
-    '#.##.##.##.#',
-    '#....##....#',
-    '#....##....#',
-    '.####..####.',
-    '............',
-  ];
-
-  static const arena = [
-    '.##########.',
-    '#..........#',
-    '#.###..###.#',
-    '#.###..###.#',
-    '#..........#',
-    '#.###..###.#',
-    '.#.##..##.#.',
-    '.#........#.',
-    '..#......#..',
-    '...#....#...',
-    '....#..#....',
-    '.....##.....',
-  ];
-
-  static const hallOfFame = [
-    '.##########.',
-    '###......###',
-    '#.#......#.#',
-    '#.#......#.#',
-    '.##......##.',
-    '..#......#..',
-    '...#....#...',
-    '....#..#....',
-    '.....##.....',
-    '.....##.....',
-    '...######...',
-    '...######...',
-  ];
-
-  static const settings = [
-    '.....##.....',
-    '..#.####.#..',
-    '.##########.',
-    '..###..###..',
-    '.###....###.',
-    '####....####',
-    '####....####',
-    '.###....###.',
-    '..###..###..',
-    '.##########.',
-    '..#.####.#..',
-    '.....##.....',
-  ];
-
-  /// `k` outline, `y` gold, `d` shade, `w` shine.
-  static const coin = [
-    '...kkkkkk...',
-    '.kkyyyyyykk.',
-    '.kywwyyyyyk.',
-    'kywyyddyyydk',
-    'kywyydyyyydk',
-    'kyyyydyyyydk',
-    'kyyyydyyyydk',
-    'kyyyydyyyydk',
-    'kyyyddddyydk',
-    '.kyyyyyyddk.',
-    '.kkddddddkk.',
-    '...kkkkkk...',
-  ];
-
-  /// `k` outline, `r` fill, `w` shine.
-  static const heart = [
-    '............',
-    '.kkk....kkk.',
-    'krrrk..krrrk',
-    'krwrrkkrrrrk',
-    'krwrrrrrrrrk',
-    'krrrrrrrrrrk',
-    '.krrrrrrrrk.',
-    '..krrrrrrk..',
-    '...krrrrk...',
-    '....krrk....',
-    '.....kk.....',
-    '............',
-  ];
-
-  static const heartEmpty = [
-    '............',
-    '.kkk....kkk.',
-    'keeek..keeek',
-    'keeeekkeeeek',
-    'keeeeeeeeeek',
-    'keeeeeeeeeek',
-    '.keeeeeeeek.',
-    '..keeeeeek..',
-    '...keeeek...',
-    '....keek....',
-    '.....kk.....',
-    '............',
-  ];
-}
-
 /// A coin icon in the theme's gold.
 class PixelCoin extends StatelessWidget {
   const PixelCoin({super.key, this.size = 24});
@@ -469,16 +312,10 @@ class PixelCoin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = PixelColors.of(context);
     return PixelIcon(
-      PixelArt.coin,
+      Sprites.coin,
       size: size,
-      colors: {
-        'k': c.frame,
-        'y': c.coin,
-        'd': c.coinShade,
-        'w': const Color(0xFFFFF4C2),
-      },
+      palette: PixelColors.of(context).palette.colors,
     );
   }
 }
@@ -492,16 +329,10 @@ class PixelHeart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = PixelColors.of(context);
     return PixelIcon(
-      full ? PixelArt.heart : PixelArt.heartEmpty,
+      full ? Sprites.heart : Sprites.heartEmpty,
       size: size,
-      colors: {
-        'k': c.frame,
-        'r': c.heart,
-        'e': c.heartEmpty,
-        'w': const Color(0xFFFFD6D0),
-      },
+      palette: PixelColors.of(context).palette.colors,
     );
   }
 }

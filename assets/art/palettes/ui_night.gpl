@@ -1,0 +1,11 @@
+GIMP Palette
+Name: UI night
+Columns: 8
+#
+ 14  12  26	frame
+247 201  72	coin
+176 122  16	coin_shade
+255 244 194	coin_shine
+232  87  74	heart
+ 74  69 112	heart_empty
+255 214 208	heart_shine

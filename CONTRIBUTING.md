@@ -46,8 +46,15 @@ minutes ahead to see a scheduled one fire (`adb shell dumpsys alarm` shows what 
 [Conventional Commits](https://www.conventionalcommits.org): `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
 
 ## Art
-Pixel art follows the [art guide](docs/ART_GUIDE.md): sizes, palettes, drawing rules and licensing.
-How the art gets into the app is planned in [docs/design/art-assets.md](docs/design/art-assets.md).
+Pixel art lives in `assets/art` as PNG files with palettes and follows the [art guide](docs/ART_GUIDE.md):
+sizes, palettes, drawing rules and licensing. After changing art, regenerate and commit
+`lib/app/art/art.g.dart` (needs Python with Pillow):
+
+```bash
+python tool/build_art.py
+```
+
+How it works is described in [docs/design/art-assets.md](docs/design/art-assets.md).
 
 ## Code layout
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

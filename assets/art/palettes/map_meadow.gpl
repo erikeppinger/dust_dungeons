@@ -1,0 +1,54 @@
+GIMP Palette
+Name: Map meadow (source)
+Columns: 8
+#
+ 90 164  60	grass
+ 63 130  43	grass_dark
+134 201  90	grass_light
+ 62 142  53	leaf
+ 44 107  39	leaf_shade
+108 184  78	leaf_light
+ 30  74  28	tree_outline
+230 199 126	sand
+201 164  90	sand_dark
+244 223 164	sand_light
+ 44 104 168	water
+ 37  90 147	water_deep
+247 226 107	flower
+ 77 147  52	hill_mid
+ 54 111  37	hill_dark
+242 242 242	flower_white
+ 91  58  31	trunk
+127 196 238	glint
+ 79 147 207	glint_shade
+214 240 251	foam
+ 62  42  26	mountain_outline
+184 146  94	mountain_lit
+124  90  54	mountain_dark
+140 106  68	mountain_plain
+244 244 238	snow
+191 208 224	snow_shade
+215 181 124	path_earth
+170 133  80	path_edge
+169 119  63	plank
+107  68  35	wood_dark
+ 74  30  20	camp_outline
+210  85  60	tent
+156  53  36	tent_shade
+ 42  20   8	tent_door
+247 169  59	fire
+255 224 122	fire_light
+ 46  42  46	lair_outline
+140 135 148	rock
+182 177 188	rock_light
+ 20  16  24	cave
+200 148  90	sign
+ 58  36  20	ink
+ 58  58  74	castle_outline
+202 202 214	wall
+154 154 174	wall_shade
+ 36  26  44	gate
+126  63 200	banner
+ 76 175  80	banner_won
+ 28  26  48	fog
+142 138 184	star

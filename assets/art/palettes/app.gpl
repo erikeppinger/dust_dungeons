@@ -1,0 +1,10 @@
+GIMP Palette
+Name: App icon
+Columns: 8
+#
+ 58  36  20	outline
+ 62 142  53	shield
+ 43 110  36	shield_shade
+143 210 122	shine
+242 182  48	check
+176 122  16	check_shade

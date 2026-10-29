@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../art/art.dart';
 import 'chore_palette.dart';
 import 'pixel.dart';
 
@@ -12,21 +13,7 @@ ThemeData buildAppTheme({
 }) {
   final dark = brightness == Brightness.dark;
   final scheme = dark ? _night(colorblindSafe) : _day(colorblindSafe);
-  final pixels = dark
-      ? const PixelColors(
-          frame: Color(0xFF0E0C1A),
-          coin: Color(0xFFF7C948),
-          coinShade: Color(0xFFB07A10),
-          heart: Color(0xFFE8574A),
-          heartEmpty: Color(0xFF4A4570),
-        )
-      : const PixelColors(
-          frame: Color(0xFF3A2414),
-          coin: Color(0xFFF2B630),
-          coinShade: Color(0xFFB07A10),
-          heart: Color(0xFFD83A2E),
-          heartEmpty: Color(0xFFD9C394),
-        );
+  final pixels = PixelColors(dark ? uiNight : uiDay);
   final frame = BorderSide(color: pixels.frame, width: pixelUnit);
   final panel = PixelBorder(side: frame);
   final base = ThemeData(colorScheme: scheme, useMaterial3: true);

@@ -435,6 +435,10 @@
   "notifBlockedShort": "Blocked in Android settings",
   "colorblindOn": "colorblind-friendly colors",
   "settingsAboutSubtitle": "Privacy, license, version",
+  "artGallery": "Art gallery",
+  "@artGallery": {
+    "description": "Debug-only screen listing all pixel art sprites"
+  },
   "aboutVersion": "Version {version}",
   "@aboutVersion": {
     "placeholders": {

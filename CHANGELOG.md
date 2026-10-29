@@ -8,6 +8,17 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-10-29
+### Changed
+- **Pixel art is now in files.** Icons, map tiles, landmarks and the launcher shield are PNGs with
+  named palettes in `assets/art`, so artists can work on them without touching code
+  ([art guide](docs/ART_GUIDE.md)).
+  - The map's seasons and the day/night coin and hearts are palette swaps of one drawing.
+  - `tool/build_art.py` checks the art (sizes, palette colors, transparency) and generates the Dart
+    code the app draws from; a test catches a forgotten run.
+  - Grass, water and sand use four hand-checkable variants instead of random details.
+  - Debug builds have an art gallery (Settings → About) showing every sprite on day and night.
+
 ## [0.7.1] - 2026-10-29
 ### Changed
 - **16-bit look.** The whole app now looks like a 16-bit game:
@@ -213,6 +224,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.7.2]: #
 [0.7.1]: #
 [0.7.0]: #
 [0.6.1]: #

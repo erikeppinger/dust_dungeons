@@ -1,0 +1,11 @@
+GIMP Palette
+Name: UI day (source)
+Columns: 8
+#
+ 58  36  20	frame
+242 182  48	coin
+176 122  16	coin_shade
+255 244 194	coin_shine
+216  58  46	heart
+217 195 148	heart_empty
+255 214 208	heart_shine

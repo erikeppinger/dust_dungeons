@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../../app/art/art_gallery.dart';
 import '../../app/theme/chore_palette.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_controller.dart';
@@ -155,6 +157,13 @@ class AboutSettings extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.tag),
             title: Text(l10n.aboutVersion(version)),
+          ),
+        // For checking new pixel art (docs/ART_GUIDE.md).
+        if (kDebugMode)
+          ListTile(
+            leading: const Icon(Icons.palette_outlined),
+            title: Text(l10n.artGallery),
+            onTap: () => ArtGallery.open(context),
           ),
         ListTile(
           leading: const Icon(Icons.school_outlined),
