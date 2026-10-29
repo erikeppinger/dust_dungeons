@@ -16,7 +16,7 @@
   "themeDark": "Dark",
   "settingsColorblind": "Colorblind-friendly colors",
   "settingsColorblindSubtitle": "Okabe-Ito palette, distinguishable with all common types of color blindness",
-  "settingsChoreColors": "Chore colors",
+  "settingsChoreColors": "Quest colors",
   "settingsLanguage": "Language",
   "languageSystem": "System default",
   "settingsAbout": "About",
@@ -51,10 +51,10 @@
     }
   },
   "undo": "Undo",
-  "noChores": "No active chores. Add one with the button below.",
-  "addChore": "Add chore",
-  "editChore": "Edit chore",
-  "manageChores": "Manage chores",
+  "noChores": "No active quests. Add one with the button below.",
+  "addChore": "Add quest",
+  "editChore": "Edit quest",
+  "manageChores": "Manage quests",
   "manageChoresSubtitle": "Add, edit, archive",
   "activeChores": "Active",
   "archivedChores": "Archived",
@@ -291,7 +291,7 @@
     }
   },
   "statsHowPointsWork": "How points work",
-  "statsPointsExplanation": "Every chore earns its base points. Doing a scheduled chore on its due day adds {onTime}%. Each day of your streak adds {perDay}% more, up to {max}%. All points you ever earn count as XP for your level.",
+  "statsPointsExplanation": "Every quest earns its base points. Doing a scheduled quest on its due day adds {onTime}%. Each day of your streak adds {perDay}% more, up to {max}%. All points you ever earn count as XP for your level.",
   "@statsPointsExplanation": {
     "placeholders": {
       "onTime": {
@@ -330,7 +330,7 @@
       }
     }
   },
-  "notifSummaryTitle": "{n, plural, =1{1 chore today} other{{n} chores today}}",
+  "notifSummaryTitle": "{n, plural, =1{1 quest today} other{{n} quests today}}",
   "@notifSummaryTitle": {
     "placeholders": {
       "n": {
@@ -363,7 +363,7 @@
     }
   },
   "notifWeeklyTitle": "Your week",
-  "notifWeeklyBody": "This week: {chores, plural, =1{1 chore} other{{chores} chores}} done, {points} points earned.",
+  "notifWeeklyBody": "This week: {chores, plural, =1{1 quest} other{{chores} quests}} done, {points} points earned.",
   "@notifWeeklyBody": {
     "placeholders": {
       "chores": {
@@ -375,7 +375,7 @@
     }
   },
   "notifMonthlyTitle": "Your month",
-  "notifMonthlyBody": "This month: {chores, plural, =1{1 chore} other{{chores} chores}} done, {points} points earned.",
+  "notifMonthlyBody": "This month: {chores, plural, =1{1 quest} other{{chores} quests}} done, {points} points earned.",
   "@notifMonthlyBody": {
     "placeholders": {
       "chores": {
@@ -389,7 +389,7 @@
   "notifTestTitle": "Notifications work 👍",
   "notifTestBody": "This is how reminders will look.",
   "channelSummary": "Daily summary",
-  "channelReminder": "Chore reminders",
+  "channelReminder": "Quest reminders",
   "channelRecap": "Weekly and monthly recap",
   "settingsNotifications": "Notifications",
   "notifEnable": "Reminders & summaries",
@@ -397,8 +397,8 @@
   "notifBlocked": "Notifications are blocked. Allow them for this app in Android settings.",
   "notifDailySummary": "Daily summary",
   "notifDailySummarySubtitle": "What is due today, at the time below",
-  "notifChoreReminders": "Chore reminders",
-  "notifChoreRemindersSubtitle": "At the time set in each chore",
+  "notifChoreReminders": "Quest reminders",
+  "notifChoreRemindersSubtitle": "At the time set in each quest",
   "notifWeeklyRecap": "Weekly recap",
   "notifWeeklyRecapSubtitle": "Sundays at {time}",
   "@notifWeeklyRecapSubtitle": {
@@ -462,7 +462,7 @@
   "bossSourceTrash": "trash, recycling",
   "bossSourceBedroom": "beds, tidying",
   "bossSourceOutside": "windows, plants, errands",
-  "bossSourceClutter": "your own chores",
+  "bossSourceClutter": "your own quests",
   "trophyDust": "Golden Feather Duster",
   "trophyClutter": "Tidy Crown",
   "trophyGeneric": "{boss} trophy",
@@ -579,7 +579,7 @@
   "hitPerfect": "Perfect",
   "hitGood": "Good",
   "hitMiss": "Miss",
-  "fightNoPoints": "Fights never give points: those come from chores only.",
+  "fightNoPoints": "Fights never give points: those come from quests only.",
   "fightBack": "Back to the Arena",
   "fightAgain": "{n, plural, =1{Fight again · 1 token left} other{Fight again · {n} tokens left}}",
   "@fightAgain": {
@@ -667,7 +667,7 @@
   "fightSettingStory": "Story mode",
   "fightSettingStorySubtitle": "Fights can't be lost, and the timing is more forgiving",
   "choreBoss": "Boss",
-  "choreBossHelp": "Doing this chore earns a fight token for this boss",
+  "choreBossHelp": "Doing this quest earns a fight token for this boss",
   "itemShield": "Sponge Shield",
   "itemShieldDesc": "Forgives your first miss in every fight",
   "itemMop": "Turbo Mop",
@@ -821,7 +821,7 @@
   "onboardingWelcomeBody": "Complete quests (your chores), collect points and level up. Every quest also earns a fight token for the Arena.",
   "onboardingPrivacy": "Everything stays on this phone: no account, no ads, no tracking.",
   "onboardingChoresTitle": "Which quests apply to you?",
-  "onboardingChoresBody": "Unticked ones are archived. Add your own or change them any time under Settings → Manage chores.",
+  "onboardingChoresBody": "Unticked ones are archived. Add your own or change them any time under Settings → Manage quests.",
   "onboardingSetupTitle": "Last touches",
   "onboardingNotifications": "Reminders and a daily summary",
   "onboardingNotificationsSubtitle": "You can fine-tune them in the settings.",

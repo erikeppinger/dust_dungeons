@@ -912,7 +912,7 @@ void main() {
   ) async {
     final db = await pumpApp(tester);
 
-    await tester.tap(find.text('Add chore'));
+    await tester.tap(find.text('Add quest'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
@@ -1066,7 +1066,7 @@ void main() {
     await pumpApp(tester);
     await _openSettings(tester);
 
-    await tester.tap(find.text('Manage chores'));
+    await tester.tap(find.text('Manage quests'));
     await tester.pumpAndSettle();
     final dustingRow = find.widgetWithText(ListTile, 'Dusting');
     await tester.tap(
@@ -1141,7 +1141,7 @@ void main() {
     await pumpApp(tester);
     await _openSettings(tester);
     for (final entry in [
-      'Manage chores',
+      'Manage quests',
       'Appearance',
       'Notifications',
       'Screen time',
@@ -1158,7 +1158,7 @@ void main() {
     }
     expect(find.text('No automatic backup'), findsOneWidget);
     await tester.scrollUntilVisible(
-      find.text('Manage chores'),
+      find.text('Manage quests'),
       -100,
       scrollable: find.byType(Scrollable).first,
     );

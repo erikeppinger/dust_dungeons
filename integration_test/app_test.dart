@@ -58,7 +58,7 @@ void main() {
       // Edit a built-in chore's points via long-press.
       await tester.longPress(find.text('Dusting'));
       await tester.pumpAndSettle();
-      expect(find.text('Edit chore'), findsOneWidget);
+      expect(find.text('Edit quest'), findsOneWidget);
       await tester.drag(find.byType(Slider), const Offset(400, 0));
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
@@ -66,7 +66,7 @@ void main() {
       expect(find.text('110 points · +10 bonus'), findsOneWidget);
 
       // Add a custom chore.
-      await tester.tap(find.text('Add chore'));
+      await tester.tap(find.text('Add quest'));
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byType(TextFormField),
@@ -120,7 +120,7 @@ void main() {
       }
 
       // Archive via Manage chores.
-      await tester.tap(find.text('Manage chores'));
+      await tester.tap(find.text('Manage quests'));
       await tester.pumpAndSettle();
       await tester.tap(
         find.descendant(

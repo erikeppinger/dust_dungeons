@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+### Changed
+- Chores are called **quests** everywhere in the app, to fit the theme: "Add quest", "Edit quest",
+  "Manage quests", quest reminders, and the notifications ("Aufgabe" became "Quest" in German).
+  The app name and the Chore Overlord keep their names.
 
 ## [0.9.0] - 2026-10-29
 ### Added

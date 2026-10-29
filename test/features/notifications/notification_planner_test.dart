@@ -90,7 +90,7 @@ void main() {
     expect(summaries, hasLength(planDays));
     final first = summaries.first;
     expect(first.when, DateTime(2026, 10, 28, 8));
-    expect(first.title, '2 chores today');
+    expect(first.title, '2 quests today');
     expect(first.body, '1 overdue · Trash, Dishes');
     expect(first.target, NotificationTarget.today);
   });
@@ -145,7 +145,7 @@ void main() {
       ],
     ).singleWhere((n) => n.title == 'Your week');
     expect(recap.when, DateTime(2026, 11, 1, 18));
-    expect(recap.body, 'This week: 2 chores done, 35 points earned.');
+    expect(recap.body, 'This week: 2 quests done, 35 points earned.');
     expect(recap.target, NotificationTarget.stats);
   });
 
@@ -154,7 +154,7 @@ void main() {
       completions: [done(DateTime(2026, 9, 30), 50), done(today, 10)],
     ).singleWhere((n) => n.title == 'Your month');
     expect(recap.when, DateTime(2026, 11, 1, 10));
-    expect(recap.body, 'This month: 1 chore done, 10 points earned.');
+    expect(recap.body, 'This month: 1 quest done, 10 points earned.');
   });
 
   test('on the 1st before 10:00 the recap is about the month that ended', () {
@@ -166,7 +166,7 @@ void main() {
       ],
     ).singleWhere((n) => n.title == 'Your month');
     expect(recap.when, DateTime(2026, 11, 1, 10));
-    expect(recap.body, 'This month: 1 chore done, 20 points earned.');
+    expect(recap.body, 'This month: 1 quest done, 20 points earned.');
   });
 
   test('ids are unique and everything is in the future', () {
