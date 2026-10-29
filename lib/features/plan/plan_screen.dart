@@ -271,7 +271,7 @@ class _DayCell extends StatelessWidget {
       excludeSemantics: true,
       child: InkWell(
         key: ValueKey('day-${day.year}-${day.month}-${day.day}'),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.zero,
         onTap: onTap,
         child: Container(
           height: 56,
@@ -281,7 +281,7 @@ class _DayCell extends StatelessWidget {
             border: isToday
                 ? Border.all(color: scheme.primary, width: 2)
                 : null,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.zero,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

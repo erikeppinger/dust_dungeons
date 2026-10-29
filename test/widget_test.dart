@@ -182,7 +182,7 @@ void main() {
           ),
         );
     await pumpApp(tester, db: db);
-    expect(find.text('Level 1'), findsOneWidget);
+    expect(find.text('LV 1'), findsOneWidget);
     expect(find.text('1-day streak'), findsOneWidget);
 
     // 15 base + 2 on time + 1 streak = 18 -> 113 XP.
@@ -192,7 +192,7 @@ void main() {
       find.text('Level 2 reached! 🎉\nDusting done · +18 (incl. 3 bonus)'),
       findsOneWidget,
     );
-    expect(find.text('Level 2'), findsOneWidget);
+    expect(find.text('LV 2'), findsOneWidget);
     expect(find.text('2-day streak'), findsOneWidget);
   });
 

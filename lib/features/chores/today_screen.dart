@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/theme/pixel.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/models/scheduled_chore.dart';
 import '../../data/providers.dart';
@@ -179,7 +180,7 @@ class _BalanceHeader extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.stars, color: theme.colorScheme.primary, size: 32),
+              const PixelCoin(size: 32),
               const SizedBox(width: 8),
               Flexible(
                 // Counts up to a new balance (instantly with reduced motion).
@@ -207,11 +208,11 @@ class _BalanceHeader extends ConsumerWidget {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Chip(
-                    avatar: const Icon(Icons.military_tech, size: 18),
-                    label: Text(l10n.levelValue(stats.level)),
-                    visualDensity: VisualDensity.compact,
+                  LevelBadge(
+                    level: stats.level,
+                    label: l10n.levelValue(stats.level),
                   ),
                   Chip(
                     avatar: const Icon(Icons.local_fire_department, size: 18),

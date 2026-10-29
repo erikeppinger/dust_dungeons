@@ -45,5 +45,9 @@ minutes ahead to see a scheduled one fire (`adb shell dumpsys alarm` shows what 
 ## Commit messages
 [Conventional Commits](https://www.conventionalcommits.org): `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
 
+## Art
+Pixel art follows the [art guide](docs/ART_GUIDE.md): sizes, palettes, drawing rules and licensing.
+How the art gets into the app is planned in [docs/design/art-assets.md](docs/design/art-assets.md).
+
 ## Code layout
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).

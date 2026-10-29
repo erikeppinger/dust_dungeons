@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../app/theme/pixel.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/day_clock.dart';
@@ -138,10 +141,9 @@ class _HeroCard extends ConsumerWidget {
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 6),
-                  LinearProgressIndicator(
+                  PixelBar(
                     value: stats?.levelProgress ?? 0,
-                    minHeight: 8,
-                    borderRadius: BorderRadius.circular(4),
+                    color: theme.colorScheme.secondary,
                     semanticsLabel: l10n.levelValue(level),
                   ),
                   const SizedBox(height: 6),

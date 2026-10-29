@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../../app/theme/pixel.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,8 +45,7 @@ class QuestMap extends ConsumerWidget {
       label: semanticLabel,
       image: true,
       child: ExcludeSemantics(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
+        child: PixelFrame(
           child: AspectRatio(
             aspectRatio: mapCols / mapRows,
             child: LayoutBuilder(

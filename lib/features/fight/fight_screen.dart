@@ -1,4 +1,9 @@
 import 'dart:async';
+
+import '../../app/theme/app_theme.dart';
+import '../../app/theme/chore_palette.dart';
+import '../../app/theme/pixel.dart';
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -238,12 +243,12 @@ class _FightScreenState extends ConsumerState<FightScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final dark = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF43A047),
-        brightness: Brightness.dark,
-      ),
-      useMaterial3: true,
+    // Fights always take place at night, in the app's dungeon colors.
+    final dark = buildAppTheme(
+      brightness: Brightness.dark,
+      colorblindSafe:
+          Theme.of(context).extension<ChorePalette>()?.isColorblindSafe ??
+          false,
     );
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -369,20 +374,25 @@ class _Duel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 4),
-          LinearProgressIndicator(
+          PixelBar(
             value: cleaned,
-            minHeight: 12,
-            borderRadius: BorderRadius.circular(6),
+            segments: 20,
+            height: 16,
             semanticsLabel: l10n.fightCleaned,
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: c.stage == FightStage.echo || lanes
                   ? scheme.primaryContainer
                   : scheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(18),
+              shape: PixelBorder(
+                side: BorderSide(
+                  color: PixelColors.of(context).frame,
+                  width: pixelUnit,
+                ),
+              ),
             ),
             child: Text(
               status,
@@ -411,15 +421,7 @@ class _Duel extends StatelessWidget {
                     spacing: 2,
                     children: [
                       for (var i = 0; i < duel.hero.maxHp; i++)
-                        Icon(
-                          i < duel.heroHp
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          size: 22,
-                          color: i < duel.heroHp
-                              ? const Color(0xFFF28B82)
-                              : scheme.outline,
-                        ),
+                        PixelHeart(full: i < duel.heroHp),
                     ],
                   ),
                 ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../app/theme/pixel.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/section_header.dart';
@@ -132,7 +135,7 @@ class ShopScreen extends ConsumerWidget {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Row(
               children: [
-                Icon(Icons.stars, color: theme.colorScheme.primary),
+                const PixelCoin(),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

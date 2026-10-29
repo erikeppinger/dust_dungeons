@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/theme/pixel.dart';
 import '../../app/theme/chore_palette.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_icons.dart';
@@ -74,9 +75,18 @@ class ChoreTile extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: color,
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: ShapeDecoration(
+                          color: color,
+                          shape: PixelBorder(
+                            side: BorderSide(
+                              color: PixelColors.of(context).frame,
+                              width: pixelUnit,
+                            ),
+                          ),
+                        ),
                         child: Icon(
                           choreIcon(iconKey),
                           color: palette.onColorFor(colorKey),
@@ -149,9 +159,14 @@ class _DoneBadge extends StatelessWidget {
       message: AppLocalizations.of(context).doneTodayCount(count),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
+        decoration: ShapeDecoration(
           color: scheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(12),
+          shape: PixelBorder(
+            side: BorderSide(
+              color: PixelColors.of(context).frame,
+              width: pixelUnit,
+            ),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

@@ -80,7 +80,7 @@ class _LaneFieldState extends State<LaneField>
                           decoration: BoxDecoration(
                             color: colors[lane].withValues(alpha: 0.25),
                             border: Border.all(color: colors[lane], width: 3),
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.zero,
                           ),
                           alignment: Alignment.center,
                           child: CustomPaint(

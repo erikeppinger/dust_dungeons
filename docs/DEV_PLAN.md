@@ -265,7 +265,9 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.5.1** ✅ | Bosses & shop | All 8 bosses, gear and avatar shop (spending points) |
 | **0.5.2** ✅ | Overlord | Weekly Chore Overlord with lane phase, latency calibration, slow mode |
 | **0.6.0** ✅ | Accessibility & polish | Colorblind palette, contrast audit, TalkBack, font scaling, onboarding, animations/haptics |
-| **0.7.0** | Screen time | Soft screen-time budget: chores earn minutes, vouchers in the Armory, reminders, Tired in the Arena ([design](design/screen-time.md)) |
+| **0.7.0** ✅ | Screen time | Soft screen-time budget: chores earn minutes, vouchers in the Armory, reminders, Tired in the Arena ([design](design/screen-time.md)) |
+| **0.7.1** | 16-bit look | Day/night palettes, pixel font headings, framed panels, segmented bars, pixel tab icons, new launcher icon and splash |
+| **0.7.2** | Art as files | Pixel art moved from code into PNG files with palettes, palette swap for seasons and avatar, art checker and gallery, [art guide](ART_GUIDE.md) ([plan](design/art-assets.md)) |
 | **0.8.0** | Data safety | Export/import, auto-backup folder, DB migration tests |
 | **0.9.0** | Profiles | Multiple people on one device, per-profile stats, chore assignment |
 | **0.10.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) |

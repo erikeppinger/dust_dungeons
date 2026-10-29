@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The 16-bit theme: parchment by day, the dungeon at night. -->
+    <color name="ic_launcher_background">#F3E5C3</color>
+    <color name="splash_background">#F3E5C3</color>
+</resources>

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../app/theme/pixel.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/chore_palette.dart';
@@ -107,11 +110,7 @@ class LevelCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.military_tech,
-                  size: 36,
-                  color: theme.colorScheme.primary,
-                ),
+                const PixelCoin(size: 36),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
@@ -122,10 +121,11 @@ class LevelCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            LinearProgressIndicator(
+            PixelBar(
               value: stats.levelProgress,
-              minHeight: 10,
-              borderRadius: BorderRadius.circular(5),
+              segments: 20,
+              height: 16,
+              color: theme.colorScheme.secondary,
               semanticsLabel: l10n.levelValue(stats.level),
             ),
             const SizedBox(height: 8),
@@ -224,7 +224,7 @@ class _WeekBars extends StatelessWidget {
                         margin: const EdgeInsets.symmetric(horizontal: 6),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primary,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.zero,
                         ),
                       ),
                       const SizedBox(height: 4),

@@ -8,6 +8,19 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-29
+### Changed
+- **16-bit look.** The whole app now looks like a 16-bit game:
+  - Two palettes: parchment by day (light mode) and the dungeon at night (dark mode); the colorblind-safe
+    palette keeps its blue accent in both.
+  - Headings in a pixel font (Press Start 2P, SIL Open Font License, bundled); body text stays in the
+    system font for readability.
+  - Panels, buttons, chips and dialogs get pixel frames with a light and a shaded edge.
+  - Points show a gold coin, the level an "LV" badge; XP, screen time and fights use segmented bars,
+    and the hero's health is a row of pixel hearts.
+  - Pixel-art tab icons, and fights always use the night palette.
+- New launcher icon and splash screen: a pixel shield with a gold check (no more Flutter logo).
+
 ## [0.7.0] - 2026-10-29
 ### Added
 - **Soft screen-time budget** (Settings → Screen time, off by default):
@@ -200,6 +213,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.7.1]: #
 [0.7.0]: #
 [0.6.1]: #
 [0.6.0]: #

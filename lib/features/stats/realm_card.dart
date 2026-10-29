@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../app/theme/pixel.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/day_clock.dart';
@@ -127,8 +130,7 @@ class _RealmCardState extends ConsumerState<RealmCard> {
                 // Month: a week and a half across, so the next one peeks in.
                 // Year: four weeks to a row.
                 final monthWeek = width / 1.5;
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                return PixelFrame(
                   child: _year
                       ? _YearGrid(
                           weeks: weeks,
@@ -285,10 +287,7 @@ class _RealmWeek extends StatelessWidget {
                       horizontal: 4,
                       vertical: 1,
                     ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xCC1C1A30),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
+                    decoration: const BoxDecoration(color: Color(0xCC1C1A30)),
                     child: Text(
                       l10n.realmWeekLabel(number),
                       style: const TextStyle(

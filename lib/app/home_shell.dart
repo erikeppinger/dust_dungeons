@@ -8,6 +8,7 @@ import '../features/stats/stats_screen.dart';
 import '../features/world/world_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'home_tab.dart';
+import 'theme/pixel.dart';
 
 /// Main scaffold with bottom navigation between the top-level screens.
 class HomeShell extends ConsumerWidget {
@@ -37,37 +38,44 @@ class HomeShell extends ConsumerWidget {
           const SettingsScreen(),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: (i) =>
-            ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.checklist_outlined),
-            selectedIcon: const Icon(Icons.checklist),
-            label: titles[0],
+      // The frame line on top sets the tabs apart like a game's menu bar.
+      bottomNavigationBar: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: PixelColors.of(context).frame,
+              width: pixelUnit,
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book),
-            label: titles[1],
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.shield_outlined),
-            selectedIcon: const Icon(Icons.shield),
-            label: titles[2],
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.emoji_events_outlined),
-            selectedIcon: const Icon(Icons.emoji_events),
-            label: titles[3],
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: titles[4],
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          selectedIndex: index,
+          onDestinationSelected: (i) =>
+              ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
+          destinations: [
+            NavigationDestination(
+              icon: const PixelIcon(PixelArt.quests),
+              label: titles[0],
+            ),
+            NavigationDestination(
+              icon: const PixelIcon(PixelArt.questLog),
+              label: titles[1],
+            ),
+            NavigationDestination(
+              icon: const PixelIcon(PixelArt.arena),
+              label: titles[2],
+            ),
+            NavigationDestination(
+              icon: const PixelIcon(PixelArt.hallOfFame),
+              label: titles[3],
+            ),
+            NavigationDestination(
+              icon: const PixelIcon(PixelArt.settings),
+              label: titles[4],
+            ),
+          ],
+        ),
       ),
     );
   }

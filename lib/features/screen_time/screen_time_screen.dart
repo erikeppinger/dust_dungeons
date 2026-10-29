@@ -1,4 +1,7 @@
 import 'dart:async';
+
+import '../../app/theme/pixel.dart';
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -351,7 +354,7 @@ class _History extends ConsumerWidget {
                                           : over
                                           ? scheme.error
                                           : scheme.primary,
-                                      borderRadius: BorderRadius.circular(3),
+                                      borderRadius: BorderRadius.zero,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -530,10 +533,12 @@ class ScreenTimeBar extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 8),
       child: Material(
         color: background,
-        borderRadius: BorderRadius.circular(12),
+        shape: PixelBorder(
+          side: BorderSide(color: PixelColors.of(context).frame, width: 2),
+        ),
         child: InkWell(
           key: const ValueKey('screen-time-bar'),
-          borderRadius: BorderRadius.circular(12),
+          customBorder: const PixelBorder(),
           onTap: () => unawaited(ScreenTimeScreen.open(context)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -564,12 +569,11 @@ class ScreenTimeBar extends ConsumerWidget {
                 ),
                 if (today.access) ...[
                   const SizedBox(height: 6),
-                  LinearProgressIndicator(
+                  PixelBar(
                     value: b.total == 0 ? 1 : (b.used / b.total).clamp(0, 1),
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(3),
+                    height: 12,
                     color: foreground,
-                    backgroundColor: foreground.withValues(alpha: 0.2),
+                    trackColor: background,
                     semanticsLabel: l10n.screenUsedOf(b.used, b.total),
                   ),
                 ],
