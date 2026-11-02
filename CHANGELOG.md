@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+### Fixed
+- **Vibration in fights didn't work on many phones.** It went through Android's touch feedback,
+  which phones turn off with "vibration on touch" or keep very faint. The beat now pulses the
+  vibration motor directly (35 ms, following the phone's media vibration setting).
 ### Changed
 - Chores are called **quests** everywhere in the app, to fit the theme: "Add quest", "Edit quest",
   "Manage quests", quest reminders, and the notifications ("Aufgabe" became "Quest" in German).

@@ -8,6 +8,8 @@
          restore scheduled reminders after a reboot. No exact alarms. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- The short pulse on each beat in fights (normal permission, granted at install). -->
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <!-- Soft screen-time budget: "usage access", granted by the user in the
          system settings. Read on the phone only; it never leaves it. -->
     <uses-permission

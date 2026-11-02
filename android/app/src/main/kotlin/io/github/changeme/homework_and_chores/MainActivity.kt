@@ -57,6 +57,16 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "haptics")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "beat" -> {
+                        Haptics.beat(this)
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "backup")
             .setMethodCallHandler { call, result ->
                 // File copies run off the main thread.

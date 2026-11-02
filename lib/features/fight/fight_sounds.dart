@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -67,5 +69,14 @@ final fightSoundsProvider = Provider<FightSounds>((ref) {
   return sounds;
 });
 
-/// A light vibration for each beat (no permission needed).
-void beatHaptic() => HapticFeedback.lightImpact();
+const _haptics = MethodChannel('haptics');
+
+/// A short pulse of the vibration motor for each beat. Not Flutter's
+/// `HapticFeedback`: that is Android's touch feedback, which many phones
+/// switch off with "vibration on touch" or make barely noticeable.
+void beatHaptic() => unawaited(
+  _haptics
+      .invokeMethod<void>('beat')
+      // No motor, or tests without the Android side: no vibration.
+      .catchError((Object _) {}),
+);
