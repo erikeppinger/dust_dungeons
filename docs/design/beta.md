@@ -1,11 +1,11 @@
-# Beta (0.11.0) — plan
+# Beta (0.12.0) — plan
 
 **Goal:** the app leaves the emulator. It gets its final app ID, public source on GitHub, checks
 on every push, a properly signed release APK, and a way for testers to install and update it,
 including F-Droid-style through IzzyOnDroid.
 
 > **Status:** postponed (2026-10-29); moved from 0.10.0 to 0.11.0 on 2026-11-02, after the
-> better schedules (0.10.0). The GitHub repository and the Google Play developer
+> better schedules (0.10.0), and to 0.12.0 the same day, after loot & gear (0.11.0). The GitHub repository and the Google Play developer
 > account are being prepared first.
 
 ## Defaults (2026-10-29)
@@ -56,7 +56,7 @@ work starts.
 - **Dependency audit:** check every package for network use, Google Play Services and prebuilt binaries. As known today: `audioplayers` uses ExoPlayer (Apache-2.0, fine), and `flutter_local_notifications` needs no Play Services.
 
 ### 4. GitHub and CI
-- **Your step:** create the repository (public) and authorize the push; I'll run `gh` once it's installed and you've logged in. The first push is the history up to 0.11.0, all tags included.
+- **Your step:** create the repository (public) and authorize the push; I'll run `gh` once it's installed and you've logged in. The first push is the history up to 0.12.0, all tags included.
 - **`.github/workflows/check.yml`**, on every push and pull request:
   - `dart format --set-exit-if-changed`, `flutter analyze`, `flutter test`
   - `python tool/build_art.py --check`
@@ -96,7 +96,7 @@ work starts.
   - notification timing after Doze
   - folder access on vendor file managers (Samsung, Xiaomi)
   - audio latency on cheap devices
-- **Fixes** land as 0.11.x patch releases.
+- **Fixes** land as 0.12.x patch releases.
 
 ### 8. IzzyOnDroid
 - After the first signed GitHub release, request inclusion at IzzyOnDroid.
@@ -151,7 +151,7 @@ Releases and IzzyOnDroid. What that changes:
 3. Signing setup, then you create the key, then a signed local build verified on the emulator.
 4. Fastlane metadata and screenshots.
 5. GitHub: you create the repo, I push and add the workflows, and CI turns green.
-6. Tag v0.11.0, with a signed release from CI; you then send the IzzyOnDroid request.
+6. Tag v0.12.0, with a signed release from CI; you then send the IzzyOnDroid request.
 7. Testing on real phones, with patch releases as needed.
 
 ## Risks
