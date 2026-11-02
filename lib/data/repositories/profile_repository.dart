@@ -61,6 +61,11 @@ class ProfileRepository {
         );
   });
 
+  /// Lifts every waiting curse (when curses are turned off).
+  Future<void> liftAllCurses() => _db
+      .update(_db.profiles)
+      .write(const ProfilesCompanion(curseFamily: Value(null)));
+
   Future<void> update(int id, ProfilesCompanion changes) =>
       (_db.update(_db.profiles)..where((p) => p.id.equals(id))).write(changes);
 

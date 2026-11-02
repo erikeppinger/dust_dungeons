@@ -290,7 +290,13 @@ class _ImportDialogState extends State<_ImportDialog> {
       if (r.completions > 0) l10n.backupCountCompletions(r.completions),
       if (r.fights > 0) l10n.backupCountFights(r.fights),
       if (r.profiles > 0) l10n.backupCountPeople(r.profiles),
-      if (r.ledger + r.inventory + r.screenDays + r.undone + r.assignees > 0)
+      if (r.ledger +
+              r.inventory +
+              r.equipped +
+              r.screenDays +
+              r.undone +
+              r.assignees >
+          0)
         l10n.backupPreviewMore,
     ];
     return AlertDialog(

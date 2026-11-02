@@ -143,6 +143,8 @@ void main() {
     await tester.pumpAndSettle();
     final voucher = find.byKey(const ValueKey('shop-screen_15'));
     await tester.scrollUntilVisible(voucher, 200);
+    await tester.ensureVisible(voucher);
+    await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(of: voucher, matching: find.text('40 pts')),
     );

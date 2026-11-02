@@ -22,6 +22,7 @@ part 'app_database.g.dart';
     Inventory,
     ScreenDays,
     ChoreAssignees,
+    Equipped,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -46,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -129,12 +130,40 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(chores, chores.windowFrom);
         await m.addColumn(chores, chores.windowTo);
       }
+      if (from < 9) {
+        // v9: loot & gear. Everyone wears the gear they own; the four items
+        // from before sit in four different slots, so no effect is lost.
+        await m.createTable(equipped);
+        await m.addColumn(profiles, profiles.curseFamily);
+        // Databases from before v4 got the fights table in its current shape.
+        if (!await _hasColumn('fights', 'loot')) {
+          await m.addColumn(fights, fights.loot);
+        }
+        await customStatement('''
+          INSERT INTO equipped (profile_id, slot, item_key)
+          SELECT profile_id, CASE item_key
+              WHEN 'sponge_shield' THEN 'shield'
+              WHEN 'turbo_mop' THEN 'weapon'
+              WHEN 'metronome_charm' THEN 'charm'
+              WHEN 'rubber_gloves' THEN 'body'
+            END, item_key
+          FROM inventory
+          WHERE count > 0 AND item_key IN
+            ('sponge_shield', 'turbo_mop', 'metronome_charm', 'rubber_gloves')
+        ''');
+      }
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
       await _ensureDefaults();
     },
   );
+
+  Future<bool> _hasColumn(String table, String column) async =>
+      (await customSelect(
+        'SELECT 1 FROM pragma_table_info(?) WHERE name = ?',
+        variables: [Variable(table), Variable(column)],
+      ).get()).isNotEmpty;
 
   /// Creates the default profile and inserts built-in chores that are missing.
   /// Runs on every start, so chores added to [defaultChores] in later versions

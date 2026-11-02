@@ -18,6 +18,9 @@ class MergeReport {
   int ledger = 0;
   int fights = 0;
   int inventory = 0;
+
+  /// Worn gear, for people who wear nothing here yet.
+  int equipped = 0;
   int screenDays = 0;
   int settings = 0;
 
@@ -31,6 +34,7 @@ class MergeReport {
           ledger +
           fights +
           inventory +
+          equipped +
           screenDays +
           settings ==
       0;
@@ -270,6 +274,30 @@ Future<void> _merge(
           i.toCompanion(false).copyWith(profileId: Value(profile)),
         );
     report.inventory++;
+  }
+
+  // Worn gear: the phone's choice wins, so only people who wear nothing
+  // here take what they wore in the backup (items they own by now).
+  final wearing = {
+    for (final e in await t.select(t.equipped).get()) e.profileId,
+  };
+  final ownedHere = {
+    for (final i in await t.select(t.inventory).get())
+      if (i.count > 0) (i.profileId, i.itemKey),
+  };
+  for (final e in await s.select(s.equipped).get()) {
+    final profile = profileIds[e.profileId]!;
+    if (wearing.contains(profile) ||
+        !ownedHere.contains((profile, e.itemKey))) {
+      continue;
+    }
+    await t
+        .into(t.equipped)
+        .insert(
+          e.toCompanion(false).copyWith(profileId: Value(profile)),
+          mode: InsertMode.insertOrIgnore,
+        );
+    report.equipped++;
   }
 
   // Screen days: per column, the larger value.

@@ -1,0 +1,20 @@
+GIMP Palette
+Name: Items night
+Columns: 8
+#
+ 14  12  26	outline
+200 208 216	metal_light
+136 144 160	metal
+ 80  88 104	metal_dark
+208 152  88	wood_light
+138  90  44	wood_dark
+216  58  46	red
+242 182  48	yellow
+ 58 120 216	blue
+ 76 168  80	green
+244 240 230	white
+240 160 184	pink
+240 120  32	orange
+138  80 192	purple
+232 200 160	beige
+168 216 240	sky

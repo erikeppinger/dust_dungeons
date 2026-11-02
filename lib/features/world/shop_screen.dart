@@ -8,44 +8,11 @@ import '../../core/widgets/section_header.dart';
 import '../../data/providers.dart';
 import '../../data/repositories/shop_repository.dart';
 import '../../domain/fight/shop.dart';
+import '../fight/boss_art.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/hero_art.dart';
 import '../screen_time/screen_time_providers.dart';
-
-String itemName(AppLocalizations l10n, ShopItem item) => switch (item.key) {
-  'sponge_shield' => l10n.itemShield,
-  'turbo_mop' => l10n.itemMop,
-  'metronome_charm' => l10n.itemCharm,
-  'rubber_gloves' => l10n.itemGloves,
-  'second_wind' => l10n.itemSecondWind,
-  'screen_15' || 'screen_30' => l10n.itemScreenTime(voucherMinutes(item)),
-  'hat_cap' => l10n.hatCap,
-  'hat_bandana' => l10n.hatBandana,
-  'hat_wizard' => l10n.hatWizard,
-  'hat_crown' => l10n.hatCrown,
-  _ => item.key,
-};
-
-String itemDescription(AppLocalizations l10n, ShopItem item) =>
-    switch (item.key) {
-      'sponge_shield' => l10n.itemShieldDesc,
-      'turbo_mop' => l10n.itemMopDesc,
-      'metronome_charm' => l10n.itemCharmDesc,
-      'rubber_gloves' => l10n.itemGlovesDesc,
-      'second_wind' => l10n.itemSecondWindDesc,
-      'screen_15' || 'screen_30' => l10n.itemScreenTimeDesc,
-      _ => l10n.hatDesc,
-    };
-
-IconData _icon(ShopItem item) => switch (item.key) {
-  'sponge_shield' => Icons.shield_outlined,
-  'turbo_mop' => Icons.cleaning_services,
-  'metronome_charm' => Icons.av_timer,
-  'rubber_gloves' => Icons.back_hand_outlined,
-  'second_wind' => Icons.air,
-  'screen_15' || 'screen_30' => Icons.hourglass_bottom,
-  _ => Icons.checkroom,
-};
+import 'items_text.dart';
 
 /// Spend points on gear, consumables and hats. Spending never lowers XP.
 class ShopScreen extends ConsumerWidget {
@@ -97,23 +64,29 @@ class ShopScreen extends ConsumerWidget {
     final balance = ref.watch(balanceProvider).value ?? 0;
     final owned = ref.watch(inventoryProvider).value ?? const {};
     final person = ref.watch(currentProfileProvider);
+    final worn = {...?ref.watch(equippedProvider).value?.values};
 
     Widget tile(ShopItem item, {Widget? leading}) {
       final count = owned[item.key] ?? 0;
       final ownedOnce = item.kind != ItemKind.consumable && count > 0;
       return ListTile(
         key: ValueKey('shop-${item.key}'),
-        leading: leading ?? Icon(_icon(item)),
+        leading: leading ?? ItemIcon(item),
         title: Text(itemName(l10n, item)),
         subtitle: Text(
-          item.kind == ItemKind.consumable && count > 0
-              ? '${itemDescription(l10n, item)} · ${l10n.shopInStock(count)}'
-              : itemDescription(l10n, item),
+          [
+            if (item.slot case final slot?) slotName(l10n, slot),
+            itemDescription(l10n, item),
+            if (item.kind == ItemKind.consumable && count > 0)
+              l10n.shopInStock(count),
+          ].join(' · '),
         ),
         trailing: ownedOnce
             ? Chip(
                 avatar: const Icon(Icons.check, size: 16),
-                label: Text(l10n.shopOwned),
+                label: Text(
+                  worn.contains(item.key) ? l10n.shopWorn : l10n.shopOwned,
+                ),
               )
             : FilledButton.tonal(
                 onPressed: balance >= item.price
@@ -151,13 +124,22 @@ class ShopScreen extends ConsumerWidget {
             child: Text(l10n.shopXpNote, style: theme.textTheme.bodySmall),
           ),
           SectionHeader(l10n.shopGear),
-          for (final item in shopItems.where((i) => i.kind == ItemKind.gear))
-            tile(item),
+          for (final item in armoryGear) tile(item),
           SectionHeader(l10n.shopConsumables),
-          for (final item in shopItems.where(
-            (i) => i.kind == ItemKind.consumable && !screenVouchers.contains(i),
-          ))
-            tile(item),
+          for (final item in fightConsumables) tile(item),
+          SectionHeader(l10n.shopLoot),
+          for (final item in lootItems)
+            if ((owned[item.key] ?? 0) > 0)
+              tile(item)
+            else
+              ListTile(
+                key: ValueKey('shop-${item.key}'),
+                leading: ItemIcon(item, unknown: true),
+                title: const Text('???'),
+                subtitle: Text(
+                  l10n.shopLootUnknown(bossName(l10n, item.dropsFrom!)),
+                ),
+              ),
           if (ref.watch(screenTimeActiveProvider)) ...[
             SectionHeader(l10n.settingsScreenTime),
             for (final item in screenVouchers) tile(item),

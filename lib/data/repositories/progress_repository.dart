@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/dates.dart';
+import '../../domain/fight/items.dart';
 import '../../domain/points.dart';
 import '../../domain/progress.dart';
 import '../db/app_database.dart';
@@ -59,8 +60,21 @@ class ProgressRepository {
             createdAt: now,
           ),
         );
+    await _liftCurse(profileId, chore.family);
     return CompletionResult(completionId: completionId, points: breakdown);
   });
+
+  /// A quest of the cursing boss's family lifts the curse (undoing the quest
+  /// doesn't bring it back).
+  Future<void> _liftCurse(int profileId, BossFamily questFamily) async {
+    final profile = await (_db.select(
+      _db.profiles,
+    )..where((p) => p.id.equals(profileId))).getSingle();
+    final family = profile.curseFamily;
+    if (family == null || !questLifts(curseOf(family), questFamily)) return;
+    await (_db.update(_db.profiles)..where((p) => p.id.equals(profileId)))
+        .write(const ProfilesCompanion(curseFamily: Value(null)));
+  }
 
   /// Streak ending yesterday, looking back only as far as the bonus cap.
   Future<int> _streakBefore(int profileId, DateTime now) async {

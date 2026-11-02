@@ -10,16 +10,17 @@ import '../../data/models/fight_progress.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/overworld.dart';
-import '../../domain/fight/shop.dart';
+import '../../domain/fight/items.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
-import '../fight/fight_screen.dart';
+import '../fight/fight_prep_screen.dart';
 import '../fight/fight_settings.dart';
 import '../fight/hero_art.dart';
 import '../settings/settings_pages.dart';
 import '../../domain/screen_time.dart';
 import '../screen_time/screen_time_providers.dart';
 import 'avatar_editor.dart';
+import 'gear_screen.dart';
 import 'quest_map.dart';
 import 'shop_screen.dart';
 
@@ -31,23 +32,24 @@ class WorldScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    // Watched here so it is loaded before any fight reads the gear.
-    final inventory = ref.watch(inventoryProvider).value ?? const {};
+    // Watched here so it is loaded before a fight's start screen reads it.
+    ref.watch(inventoryProvider);
+    ref.watch(equippedProvider);
+    final curse = ref.watch(curseProvider);
     final today = ref.watch(todayProvider);
     return ref
         .watch(fightProgressProvider)
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(child: Text(l10n.errorGeneric)),
-          data: (progress) =>
-              _list(context, progress, Loadout.fromInventory(inventory), today),
+          data: (progress) => _list(context, progress, curse, today),
         );
   }
 
   Widget _list(
     BuildContext context,
     FightProgress progress,
-    Loadout loadout,
+    Curse? curse,
     DateTime today,
   ) {
     final l10n = AppLocalizations.of(context);
@@ -60,8 +62,9 @@ class WorldScreen extends ConsumerWidget {
       ),
       children: [
         const _HeroCard(),
+        if (curse != null) CurseCard(curse: curse),
         SectionHeader(l10n.worldWeeklyBoss),
-        _OverlordCard(progress: progress, loadout: loadout, today: today),
+        _OverlordCard(progress: progress, today: today),
         SectionHeader(
           '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
         ),
@@ -74,11 +77,7 @@ class WorldScreen extends ConsumerWidget {
               children: [
                 for (final family in choreFamilies.skip(i).take(2))
                   Expanded(
-                    child: _BossCard(
-                      family: family,
-                      progress: progress,
-                      loadout: loadout,
-                    ),
+                    child: _BossCard(family: family, progress: progress),
                   ),
               ],
             ),
@@ -111,13 +110,12 @@ class _HeroCard extends ConsumerWidget {
     final person = ref.watch(currentProfileProvider);
     final stats = ref.watch(progressStatsProvider).value;
     final level = stats?.level ?? 1;
-    final loadout = Loadout.fromInventory(
-      ref.watch(inventoryProvider).value ?? const {},
-    );
     final hero = HeroStats.forLevel(level);
     final tired = ref.watch(tiredProvider);
-    final hearts =
-        tiredMaxHp(hero.maxHp, tired: tired) + (loadout.gloves ? 1 : 0);
+    final hearts = heartsWith(
+      tiredMaxHp(hero.maxHp, tired: tired),
+      ref.watch(gearLoadoutProvider).against(),
+    );
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -173,6 +171,11 @@ class _HeroCard extends ConsumerWidget {
                         onPressed: () => AvatarEditor.open(context),
                         child: Text(l10n.worldCustomize),
                       ),
+                      OutlinedButton(
+                        key: const ValueKey('open-gear'),
+                        onPressed: () => GearScreen.open(context),
+                        child: Text(l10n.worldGear),
+                      ),
                       FilledButton(
                         onPressed: () => ShopScreen.open(context),
                         child: Text(l10n.worldShop),
@@ -190,15 +193,10 @@ class _HeroCard extends ConsumerWidget {
 }
 
 class _BossCard extends StatelessWidget {
-  const _BossCard({
-    required this.family,
-    required this.progress,
-    required this.loadout,
-  });
+  const _BossCard({required this.family, required this.progress});
 
   final BossFamily family;
   final FightProgress progress;
-  final Loadout loadout;
 
   @override
   Widget build(BuildContext context) {
@@ -249,11 +247,10 @@ class _BossCard extends StatelessWidget {
               width: double.infinity,
               child: progress.canFight(family)
                   ? FilledButton(
-                      onPressed: () => FightScreen.open(
+                      onPressed: () => FightPrepScreen.open(
                         context,
                         family,
                         progress.tier(family),
-                        loadout,
                       ),
                       child: Text(l10n.worldFight),
                     )
@@ -274,14 +271,9 @@ class _BossCard extends StatelessWidget {
 
 /// The weekly Chore Overlord: how close it is, ready to fight, or beaten.
 class _OverlordCard extends StatelessWidget {
-  const _OverlordCard({
-    required this.progress,
-    required this.loadout,
-    required this.today,
-  });
+  const _OverlordCard({required this.progress, required this.today});
 
   final FightProgress progress;
-  final Loadout loadout;
   final DateTime today;
 
   @override
@@ -339,11 +331,10 @@ class _OverlordCard extends StatelessWidget {
             if (ready) ...[
               const SizedBox(height: 8),
               FilledButton(
-                onPressed: () => FightScreen.open(
+                onPressed: () => FightPrepScreen.open(
                   context,
                   family,
                   progress.tier(family),
-                  loadout,
                   motifs: progress.weekBeaten(today),
                 ),
                 child: Text(l10n.worldFight),

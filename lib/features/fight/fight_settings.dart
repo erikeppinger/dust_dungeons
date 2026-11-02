@@ -35,6 +35,18 @@ class FightSettings extends ConsumerWidget {
           onChanged: (v) =>
               controller.update((x) => x.copyWith(fightHaptics: v)),
         ),
+        SwitchListTile(
+          key: const ValueKey('setting-curses'),
+          secondary: const Icon(Icons.sentiment_very_dissatisfied_outlined),
+          title: Text(l10n.fightSettingCurses),
+          subtitle: Text(l10n.fightSettingCursesSubtitle),
+          value: s.curses,
+          onChanged: (v) async {
+            controller.update((x) => x.copyWith(curses: v));
+            // Off lifts every waiting curse.
+            if (!v) await profiles.liftAllCurses();
+          },
+        ),
         // Story and slow mode belong to the person; the rest to the phone.
         if (people.length > 1)
           Padding(

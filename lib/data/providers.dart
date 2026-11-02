@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day_clock.dart';
+import '../domain/fight/items.dart';
 import 'db/app_database.dart';
 import 'models/fight_progress.dart';
 import 'models/progress_stats.dart';
@@ -233,4 +234,26 @@ final inventoryProvider = StreamProvider<Map<String, int>>(
   (ref) => ref
       .watch(shopRepositoryProvider)
       .watchInventory(ref.watch(currentProfileIdProvider)),
+);
+
+/// The gear the current person wears: slot → item key.
+final equippedProvider = StreamProvider<Map<GearSlot, String>>(
+  (ref) => ref
+      .watch(shopRepositoryProvider)
+      .watchEquipped(ref.watch(currentProfileIdProvider)),
+);
+
+/// The curse waiting for the current person's next fight, or `null`.
+/// Turning curses off lifts every waiting one.
+final curseProvider = Provider<Curse?>((ref) {
+  final family = ref.watch(currentProfileProvider).curseFamily;
+  return family == null ? null : curseOf(family);
+});
+
+/// The current person's gear (without the consumables picked for a fight).
+final gearLoadoutProvider = Provider<Loadout>(
+  (ref) => Loadout.fromEquipped(
+    ref.watch(equippedProvider).value ?? const {},
+    curse: ref.watch(curseProvider),
+  ),
 );

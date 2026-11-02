@@ -25,6 +25,7 @@ class AppSettings {
     this.screenWarn = true,
     this.screenOver = true,
     this.screenSummary = true,
+    this.curses = true,
   });
 
   final ThemeMode themeMode;
@@ -74,6 +75,9 @@ class AppSettings {
   /// Yesterday's result in the daily summary.
   final bool screenSummary;
 
+  /// A lost fight leaves the boss's curse (docs/design/items.md).
+  final bool curses;
+
   AppSettings copyWith({
     ThemeMode? themeMode,
     bool? colorblindSafe,
@@ -95,6 +99,7 @@ class AppSettings {
     bool? screenWarn,
     bool? screenOver,
     bool? screenSummary,
+    bool? curses,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     colorblindSafe: colorblindSafe ?? this.colorblindSafe,
@@ -116,6 +121,7 @@ class AppSettings {
     screenWarn: screenWarn ?? this.screenWarn,
     screenOver: screenOver ?? this.screenOver,
     screenSummary: screenSummary ?? this.screenSummary,
+    curses: curses ?? this.curses,
   );
 
   @override
@@ -140,7 +146,8 @@ class AppSettings {
       listEquals(other.screenApps, screenApps) &&
       other.screenWarn == screenWarn &&
       other.screenOver == screenOver &&
-      other.screenSummary == screenSummary;
+      other.screenSummary == screenSummary &&
+      other.curses == curses;
 
   @override
   int get hashCode => Object.hashAll([
@@ -164,5 +171,6 @@ class AppSettings {
     screenWarn,
     screenOver,
     screenSummary,
+    curses,
   ]);
 }

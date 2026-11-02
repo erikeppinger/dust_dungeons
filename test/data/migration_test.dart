@@ -11,17 +11,18 @@ import 'generated_migrations/schema_v4.dart' as v4;
 import 'generated_migrations/schema_v5.dart' as v5;
 import 'generated_migrations/schema_v6.dart' as v6;
 import 'generated_migrations/schema_v7.dart' as v7;
+import 'generated_migrations/schema_v8.dart' as v8;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4, 5, 6, 7]) {
-    test('v$from -> v8 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5, 6, 7, 8]) {
+    test('v$from -> v9 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 8);
+      await verifier.migrateAndValidate(db, 9);
       await db.close();
     });
   }
@@ -225,5 +226,40 @@ void main() {
     expect(windows.repeatMonthWeek, isNull);
     expect(windows.windowDays, 1);
     expect(windows.timeWindow, isNull);
+  });
+
+  test('v8 -> v9 wears the gear people own; nobody is cursed', () async {
+    final schema = await verifier.schemaAt(8);
+    final old = v8.DatabaseAtV8(schema.newConnection());
+    await old.customStatement(
+      "INSERT INTO profiles (name) VALUES ('Me'), ('Sam')",
+    );
+    await old.customStatement(
+      'INSERT INTO inventory (profile_id, item_key, count) VALUES '
+      "(1, 'sponge_shield', 1), (1, 'turbo_mop', 1), "
+      "(1, 'metronome_charm', 1), (1, 'rubber_gloves', 1), "
+      "(1, 'second_wind', 2), (1, 'hat_cap', 1), (2, 'turbo_mop', 0)",
+    );
+    await old.customStatement(
+      'INSERT INTO fights (profile_id, family, tier, started_at, result) '
+      "VALUES (1, 'dust', 1, '2026-10-20T09:00:00.000', 'won')",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final worn = {
+      for (final e in await db.select(db.equipped).get())
+        (e.profileId, e.slot): e.itemKey,
+    };
+    expect(worn, {
+      (1, GearSlot.shield): 'sponge_shield',
+      (1, GearSlot.weapon): 'turbo_mop',
+      (1, GearSlot.charm): 'metronome_charm',
+      (1, GearSlot.body): 'rubber_gloves',
+    });
+    final people = await db.select(db.profiles).get();
+    expect(people.map((p) => p.curseFamily), [null, null]);
+    expect((await db.select(db.fights).getSingle()).loot, isNull);
   });
 }

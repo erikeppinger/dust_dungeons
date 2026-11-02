@@ -144,6 +144,15 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     requiredDuringInsert: false,
   );
   @override
+  late final GeneratedColumnWithTypeConverter<BossFamily?, String> curseFamily =
+      GeneratedColumn<String>(
+        'curse_family',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<BossFamily?>($ProfilesTable.$convertercurseFamilyn);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     name,
@@ -156,6 +165,7 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     storyMode,
     slowMode,
     archivedAt,
+    curseFamily,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -287,6 +297,12 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}archived_at'],
       ),
+      curseFamily: $ProfilesTable.$convertercurseFamilyn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}curse_family'],
+        ),
+      ),
     );
   }
 
@@ -294,6 +310,11 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
   $ProfilesTable createAlias(String alias) {
     return $ProfilesTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<BossFamily, String, String> $convertercurseFamily =
+      const EnumNameConverter<BossFamily>(BossFamily.values);
+  static JsonTypeConverter2<BossFamily?, String?, String?>
+  $convertercurseFamilyn = JsonTypeConverter2.asNullable($convertercurseFamily);
 }
 
 class Profile extends DataClass implements Insertable<Profile> {
@@ -314,6 +335,9 @@ class Profile extends DataClass implements Insertable<Profile> {
 
   /// Removed people are hidden but keep their history.
   final DateTime? archivedAt;
+
+  /// The boss whose curse waits for the next fight (schema v9).
+  final BossFamily? curseFamily;
   const Profile({
     required this.id,
     required this.name,
@@ -326,6 +350,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     required this.storyMode,
     required this.slowMode,
     this.archivedAt,
+    this.curseFamily,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -342,6 +367,11 @@ class Profile extends DataClass implements Insertable<Profile> {
     map['slow_mode'] = Variable<bool>(slowMode);
     if (!nullToAbsent || archivedAt != null) {
       map['archived_at'] = Variable<DateTime>(archivedAt);
+    }
+    if (!nullToAbsent || curseFamily != null) {
+      map['curse_family'] = Variable<String>(
+        $ProfilesTable.$convertercurseFamilyn.toSql(curseFamily),
+      );
     }
     return map;
   }
@@ -361,6 +391,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       archivedAt: archivedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(archivedAt),
+      curseFamily: curseFamily == null && nullToAbsent
+          ? const Value.absent()
+          : Value(curseFamily),
     );
   }
 
@@ -381,6 +414,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       storyMode: serializer.fromJson<bool>(json['storyMode']),
       slowMode: serializer.fromJson<bool>(json['slowMode']),
       archivedAt: serializer.fromJson<DateTime?>(json['archivedAt']),
+      curseFamily: $ProfilesTable.$convertercurseFamilyn.fromJson(
+        serializer.fromJson<String?>(json['curseFamily']),
+      ),
     );
   }
   @override
@@ -398,6 +434,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       'storyMode': serializer.toJson<bool>(storyMode),
       'slowMode': serializer.toJson<bool>(slowMode),
       'archivedAt': serializer.toJson<DateTime?>(archivedAt),
+      'curseFamily': serializer.toJson<String?>(
+        $ProfilesTable.$convertercurseFamilyn.toJson(curseFamily),
+      ),
     };
   }
 
@@ -413,6 +452,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     bool? storyMode,
     bool? slowMode,
     Value<DateTime?> archivedAt = const Value.absent(),
+    Value<BossFamily?> curseFamily = const Value.absent(),
   }) => Profile(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -425,6 +465,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     storyMode: storyMode ?? this.storyMode,
     slowMode: slowMode ?? this.slowMode,
     archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
+    curseFamily: curseFamily.present ? curseFamily.value : this.curseFamily,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
     return Profile(
@@ -447,6 +488,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       archivedAt: data.archivedAt.present
           ? data.archivedAt.value
           : this.archivedAt,
+      curseFamily: data.curseFamily.present
+          ? data.curseFamily.value
+          : this.curseFamily,
     );
   }
 
@@ -463,7 +507,8 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('avatarHat: $avatarHat, ')
           ..write('storyMode: $storyMode, ')
           ..write('slowMode: $slowMode, ')
-          ..write('archivedAt: $archivedAt')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('curseFamily: $curseFamily')
           ..write(')'))
         .toString();
   }
@@ -481,6 +526,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     storyMode,
     slowMode,
     archivedAt,
+    curseFamily,
   );
   @override
   bool operator ==(Object other) =>
@@ -496,7 +542,8 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.avatarHat == this.avatarHat &&
           other.storyMode == this.storyMode &&
           other.slowMode == this.slowMode &&
-          other.archivedAt == this.archivedAt);
+          other.archivedAt == this.archivedAt &&
+          other.curseFamily == this.curseFamily);
 }
 
 class ProfilesCompanion extends UpdateCompanion<Profile> {
@@ -511,6 +558,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<bool> storyMode;
   final Value<bool> slowMode;
   final Value<DateTime?> archivedAt;
+  final Value<BossFamily?> curseFamily;
   const ProfilesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -523,6 +571,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.storyMode = const Value.absent(),
     this.slowMode = const Value.absent(),
     this.archivedAt = const Value.absent(),
+    this.curseFamily = const Value.absent(),
   });
   ProfilesCompanion.insert({
     this.id = const Value.absent(),
@@ -536,6 +585,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.storyMode = const Value.absent(),
     this.slowMode = const Value.absent(),
     this.archivedAt = const Value.absent(),
+    this.curseFamily = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Profile> custom({
     Expression<int>? id,
@@ -549,6 +599,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<bool>? storyMode,
     Expression<bool>? slowMode,
     Expression<DateTime>? archivedAt,
+    Expression<String>? curseFamily,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -562,6 +613,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (storyMode != null) 'story_mode': storyMode,
       if (slowMode != null) 'slow_mode': slowMode,
       if (archivedAt != null) 'archived_at': archivedAt,
+      if (curseFamily != null) 'curse_family': curseFamily,
     });
   }
 
@@ -577,6 +629,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<bool>? storyMode,
     Value<bool>? slowMode,
     Value<DateTime?>? archivedAt,
+    Value<BossFamily?>? curseFamily,
   }) {
     return ProfilesCompanion(
       id: id ?? this.id,
@@ -590,6 +643,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       storyMode: storyMode ?? this.storyMode,
       slowMode: slowMode ?? this.slowMode,
       archivedAt: archivedAt ?? this.archivedAt,
+      curseFamily: curseFamily ?? this.curseFamily,
     );
   }
 
@@ -629,6 +683,11 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (archivedAt.present) {
       map['archived_at'] = Variable<DateTime>(archivedAt.value);
     }
+    if (curseFamily.present) {
+      map['curse_family'] = Variable<String>(
+        $ProfilesTable.$convertercurseFamilyn.toSql(curseFamily.value),
+      );
+    }
     return map;
   }
 
@@ -645,7 +704,8 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('avatarHat: $avatarHat, ')
           ..write('storyMode: $storyMode, ')
           ..write('slowMode: $slowMode, ')
-          ..write('archivedAt: $archivedAt')
+          ..write('archivedAt: $archivedAt, ')
+          ..write('curseFamily: $curseFamily')
           ..write(')'))
         .toString();
   }
@@ -3091,6 +3151,15 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _lootMeta = const VerificationMeta('loot');
+  @override
+  late final GeneratedColumn<String> loot = GeneratedColumn<String>(
+    'loot',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3104,6 +3173,7 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
     perfect,
     good,
     miss,
+    loot,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3174,6 +3244,12 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
         miss.isAcceptableOrUnknown(data['miss']!, _missMeta),
       );
     }
+    if (data.containsKey('loot')) {
+      context.handle(
+        _lootMeta,
+        loot.isAcceptableOrUnknown(data['loot']!, _lootMeta),
+      );
+    }
     return context;
   }
 
@@ -3231,6 +3307,10 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
         DriftSqlType.int,
         data['${effectivePrefix}miss'],
       )!,
+      loot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}loot'],
+      ),
     );
   }
 
@@ -3259,6 +3339,9 @@ class Fight extends DataClass implements Insertable<Fight> {
   final int perfect;
   final int good;
   final int miss;
+
+  /// The item a won fight dropped (schema v9).
+  final String? loot;
   const Fight({
     required this.id,
     required this.profileId,
@@ -3271,6 +3354,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     required this.perfect,
     required this.good,
     required this.miss,
+    this.loot,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3296,6 +3380,9 @@ class Fight extends DataClass implements Insertable<Fight> {
     map['perfect'] = Variable<int>(perfect);
     map['good'] = Variable<int>(good);
     map['miss'] = Variable<int>(miss);
+    if (!nullToAbsent || loot != null) {
+      map['loot'] = Variable<String>(loot);
+    }
     return map;
   }
 
@@ -3316,6 +3403,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       perfect: Value(perfect),
       good: Value(good),
       miss: Value(miss),
+      loot: loot == null && nullToAbsent ? const Value.absent() : Value(loot),
     );
   }
 
@@ -3340,6 +3428,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       perfect: serializer.fromJson<int>(json['perfect']),
       good: serializer.fromJson<int>(json['good']),
       miss: serializer.fromJson<int>(json['miss']),
+      loot: serializer.fromJson<String?>(json['loot']),
     );
   }
   @override
@@ -3361,6 +3450,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       'perfect': serializer.toJson<int>(perfect),
       'good': serializer.toJson<int>(good),
       'miss': serializer.toJson<int>(miss),
+      'loot': serializer.toJson<String?>(loot),
     };
   }
 
@@ -3376,6 +3466,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     int? perfect,
     int? good,
     int? miss,
+    Value<String?> loot = const Value.absent(),
   }) => Fight(
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
@@ -3388,6 +3479,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     perfect: perfect ?? this.perfect,
     good: good ?? this.good,
     miss: miss ?? this.miss,
+    loot: loot.present ? loot.value : this.loot,
   );
   Fight copyWithCompanion(FightsCompanion data) {
     return Fight(
@@ -3402,6 +3494,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       perfect: data.perfect.present ? data.perfect.value : this.perfect,
       good: data.good.present ? data.good.value : this.good,
       miss: data.miss.present ? data.miss.value : this.miss,
+      loot: data.loot.present ? data.loot.value : this.loot,
     );
   }
 
@@ -3418,7 +3511,8 @@ class Fight extends DataClass implements Insertable<Fight> {
           ..write('result: $result, ')
           ..write('perfect: $perfect, ')
           ..write('good: $good, ')
-          ..write('miss: $miss')
+          ..write('miss: $miss, ')
+          ..write('loot: $loot')
           ..write(')'))
         .toString();
   }
@@ -3436,6 +3530,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     perfect,
     good,
     miss,
+    loot,
   );
   @override
   bool operator ==(Object other) =>
@@ -3451,7 +3546,8 @@ class Fight extends DataClass implements Insertable<Fight> {
           other.result == this.result &&
           other.perfect == this.perfect &&
           other.good == this.good &&
-          other.miss == this.miss);
+          other.miss == this.miss &&
+          other.loot == this.loot);
 }
 
 class FightsCompanion extends UpdateCompanion<Fight> {
@@ -3466,6 +3562,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
   final Value<int> perfect;
   final Value<int> good;
   final Value<int> miss;
+  final Value<String?> loot;
   const FightsCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -3478,6 +3575,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     this.perfect = const Value.absent(),
     this.good = const Value.absent(),
     this.miss = const Value.absent(),
+    this.loot = const Value.absent(),
   });
   FightsCompanion.insert({
     this.id = const Value.absent(),
@@ -3491,6 +3589,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     this.perfect = const Value.absent(),
     this.good = const Value.absent(),
     this.miss = const Value.absent(),
+    this.loot = const Value.absent(),
   }) : profileId = Value(profileId),
        family = Value(family),
        tier = Value(tier),
@@ -3507,6 +3606,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     Expression<int>? perfect,
     Expression<int>? good,
     Expression<int>? miss,
+    Expression<String>? loot,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3520,6 +3620,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
       if (perfect != null) 'perfect': perfect,
       if (good != null) 'good': good,
       if (miss != null) 'miss': miss,
+      if (loot != null) 'loot': loot,
     });
   }
 
@@ -3535,6 +3636,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     Value<int>? perfect,
     Value<int>? good,
     Value<int>? miss,
+    Value<String?>? loot,
   }) {
     return FightsCompanion(
       id: id ?? this.id,
@@ -3548,6 +3650,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
       perfect: perfect ?? this.perfect,
       good: good ?? this.good,
       miss: miss ?? this.miss,
+      loot: loot ?? this.loot,
     );
   }
 
@@ -3591,6 +3694,9 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     if (miss.present) {
       map['miss'] = Variable<int>(miss.value);
     }
+    if (loot.present) {
+      map['loot'] = Variable<String>(loot.value);
+    }
     return map;
   }
 
@@ -3607,7 +3713,8 @@ class FightsCompanion extends UpdateCompanion<Fight> {
           ..write('result: $result, ')
           ..write('perfect: $perfect, ')
           ..write('good: $good, ')
-          ..write('miss: $miss')
+          ..write('miss: $miss, ')
+          ..write('loot: $loot')
           ..write(')'))
         .toString();
   }
@@ -4489,6 +4596,278 @@ class ChoreAssigneesCompanion extends UpdateCompanion<ChoreAssignee> {
   }
 }
 
+class $EquippedTable extends Equipped
+    with TableInfo<$EquippedTable, EquippedItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EquippedTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES profiles (id)',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<GearSlot, String> slot =
+      GeneratedColumn<String>(
+        'slot',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<GearSlot>($EquippedTable.$converterslot);
+  static const VerificationMeta _itemKeyMeta = const VerificationMeta(
+    'itemKey',
+  );
+  @override
+  late final GeneratedColumn<String> itemKey = GeneratedColumn<String>(
+    'item_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [profileId, slot, itemKey];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'equipped';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EquippedItem> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('item_key')) {
+      context.handle(
+        _itemKeyMeta,
+        itemKey.isAcceptableOrUnknown(data['item_key']!, _itemKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_itemKeyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {profileId, slot};
+  @override
+  EquippedItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EquippedItem(
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      )!,
+      slot: $EquippedTable.$converterslot.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}slot'],
+        )!,
+      ),
+      itemKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}item_key'],
+      )!,
+    );
+  }
+
+  @override
+  $EquippedTable createAlias(String alias) {
+    return $EquippedTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<GearSlot, String, String> $converterslot =
+      const EnumNameConverter<GearSlot>(GearSlot.values);
+}
+
+class EquippedItem extends DataClass implements Insertable<EquippedItem> {
+  final int profileId;
+  final GearSlot slot;
+  final String itemKey;
+  const EquippedItem({
+    required this.profileId,
+    required this.slot,
+    required this.itemKey,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['profile_id'] = Variable<int>(profileId);
+    {
+      map['slot'] = Variable<String>($EquippedTable.$converterslot.toSql(slot));
+    }
+    map['item_key'] = Variable<String>(itemKey);
+    return map;
+  }
+
+  EquippedCompanion toCompanion(bool nullToAbsent) {
+    return EquippedCompanion(
+      profileId: Value(profileId),
+      slot: Value(slot),
+      itemKey: Value(itemKey),
+    );
+  }
+
+  factory EquippedItem.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EquippedItem(
+      profileId: serializer.fromJson<int>(json['profileId']),
+      slot: $EquippedTable.$converterslot.fromJson(
+        serializer.fromJson<String>(json['slot']),
+      ),
+      itemKey: serializer.fromJson<String>(json['itemKey']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'profileId': serializer.toJson<int>(profileId),
+      'slot': serializer.toJson<String>(
+        $EquippedTable.$converterslot.toJson(slot),
+      ),
+      'itemKey': serializer.toJson<String>(itemKey),
+    };
+  }
+
+  EquippedItem copyWith({int? profileId, GearSlot? slot, String? itemKey}) =>
+      EquippedItem(
+        profileId: profileId ?? this.profileId,
+        slot: slot ?? this.slot,
+        itemKey: itemKey ?? this.itemKey,
+      );
+  EquippedItem copyWithCompanion(EquippedCompanion data) {
+    return EquippedItem(
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      slot: data.slot.present ? data.slot.value : this.slot,
+      itemKey: data.itemKey.present ? data.itemKey.value : this.itemKey,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EquippedItem(')
+          ..write('profileId: $profileId, ')
+          ..write('slot: $slot, ')
+          ..write('itemKey: $itemKey')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(profileId, slot, itemKey);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EquippedItem &&
+          other.profileId == this.profileId &&
+          other.slot == this.slot &&
+          other.itemKey == this.itemKey);
+}
+
+class EquippedCompanion extends UpdateCompanion<EquippedItem> {
+  final Value<int> profileId;
+  final Value<GearSlot> slot;
+  final Value<String> itemKey;
+  final Value<int> rowid;
+  const EquippedCompanion({
+    this.profileId = const Value.absent(),
+    this.slot = const Value.absent(),
+    this.itemKey = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EquippedCompanion.insert({
+    required int profileId,
+    required GearSlot slot,
+    required String itemKey,
+    this.rowid = const Value.absent(),
+  }) : profileId = Value(profileId),
+       slot = Value(slot),
+       itemKey = Value(itemKey);
+  static Insertable<EquippedItem> custom({
+    Expression<int>? profileId,
+    Expression<String>? slot,
+    Expression<String>? itemKey,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (profileId != null) 'profile_id': profileId,
+      if (slot != null) 'slot': slot,
+      if (itemKey != null) 'item_key': itemKey,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EquippedCompanion copyWith({
+    Value<int>? profileId,
+    Value<GearSlot>? slot,
+    Value<String>? itemKey,
+    Value<int>? rowid,
+  }) {
+    return EquippedCompanion(
+      profileId: profileId ?? this.profileId,
+      slot: slot ?? this.slot,
+      itemKey: itemKey ?? this.itemKey,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (slot.present) {
+      map['slot'] = Variable<String>(
+        $EquippedTable.$converterslot.toSql(slot.value),
+      );
+    }
+    if (itemKey.present) {
+      map['item_key'] = Variable<String>(itemKey.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EquippedCompanion(')
+          ..write('profileId: $profileId, ')
+          ..write('slot: $slot, ')
+          ..write('itemKey: $itemKey, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4501,6 +4880,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $InventoryTable inventory = $InventoryTable(this);
   late final $ScreenDaysTable screenDays = $ScreenDaysTable(this);
   late final $ChoreAssigneesTable choreAssignees = $ChoreAssigneesTable(this);
+  late final $EquippedTable equipped = $EquippedTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4515,6 +4895,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     inventory,
     screenDays,
     choreAssignees,
+    equipped,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -4533,6 +4914,7 @@ typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
   Value<bool> storyMode,
   Value<bool> slowMode,
   Value<DateTime?> archivedAt,
+  Value<BossFamily?> curseFamily,
 });
 typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<int> id,
@@ -4546,6 +4928,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<bool> storyMode,
   Value<bool> slowMode,
   Value<DateTime?> archivedAt,
+  Value<BossFamily?> curseFamily,
 });
 
 final class $$ProfilesTableReferences
@@ -4660,6 +5043,24 @@ final class $$ProfilesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$EquippedTable, List<EquippedItem>>
+  _equippedRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.equipped,
+    aliasName: 'profiles__id__equipped__profile_id',
+  );
+
+  $$EquippedTableProcessedTableManager get equippedRefs {
+    final manager = $$EquippedTableTableManager(
+      $_db,
+      $_db.equipped,
+    ).filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_equippedRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$ProfilesTableFilterComposer
@@ -4724,6 +5125,12 @@ class $$ProfilesTableFilterComposer
   ColumnFilters<DateTime> get archivedAt => $composableBuilder(
     column: $table.archivedAt,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BossFamily?, BossFamily, String>
+  get curseFamily => $composableBuilder(
+    column: $table.curseFamily,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   Expression<bool> completionsRefs(
@@ -4875,6 +5282,31 @@ class $$ProfilesTableFilterComposer
     );
     return f(composer);
   }
+
+  Expression<bool> equippedRefs(
+    Expression<bool> Function($$EquippedTableFilterComposer f) f,
+  ) {
+    final $$EquippedTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.equipped,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EquippedTableFilterComposer(
+            $db: $db,
+            $table: $db.equipped,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableOrderingComposer
@@ -4940,6 +5372,11 @@ class $$ProfilesTableOrderingComposer
     column: $table.archivedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get curseFamily => $composableBuilder(
+    column: $table.curseFamily,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProfilesTableAnnotationComposer
@@ -4991,6 +5428,12 @@ class $$ProfilesTableAnnotationComposer
     column: $table.archivedAt,
     builder: (column) => column,
   );
+
+  GeneratedColumnWithTypeConverter<BossFamily?, String> get curseFamily =>
+      $composableBuilder(
+        column: $table.curseFamily,
+        builder: (column) => column,
+      );
 
   Expression<T> completionsRefs<T extends Object>(
     Expression<T> Function($$CompletionsTableAnnotationComposer a) f,
@@ -5141,6 +5584,31 @@ class $$ProfilesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> equippedRefs<T extends Object>(
+    Expression<T> Function($$EquippedTableAnnotationComposer a) f,
+  ) {
+    final $$EquippedTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.equipped,
+      getReferencedColumn: (t) => t.profileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EquippedTableAnnotationComposer(
+            $db: $db,
+            $table: $db.equipped,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager
@@ -5163,6 +5631,7 @@ class $$ProfilesTableTableManager
             bool inventoryRefs,
             bool screenDaysRefs,
             bool choreAssigneesRefs,
+            bool equippedRefs,
           })
         > {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
@@ -5189,6 +5658,7 @@ class $$ProfilesTableTableManager
                 Value<bool> storyMode = const Value.absent(),
                 Value<bool> slowMode = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
+                Value<BossFamily?> curseFamily = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
                 name: name,
@@ -5201,6 +5671,7 @@ class $$ProfilesTableTableManager
                 storyMode: storyMode,
                 slowMode: slowMode,
                 archivedAt: archivedAt,
+                curseFamily: curseFamily,
               ),
           createCompanionCallback:
               ({
@@ -5215,6 +5686,7 @@ class $$ProfilesTableTableManager
                 Value<bool> storyMode = const Value.absent(),
                 Value<bool> slowMode = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
+                Value<BossFamily?> curseFamily = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
                 name: name,
@@ -5227,6 +5699,7 @@ class $$ProfilesTableTableManager
                 storyMode: storyMode,
                 slowMode: slowMode,
                 archivedAt: archivedAt,
+                curseFamily: curseFamily,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5244,6 +5717,7 @@ class $$ProfilesTableTableManager
                 inventoryRefs = false,
                 screenDaysRefs = false,
                 choreAssigneesRefs = false,
+                equippedRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -5254,6 +5728,7 @@ class $$ProfilesTableTableManager
                     if (inventoryRefs) db.inventory,
                     if (screenDaysRefs) db.screenDays,
                     if (choreAssigneesRefs) db.choreAssignees,
+                    if (equippedRefs) db.equipped,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -5378,6 +5853,26 @@ class $$ProfilesTableTableManager
                           referencedColumn: 'profile_id',
                           typedResults: items,
                         ),
+                      if (equippedRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Profile,
+                          $ProfilesTable,
+                          EquippedItem,
+                          $EquippedTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProfilesTableReferences
+                              ._equippedRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).equippedRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'profile_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5405,6 +5900,7 @@ typedef $$ProfilesTableProcessedTableManager =
         bool inventoryRefs,
         bool screenDaysRefs,
         bool choreAssigneesRefs,
+        bool equippedRefs,
       })
     >;
 typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
@@ -7237,6 +7733,7 @@ typedef $$FightsTableCreateCompanionBuilder = FightsCompanion Function({
   Value<int> perfect,
   Value<int> good,
   Value<int> miss,
+  Value<String?> loot,
 });
 typedef $$FightsTableUpdateCompanionBuilder = FightsCompanion Function({
   Value<int> id,
@@ -7250,6 +7747,7 @@ typedef $$FightsTableUpdateCompanionBuilder = FightsCompanion Function({
   Value<int> perfect,
   Value<int> good,
   Value<int> miss,
+  Value<String?> loot,
 });
 
 final class $$FightsTableReferences
@@ -7332,6 +7830,11 @@ class $$FightsTableFilterComposer
 
   ColumnFilters<int> get miss => $composableBuilder(
     column: $table.miss,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get loot => $composableBuilder(
+    column: $table.loot,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7418,6 +7921,11 @@ class $$FightsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get loot => $composableBuilder(
+    column: $table.loot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ProfilesTableOrderingComposer get profileId {
     final $$ProfilesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -7480,6 +7988,9 @@ class $$FightsTableAnnotationComposer
 
   GeneratedColumn<int> get miss =>
       $composableBuilder(column: $table.miss, builder: (column) => column);
+
+  GeneratedColumn<String> get loot =>
+      $composableBuilder(column: $table.loot, builder: (column) => column);
 
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
@@ -7544,6 +8055,7 @@ class $$FightsTableTableManager
                 Value<int> perfect = const Value.absent(),
                 Value<int> good = const Value.absent(),
                 Value<int> miss = const Value.absent(),
+                Value<String?> loot = const Value.absent(),
               }) => FightsCompanion(
                 id: id,
                 profileId: profileId,
@@ -7556,6 +8068,7 @@ class $$FightsTableTableManager
                 perfect: perfect,
                 good: good,
                 miss: miss,
+                loot: loot,
               ),
           createCompanionCallback:
               ({
@@ -7570,6 +8083,7 @@ class $$FightsTableTableManager
                 Value<int> perfect = const Value.absent(),
                 Value<int> good = const Value.absent(),
                 Value<int> miss = const Value.absent(),
+                Value<String?> loot = const Value.absent(),
               }) => FightsCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -7582,6 +8096,7 @@ class $$FightsTableTableManager
                 perfect: perfect,
                 good: good,
                 miss: miss,
+                loot: loot,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -8590,6 +9105,282 @@ typedef $$ChoreAssigneesTableProcessedTableManager =
       ChoreAssignee,
       PrefetchHooks Function({bool choreId, bool profileId})
     >;
+typedef $$EquippedTableCreateCompanionBuilder = EquippedCompanion Function({
+  required int profileId,
+  required GearSlot slot,
+  required String itemKey,
+  Value<int> rowid,
+});
+typedef $$EquippedTableUpdateCompanionBuilder = EquippedCompanion Function({
+  Value<int> profileId,
+  Value<GearSlot> slot,
+  Value<String> itemKey,
+  Value<int> rowid,
+});
+
+final class $$EquippedTableReferences
+    extends BaseReferences<_$AppDatabase, $EquippedTable, EquippedItem> {
+  $$EquippedTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('equipped__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager(
+      $_db,
+      $_db.profiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$EquippedTableFilterComposer
+    extends Composer<_$AppDatabase, $EquippedTable> {
+  $$EquippedTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<GearSlot, GearSlot, String> get slot =>
+      $composableBuilder(
+        column: $table.slot,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get itemKey => $composableBuilder(
+    column: $table.itemKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EquippedTableOrderingComposer
+    extends Composer<_$AppDatabase, $EquippedTable> {
+  $$EquippedTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slot => $composableBuilder(
+    column: $table.slot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get itemKey => $composableBuilder(
+    column: $table.itemKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableOrderingComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EquippedTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EquippedTable> {
+  $$EquippedTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<GearSlot, String> get slot =>
+      $composableBuilder(column: $table.slot, builder: (column) => column);
+
+  GeneratedColumn<String> get itemKey =>
+      $composableBuilder(column: $table.itemKey, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.profileId,
+      referencedTable: $db.profiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProfilesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.profiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$EquippedTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EquippedTable,
+          EquippedItem,
+          $$EquippedTableFilterComposer,
+          $$EquippedTableOrderingComposer,
+          $$EquippedTableAnnotationComposer,
+          $$EquippedTableCreateCompanionBuilder,
+          $$EquippedTableUpdateCompanionBuilder,
+          (EquippedItem, $$EquippedTableReferences),
+          EquippedItem,
+          PrefetchHooks Function({bool profileId})
+        > {
+  $$EquippedTableTableManager(_$AppDatabase db, $EquippedTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EquippedTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EquippedTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EquippedTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> profileId = const Value.absent(),
+                Value<GearSlot> slot = const Value.absent(),
+                Value<String> itemKey = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EquippedCompanion(
+                profileId: profileId,
+                slot: slot,
+                itemKey: itemKey,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required int profileId,
+                required GearSlot slot,
+                required String itemKey,
+                Value<int> rowid = const Value.absent(),
+              }) => EquippedCompanion.insert(
+                profileId: profileId,
+                slot: slot,
+                itemKey: itemKey,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EquippedTable, EquippedItem>(table),
+                  $$EquippedTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (profileId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.profileId,
+                        referencedTable: $$EquippedTableReferences
+                            ._profileIdTable(db),
+                        referencedColumn: $$EquippedTableReferences
+                            ._profileIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$EquippedTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EquippedTable,
+      EquippedItem,
+      $$EquippedTableFilterComposer,
+      $$EquippedTableOrderingComposer,
+      $$EquippedTableAnnotationComposer,
+      $$EquippedTableCreateCompanionBuilder,
+      $$EquippedTableUpdateCompanionBuilder,
+      (EquippedItem, $$EquippedTableReferences),
+      EquippedItem,
+      PrefetchHooks Function({bool profileId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8612,4 +9403,6 @@ class $AppDatabaseManager {
       $$ScreenDaysTableTableManager(_db, _db.screenDays);
   $$ChoreAssigneesTableTableManager get choreAssignees =>
       $$ChoreAssigneesTableTableManager(_db, _db.choreAssignees);
+  $$EquippedTableTableManager get equipped =>
+      $$EquippedTableTableManager(_db, _db.equipped);
 }

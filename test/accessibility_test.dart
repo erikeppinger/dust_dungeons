@@ -76,6 +76,7 @@ void main() {
   const screens = [
     ('shop', 'Arena', ['Armory'], ['Rüstkammer']),
     ('avatar', 'Arena', ['Wardrobe'], ['Garderobe']),
+    ('gear', 'Arena', ['Gear'], ['Ausrüstung']),
     ('fight settings', 'Settings', ['Boss fights'], ['Bosskämpfe']),
     (
       'calibration',
@@ -124,7 +125,7 @@ void main() {
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       await pumpWith(tester, const AppSettings(locale: Locale('de')));
       final tab = switch (name) {
-        'shop' || 'avatar' => 'Arena',
+        'shop' || 'avatar' || 'gear' => 'Arena',
         'add chore' => 'Quests',
         _ => 'Einstellungen',
       };

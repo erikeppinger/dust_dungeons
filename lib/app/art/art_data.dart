@@ -352,6 +352,70 @@ const _app = [
 ];
 const app = AppPalette(_app);
 
+/// The items palettes; colors in the order of the .gpl files.
+class ItemsPalette {
+  const ItemsPalette(this.colors);
+
+  final List<Color> colors;
+
+  Color get outline => colors[0];
+  Color get metalLight => colors[1];
+  Color get metal => colors[2];
+  Color get metalDark => colors[3];
+  Color get woodLight => colors[4];
+  Color get woodDark => colors[5];
+  Color get red => colors[6];
+  Color get yellow => colors[7];
+  Color get blue => colors[8];
+  Color get green => colors[9];
+  Color get white => colors[10];
+  Color get pink => colors[11];
+  Color get orange => colors[12];
+  Color get purple => colors[13];
+  Color get beige => colors[14];
+  Color get sky => colors[15];
+}
+
+const _itemsDay = [
+  Color(0xFF3A2414), // outline
+  Color(0xFFC8D0D8), // metal_light
+  Color(0xFF8890A0), // metal
+  Color(0xFF505868), // metal_dark
+  Color(0xFFD09858), // wood_light
+  Color(0xFF8A5A2C), // wood_dark
+  Color(0xFFD83A2E), // red
+  Color(0xFFF2B630), // yellow
+  Color(0xFF3A78D8), // blue
+  Color(0xFF4CA850), // green
+  Color(0xFFF4F0E6), // white
+  Color(0xFFF0A0B8), // pink
+  Color(0xFFF07820), // orange
+  Color(0xFF8A50C0), // purple
+  Color(0xFFE8C8A0), // beige
+  Color(0xFFA8D8F0), // sky
+];
+const itemsDay = ItemsPalette(_itemsDay);
+
+const _itemsNight = [
+  Color(0xFF0E0C1A), // outline
+  Color(0xFFC8D0D8), // metal_light
+  Color(0xFF8890A0), // metal
+  Color(0xFF505868), // metal_dark
+  Color(0xFFD09858), // wood_light
+  Color(0xFF8A5A2C), // wood_dark
+  Color(0xFFD83A2E), // red
+  Color(0xFFF2B630), // yellow
+  Color(0xFF3A78D8), // blue
+  Color(0xFF4CA850), // green
+  Color(0xFFF4F0E6), // white
+  Color(0xFFF0A0B8), // pink
+  Color(0xFFF07820), // orange
+  Color(0xFF8A50C0), // purple
+  Color(0xFFE8C8A0), // beige
+  Color(0xFFA8D8F0), // sky
+];
+const itemsNight = ItemsPalette(_itemsNight);
+
 abstract final class Sprites {
   static const tabQuests = Sprite([
     '..00000000..',
@@ -942,6 +1006,443 @@ abstract final class Sprites {
     '.GGGGGGGGGGGGGG.',
   ]);
 
+  static const apronOfHolding = Sprite([
+    '................',
+    '.....0....0.....',
+    '.....0....0.....',
+    '....06666660....',
+    '....06666660....',
+    '0000666666660000',
+    '...0666666660...',
+    '..066666666660..',
+    '..066666666660..',
+    '..066aaaaaa660..',
+    '..066a6666a660..',
+    '..066aaaaaa660..',
+    '..066666666660..',
+    '..066666666660..',
+    '..000000000000..',
+    '................',
+  ]);
+
+  static const capeOfCleanSweep = Sprite([
+    '................',
+    '....00000000....',
+    '...0ddd77ddd0...',
+    '..0dddddddddd0..',
+    '..0dddddddddd0..',
+    '.0dddddddddddd0.',
+    '.0dddddddddddd0.',
+    '.0d3dddddddd3d0.',
+    '0dd3dddddddd3dd0',
+    '0dd3dddddddd3dd0',
+    '0dd3dddddddd3dd0',
+    '0ddd3dddddd3ddd0',
+    '0ddd3dddddd3ddd0',
+    '0ddd3dddddd3ddd0',
+    '0000000000000000',
+    '................',
+  ]);
+
+  static const coffeeOfHaste = Sprite([
+    '....000000......',
+    '....0f00f00.....',
+    '....00f00f0.....',
+    '....0f00f00.....',
+    '..0000000000....',
+    '..0a555555a0....',
+    '..0aaaaaaaa000..',
+    '..0aaaaaaaaaa0..',
+    '..0aaaaaaaa0a0..',
+    '..0aaaaaaaa0a0..',
+    '..0aaaaaaaaaa0..',
+    '..0aaaaaaaa000..',
+    '..0aaaaaaaa0....',
+    '..0aaaaaaaa0....',
+    '..0000000000....',
+    '................',
+  ]);
+
+  static const colanderOfClarity = Sprite([
+    '................',
+    '................',
+    '................',
+    '.....000000.....',
+    '...0011111100...',
+    '..013111111310..',
+    '.01111311311110.',
+    '.01311111111310.',
+    '0011113113111100',
+    '0222222222222220',
+    '0000000000000000',
+    '................',
+    '................',
+    '................',
+    '................',
+    '................',
+  ]);
+
+  static const featherDuster = Sprite([
+    '...00000........',
+    '..00bdb00.......',
+    '.00bdbbd00......',
+    '00bdbbdbb00.....',
+    '0bdbbdbbdb0.....',
+    '0dbbdbbdbb0.....',
+    '0bbdbbdbbd0.....',
+    '00dbbdbbd00.....',
+    '.00bdbbd000.....',
+    '..00bbd05500....',
+    '...0000005500...',
+    '........005500..',
+    '.........005500.',
+    '..........005500',
+    '...........00550',
+    '............0000',
+  ]);
+
+  static const fuzzySlippers = Sprite([
+    '................',
+    '................',
+    '................',
+    '...00000........',
+    '.000a0a00.......',
+    '.0aaaaaa0.......',
+    '.0aaaaaa0.......',
+    '.0bbbbb00000000.',
+    '.0bbbbbbbbbbbb0.',
+    '.0bbbbbbbbbbbb0.',
+    '.0bbbbbbbbbbbb0.',
+    '00bbbbbbbbbbbb00',
+    '0555555555555550',
+    '0000000000000000',
+    '................',
+    '................',
+  ]);
+
+  static const gardenGnome = Sprite([
+    '.......00.......',
+    '......0660......',
+    '.....066660.....',
+    '.....066660.....',
+    '....06666660....',
+    '...0666666660...',
+    '...0eeeeeeee0...',
+    '...0e0eeee0e0...',
+    '..0aaaaaaaaaa0..',
+    '..0aaaaaaaaaa0..',
+    '..08aaaaaaaa80..',
+    '.0888aaaaaa8880.',
+    '.08888aaaa88880.',
+    '.08888888888880.',
+    '.05555555555550.',
+    '.00000000000000.',
+  ]);
+
+  static const hiVisVest = Sprite([
+    '................',
+    '..000......000..',
+    '.0cc0......0cc0.',
+    '.0cc0......0cc0.',
+    '0ccc0......0ccc0',
+    '0cccc0....0cccc0',
+    '0ccccc0..0ccccc0',
+    '0777777007777770',
+    '0cccccc00cccccc0',
+    '0cccccc00cccccc0',
+    '0777777007777770',
+    '0cccccc00cccccc0',
+    '0cccccc00cccccc0',
+    '0000000000000000',
+    '................',
+    '................',
+  ]);
+
+  static const laundryBasketHelm = Sprite([
+    '................',
+    '................',
+    '...0000000000...',
+    '..045454454540..',
+    '.04545455454540.',
+    '.05454544545450.',
+    '0454545445454540',
+    '0450000000000540',
+    '0454545445454540',
+    '0545454554545450',
+    '0000000000000000',
+    '................',
+    '................',
+    '................',
+    '................',
+    '................',
+  ]);
+
+  static const lostRemote = Sprite([
+    '................',
+    '....00000000....',
+    '....03333330....',
+    '....03633630....',
+    '....03333330....',
+    '....03833830....',
+    '....03333330....',
+    '....03933930....',
+    '....03333330....',
+    '....03233230....',
+    '....03333330....',
+    '....03233230....',
+    '....03333330....',
+    '....03333330....',
+    '....00000000....',
+    '................',
+  ]);
+
+  static const luckyOddSock = Sprite([
+    '....00000000....',
+    '....06666660....',
+    '....0aaaaaa0....',
+    '....06666660....',
+    '....0aaaaaa0....',
+    '....06666660....',
+    '....0aaaaaa0....',
+    '....06666660....',
+    '....0666666000..',
+    '....06666666600.',
+    '....0666666aaa0.',
+    '....0666666aaa0.',
+    '....0666666aaa0.',
+    '....00000000000.',
+    '................',
+    '................',
+  ]);
+
+  static const metronomeCharm = Sprite([
+    '................',
+    '.......00.......',
+    '......0110......',
+    '......0110......',
+    '.....041140.....',
+    '.....043340.....',
+    '....04433440....',
+    '....04411440....',
+    '...0444114440...',
+    '...0444114440...',
+    '..044441144440..',
+    '..044441144440..',
+    '.05555555555550.',
+    '.05555555555550.',
+    '.00000000000000.',
+    '................',
+  ]);
+
+  static const mopOfDoom = Sprite([
+    '............0000',
+    '...........00120',
+    '..........001200',
+    '.........001200.',
+    '........001200..',
+    '.......001200...',
+    '.....0001200....',
+    '.....077200.....',
+    '00000012000.....',
+    '0ddddddddd0.....',
+    '0ddddddddd0.....',
+    '0d3d3d3d3d0.....',
+    '0d3d3d3d3d0.....',
+    '0d3d3d3d3d0.....',
+    '0d3d3d3d3d0.....',
+    '00000000000.....',
+  ]);
+
+  static const plungerOfSmiting = Sprite([
+    '......0000......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '......0440......',
+    '....00044000....',
+    '...0666666660...',
+    '..066666666660..',
+    '.06666666666660.',
+    '.06666666666660.',
+    '.00000000000000.',
+    '................',
+  ]);
+
+  static const rubberBoots = Sprite([
+    '...00000000.....',
+    '...0aaaaaa0.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...09999990.....',
+    '...099999900000.',
+    '...099999999990.',
+    '...099999999990.',
+    '...099999999990.',
+    '...055555555550.',
+    '...000000000000.',
+    '................',
+  ]);
+
+  static const rubberGloves = Sprite([
+    '................',
+    '...0000000000...',
+    '...0770770770...',
+    '...0770770770...',
+    '...0770770770...',
+    '...0770770770...',
+    '...077777777000.',
+    '...077777777070.',
+    '...077777777700.',
+    '...07777777770..',
+    '...07777777700..',
+    '...0777777770...',
+    '...0cccccccc0...',
+    '...0cccccccc0...',
+    '...0000000000...',
+    '................',
+  ]);
+
+  static const secondWind = Sprite([
+    '..........000...',
+    '..........0f00..',
+    '..........00f0..',
+    '.0000000000f00..',
+    '.0fffffffff00...',
+    '.00000000000000.',
+    '............0a0.',
+    '0000000000000a0.',
+    '0aaaaaaaaaaaa00.',
+    '00000000000000..',
+    '................',
+    '..000000000.....',
+    '..0fffffff000...',
+    '..00000000ff0...',
+    '.........0000...',
+    '................',
+  ]);
+
+  static const snackBreak = Sprite([
+    '................',
+    '................',
+    '.....000000.....',
+    '...0044444400...',
+    '..044544445440..',
+    '.04444444444440.',
+    '.04544444444540.',
+    '0444445445444440',
+    '0444444444444440',
+    '0445444444445440',
+    '.04444455444440.',
+    '.04444444444440.',
+    '..044444444440..',
+    '...0044444400...',
+    '.....000000.....',
+    '................',
+  ]);
+
+  static const soapOfUncursing = Sprite([
+    '................',
+    '..00........00..',
+    '.0fa0......0af0.',
+    '.0ff0......0ff0.',
+    '..00........00..',
+    '................',
+    '..000000000000..',
+    '.0aabbbbbbbbaa0.',
+    '.0abbbbbbbbbba0.',
+    '.0bbbbbbbbbbbb0.',
+    '.0bbbbbbbbbbbb0.',
+    '.00000000000000.',
+    '................',
+    '................',
+    '................',
+    '................',
+  ]);
+
+  static const spatulaOfFlipping = Sprite([
+    '................',
+    '.000000000......',
+    '.011111110......',
+    '.011111110......',
+    '.013333310......',
+    '.011111110......',
+    '.013333310......',
+    '.0111111100.....',
+    '.01111111500....',
+    '.000000005500...',
+    '........005500..',
+    '.........005500.',
+    '..........00550.',
+    '...........0050.',
+    '............000.',
+    '................',
+  ]);
+
+  static const spongeShield = Sprite([
+    '................',
+    '.00000000000000.',
+    '.07777777777770.',
+    '.07c77777777c70.',
+    '.0777c7777c7770.',
+    '.07777777777770.',
+    '.07c77777777c70.',
+    '.07777777777770.',
+    '..077c7777c770..',
+    '..077777777770..',
+    '...0777777770...',
+    '....07777770....',
+    '.....077770.....',
+    '......0770......',
+    '.......00.......',
+    '................',
+  ]);
+
+  static const trashCanLid = Sprite([
+    '................',
+    '................',
+    '......0000......',
+    '.....030030.....',
+    '.....030030.....',
+    '...0000000000...',
+    '..011111111110..',
+    '.01212122121210.',
+    '0121212112121210',
+    '0111111111111110',
+    '0333333333333330',
+    '.00000000000000.',
+    '................',
+    '................',
+    '................',
+    '................',
+  ]);
+
+  static const turboMop = Sprite([
+    '...........0000.',
+    '..........00440.',
+    '.........004400.',
+    '........004400..',
+    '.......004400...',
+    '......004400....',
+    '.....004400.....',
+    '.000004400......',
+    '.088888880......',
+    '.088888880......',
+    '.0afafafa0......',
+    '.0afafafa0......',
+    '.0afafafa0......',
+    '.0afafafa0......',
+    '.000000000......',
+    '................',
+  ]);
+
   /// Every sprite with its palette group, for the art gallery.
   static const all = <String, (List<Sprite>, String)>{
     'icons/tab_quests': ([tabQuests], 'mask'),
@@ -967,6 +1468,29 @@ abstract final class Sprites {
     'map/lair_sign': ([lairSign], 'map'),
     'map/castle': ([castle], 'map'),
     'map/castle_won': ([castleWon], 'map'),
+    'items/apron_of_holding': ([apronOfHolding], 'items'),
+    'items/cape_of_clean_sweep': ([capeOfCleanSweep], 'items'),
+    'items/coffee_of_haste': ([coffeeOfHaste], 'items'),
+    'items/colander_of_clarity': ([colanderOfClarity], 'items'),
+    'items/feather_duster': ([featherDuster], 'items'),
+    'items/fuzzy_slippers': ([fuzzySlippers], 'items'),
+    'items/garden_gnome': ([gardenGnome], 'items'),
+    'items/hi_vis_vest': ([hiVisVest], 'items'),
+    'items/laundry_basket_helm': ([laundryBasketHelm], 'items'),
+    'items/lost_remote': ([lostRemote], 'items'),
+    'items/lucky_odd_sock': ([luckyOddSock], 'items'),
+    'items/metronome_charm': ([metronomeCharm], 'items'),
+    'items/mop_of_doom': ([mopOfDoom], 'items'),
+    'items/plunger_of_smiting': ([plungerOfSmiting], 'items'),
+    'items/rubber_boots': ([rubberBoots], 'items'),
+    'items/rubber_gloves': ([rubberGloves], 'items'),
+    'items/second_wind': ([secondWind], 'items'),
+    'items/snack_break': ([snackBreak], 'items'),
+    'items/soap_of_uncursing': ([soapOfUncursing], 'items'),
+    'items/spatula_of_flipping': ([spatulaOfFlipping], 'items'),
+    'items/sponge_shield': ([spongeShield], 'items'),
+    'items/trash_can_lid': ([trashCanLid], 'items'),
+    'items/turbo_mop': ([turboMop], 'items'),
   };
 }
 
@@ -981,4 +1505,5 @@ const paletteGroups = <String, Map<String, List<Color>>>{
   'ui': {'ui_day': _uiDay, 'ui_night': _uiNight},
   'mask': {'mask': _mask},
   'app': {'app': _app},
+  'items': {'items_day': _itemsDay, 'items_night': _itemsNight},
 };

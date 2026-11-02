@@ -6,7 +6,8 @@
     },
     "ui": { "source": "ui_day", "variants": ["ui_day", "ui_night"] },
     "mask": { "source": "mask", "variants": ["mask"] },
-    "app": { "source": "app", "variants": ["app"] }
+    "app": { "source": "app", "variants": ["app"] },
+    "items": { "source": "items_day", "variants": ["items_day", "items_night"] }
   },
   "sprites": {
     "icons/tab_quests": { "size": [12, 12], "palette": "mask" },
@@ -31,6 +32,29 @@
     "map/lair": { "size": [16, 16], "palette": "map" },
     "map/lair_sign": { "size": [16, 16], "palette": "map" },
     "map/castle": { "size": [16, 16], "palette": "map" },
-    "map/castle_won": { "size": [16, 16], "palette": "map" }
+    "map/castle_won": { "size": [16, 16], "palette": "map" },
+    "items/apron_of_holding": { "size": [16, 16], "palette": "items" },
+    "items/cape_of_clean_sweep": { "size": [16, 16], "palette": "items" },
+    "items/coffee_of_haste": { "size": [16, 16], "palette": "items" },
+    "items/colander_of_clarity": { "size": [16, 16], "palette": "items" },
+    "items/feather_duster": { "size": [16, 16], "palette": "items" },
+    "items/fuzzy_slippers": { "size": [16, 16], "palette": "items" },
+    "items/garden_gnome": { "size": [16, 16], "palette": "items" },
+    "items/hi_vis_vest": { "size": [16, 16], "palette": "items" },
+    "items/laundry_basket_helm": { "size": [16, 16], "palette": "items" },
+    "items/lost_remote": { "size": [16, 16], "palette": "items" },
+    "items/lucky_odd_sock": { "size": [16, 16], "palette": "items" },
+    "items/metronome_charm": { "size": [16, 16], "palette": "items" },
+    "items/mop_of_doom": { "size": [16, 16], "palette": "items" },
+    "items/plunger_of_smiting": { "size": [16, 16], "palette": "items" },
+    "items/rubber_boots": { "size": [16, 16], "palette": "items" },
+    "items/rubber_gloves": { "size": [16, 16], "palette": "items" },
+    "items/second_wind": { "size": [16, 16], "palette": "items" },
+    "items/snack_break": { "size": [16, 16], "palette": "items" },
+    "items/soap_of_uncursing": { "size": [16, 16], "palette": "items" },
+    "items/spatula_of_flipping": { "size": [16, 16], "palette": "items" },
+    "items/sponge_shield": { "size": [16, 16], "palette": "items" },
+    "items/trash_can_lid": { "size": [16, 16], "palette": "items" },
+    "items/turbo_mop": { "size": [16, 16], "palette": "items" }
   }
 }

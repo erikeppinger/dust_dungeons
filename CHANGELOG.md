@@ -8,6 +8,33 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-02
+### Added
+- **Loot & gear** ([design](docs/design/items.md)):
+  - **Six gear slots** (head, body, weapon, shield, feet, charm), one item each, on the new **Gear**
+    screen. A two-handed weapon also takes the shield slot.
+  - **Five new Armory items**, among them the Colander of Clarity, the Hi-Vis Vest and the
+    Spatula of Flipping. Rubber Boots and others work better against some bosses.
+  - **Boss loot:** each boss can drop its own item after a win (more often at higher tiers). The
+    Overlord drops one every time. After four wins without loot, the fifth always drops. Story
+    mode wins drop loot too. The Armory shows loot not found yet as "???".
+  - **New consumables:** Coffee of Haste and Snack Break, picked on the new start screen before
+    a fight, and Soap of Uncursing.
+  - **Mild curses:** losing a fight leaves the boss's curse for the next fight only: one heart
+    fewer, stricter timing, or one slot that does nothing. A quest of that boss's kind (marked
+    "Lifts curse") or soap lifts it early. Settings → Boss fights can turn curses off.
+  - **Start screen before each fight:** your gear, a waiting curse, consumables to pick, and
+    hints like "Plunger of Smiting: strong here".
+  - Every fight item has a pixel icon.
+  - Items change fights only, never points, XP, streaks or screen time.
+
+### Changed
+- Gear no longer works just by owning it: each person wears one item per slot. The four items
+  from before sit in four different slots, so after the update they are all worn as before.
+- Schema v9 (`equipped`, `profiles.curseFamily`, `fights.loot`). Backups bring worn gear along
+  for people who wear nothing yet.
+- Roadmap: the beta moves to 0.12.0.
+
 ## [0.10.0] - 2026-11-02
 ### Added
 - **Better schedules** ([design](docs/design/scheduling.md)):

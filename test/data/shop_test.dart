@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/progress_repository.dart';
@@ -69,11 +70,62 @@ void main() {
     expect((await shop.watchInventory(profile).first)['second_wind'], 0);
   });
 
-  test('loadout comes from what is owned', () {
-    final l = Loadout.fromInventory({'sponge_shield': 1, 'second_wind': 3});
-    expect(l.shield, isTrue);
-    expect(l.turboMop, isFalse);
-    expect(Loadout.fromInventory(const {}).gloves, isFalse);
+  Future<Map<GearSlot, String>> worn() => shop.watchEquipped(profile).first;
+
+  test('new gear is worn when its slot is free', () async {
+    await earn(15);
+    await shop.buy(profile, mopItem);
+    await shop.buy(profile, spatulaItem);
+    expect(await worn(), {GearSlot.weapon: 'turbo_mop'});
+    await shop.buy(profile, secondWindItem);
+    expect(await worn(), hasLength(1));
+  });
+
+  test('wearing swaps the slot; two hands push out the shield', () async {
+    await earn(20);
+    await shop.buy(profile, mopItem);
+    await shop.buy(profile, spatulaItem);
+    await shop.buy(profile, shieldItem);
+    await shop.wear(profile, spatulaItem);
+    expect(await worn(), {
+      GearSlot.weapon: 'spatula_of_flipping',
+      GearSlot.shield: 'sponge_shield',
+    });
+    await db
+        .into(db.inventory)
+        .insert(
+          InventoryCompanion.insert(
+            profileId: profile,
+            itemKey: mopOfDoomItem.key,
+            count: 1,
+          ),
+        );
+    await shop.wear(profile, mopOfDoomItem);
+    expect(await worn(), {GearSlot.weapon: 'mop_of_doom'});
+    await shop.wear(profile, shieldItem);
+    expect(await worn(), {GearSlot.shield: 'sponge_shield'});
+    await shop.takeOff(profile, GearSlot.shield);
+    expect(await worn(), isEmpty);
+  });
+
+  test('only owned gear can be worn', () async {
+    await shop.wear(profile, vestItem);
+    expect(await worn(), isEmpty);
+  });
+
+  test('soap lifts a curse, and is kept without one', () async {
+    await earn(1);
+    await shop.buy(profile, soapItem);
+    expect(await shop.useSoap(profile), isFalse);
+    await (db.update(db.profiles)..where((p) => p.id.equals(profile))).write(
+      const ProfilesCompanion(curseFamily: Value(BossFamily.trash)),
+    );
+    expect(await shop.useSoap(profile), isTrue);
+    final p = await (db.select(
+      db.profiles,
+    )..where((p) => p.id.equals(profile))).getSingle();
+    expect(p.curseFamily, isNull);
+    expect((await shop.watchInventory(profile).first)[soapItem.key], 0);
   });
 
   test('every shop item key is unique', () {

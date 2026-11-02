@@ -43,7 +43,7 @@ quest points only, so gear can't buy a better rank, and nobody is behind on ques
 Effects come from a small set, so they're easy to explain and test:
 **+hearts**, **+damage** (on every hit), **Perfect ×3**, **free misses**, **wider timing**,
 **heal on combo** (+1 heart after a number of hits in a row, up to the maximum),
-**sneak attack** (the first echo deals double damage), **slower boss** (tempo −10 %), and
+**sneak attack** (the first echo deals 50 % more damage), **slower boss** (tempo −10 %), and
 **against a boss** (an effect that only works against one family).
 
 ### Armory (points)
@@ -154,7 +154,7 @@ These are first drafts; they're settled when the ARB files are written.
 
 ## Data (schema v9)
 - **`equipped`** (profileId, slot, itemKey): the worn item per slot. Owned items stay in `inventory`.
-- **`curses`** (profileId, family, since): at most one row per person.
+- **`profiles.curseFamily`** (nullable): the waiting curse, at most one per person.
 - **`fights.loot`** (text, nullable): the item a win dropped. It feeds the bad-luck counter and the
   fight history.
 - **Setting:** `curses` (bool, default on).
@@ -162,7 +162,7 @@ These are first drafts; they're settled when the ARB files are written.
   so nobody loses an effect they have today.
 - **Backups:**
   - `equipped`: matched by person and slot, the phone's choice wins.
-  - `curses`: the phone's row wins.
+  - The curse: the phone's person row wins.
   - `fights.loot`: travels with its fight row.
   - `inventory` merges as today.
 
@@ -192,6 +192,15 @@ These are first drafts; they're settled when the ARB files are written.
 - **Sets** (a bonus for wearing items that belong together).
 - **Items on the hero picture:** with the pixel hero (art step 5).
 - **Trading items between people.**
+
+## As built (changes to the plan)
+- **Sneak attack** deals 50 % more in the first echo, not double: with full gear, double could beat
+  a tier-1 boss in one echo.
+- **The curse** is stored on the person (`profiles.curseFamily`), not in its own table: there's at
+  most one, and the phone's person row already wins in a backup merge.
+- **Turning curses off** lifts every waiting curse.
+- **New gear is worn right away** when nothing clashes with it, bought or dropped.
+- **Overlord's curse:** any quest lifts it, as no quest feeds the Overlord.
 
 ## Version
 **0.11.0**, decided 2026-11-02. The beta moves to 0.12.0.

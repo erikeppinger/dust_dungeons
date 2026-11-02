@@ -6,8 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/pixel.dart';
 import '../../core/widgets/section_header.dart';
+import '../../data/db/app_database.dart';
 import '../../data/models/scheduled_chore.dart';
 import '../../data/providers.dart';
+import '../../domain/fight/items.dart';
 import '../../domain/points.dart';
 import '../../domain/progress.dart';
 import '../../l10n/app_localizations.dart';
@@ -85,6 +87,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final streakBeforeToday =
         ref.watch(progressStatsProvider).value?.streakBefore ?? 0;
     final people = ref.watch(profilesProvider);
+    final curse = ref.watch(curseProvider);
     return [
       SliverToBoxAdapter(child: SectionHeader('$title (${chores.length})')),
       SliverPadding(
@@ -123,6 +126,10 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                   : null,
               status: questStatus(context, s),
               overdue: s.isOverdue || s.isTimesUp,
+              liftsCurse:
+                  curse != null &&
+                  s.doneToday == 0 &&
+                  questLifts(curse, s.chore.family),
               onTap: () => _complete(s),
               onLongPress: () => ChoreEditScreen.open(context, s.chore),
             );

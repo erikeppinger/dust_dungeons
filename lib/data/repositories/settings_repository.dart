@@ -29,6 +29,7 @@ class SettingsRepository {
   static const _screenWarn = 'screenWarn';
   static const _screenOver = 'screenOver';
   static const _screenSummary = 'screenSummary';
+  static const _curses = 'curses';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -79,6 +80,7 @@ class SettingsRepository {
       screenWarn: flag(_screenWarn, defaults.screenWarn),
       screenOver: flag(_screenOver, defaults.screenOver),
       screenSummary: flag(_screenSummary, defaults.screenSummary),
+      curses: flag(_curses, defaults.curses),
     );
   }
 
@@ -110,6 +112,7 @@ class SettingsRepository {
     await _put(_screenWarn, '${settings.screenWarn}');
     await _put(_screenOver, '${settings.screenOver}');
     await _put(_screenSummary, '${settings.screenSummary}');
+    await _put(_curses, '${settings.curses}');
   });
 
   Future<void> _put(String key, String value) => _db

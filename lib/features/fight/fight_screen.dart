@@ -16,18 +16,22 @@ import '../../data/repositories/fight_repository.dart';
 import '../../data/repositories/shop_repository.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/echo_duel.dart';
+import '../../domain/fight/items.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import '../../domain/screen_time.dart';
 import '../screen_time/screen_time_providers.dart';
+import '../world/items_text.dart';
 import 'boss_art.dart';
 import 'fight_controller.dart';
+import 'fight_prep_screen.dart';
 import 'fight_sounds.dart';
 import 'lane_field.dart';
 
-/// One boss fight. Starting it spends a token (the Overlord needs none);
-/// leaving early or putting the app in the background abandons it.
+/// One boss fight, opened from [FightPrepScreen]. Starting it spends a
+/// token (the Overlord needs none); leaving early or putting the app in the
+/// background abandons it.
 class FightScreen extends ConsumerStatefulWidget {
   const FightScreen({
     super.key,
@@ -40,42 +44,13 @@ class FightScreen extends ConsumerStatefulWidget {
   final BossFamily family;
   final int tier;
 
-  /// The gear owned when the fight starts.
+  /// The gear, consumables and curse the fight starts with.
   final Loadout loadout;
 
   /// For the Overlord: the bosses beaten this week, whose rhythms it plays.
   final List<BossFamily> motifs;
 
   bool get overlord => family == BossFamily.overlord;
-
-  static bool _opening = false;
-
-  /// Opens a fight. A second call while one is opening or open is ignored,
-  /// so a double tap cannot start (and pay for) two fights.
-  static Future<void> open(
-    BuildContext context,
-    BossFamily family,
-    int tier,
-    Loadout loadout, {
-    List<BossFamily> motifs = const [],
-  }) async {
-    if (_opening) return;
-    _opening = true;
-    try {
-      await Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (_) => FightScreen(
-            family: family,
-            tier: tier,
-            loadout: loadout,
-            motifs: motifs,
-          ),
-        ),
-      );
-    } finally {
-      _opening = false;
-    }
-  }
 
   @override
   ConsumerState<FightScreen> createState() => _FightScreenState();
@@ -88,8 +63,12 @@ class _FightScreenState extends ConsumerState<FightScreen> {
   late final int _profileId;
   late final Future<int> _fightId;
   late final AppLifecycleListener _lifecycle;
+  late final bool _curses;
   bool _recorded = false;
   bool _abandoned = false;
+
+  /// What the won fight dropped, once recorded.
+  ShopItem? _loot;
 
   @override
   void initState() {
@@ -106,6 +85,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
     _repo = ref.read(fightRepositoryProvider);
     _shop = ref.read(shopRepositoryProvider);
     _profileId = ref.read(currentProfileIdProvider);
+    _curses = settings.curses;
     _fightId = _repo.start(
       profileId: _profileId,
       family: widget.family,
@@ -156,13 +136,15 @@ class _FightScreenState extends ConsumerState<FightScreen> {
     if (_recorded) return;
     _recorded = true;
     final duel = _controller.duel;
-    await _repo.finish(
+    final loot = await _repo.finish(
       await _fightId,
       result: result,
       perfect: duel.perfect,
       good: duel.good,
       miss: duel.miss,
+      curses: _curses,
     );
+    if (loot != null && mounted) setState(() => _loot = loot);
   }
 
   bool get _over => _controller.stage == FightStage.finished || _abandoned;
@@ -274,6 +256,8 @@ class _FightScreenState extends ConsumerState<FightScreen> {
                         family: widget.family,
                         duel: _controller.duel,
                         motifs: widget.motifs,
+                        loot: _loot,
+                        curseWaits: _curses && !_controller.duel.storyMode,
                         onSecondWind: _useSecondWind,
                       )
                     : _Duel(controller: _controller, onLeave: _confirmLeave),
@@ -427,11 +411,21 @@ class _Duel extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
-              if (duel.storyMode)
-                Text(l10n.fightSettingStory, style: theme.textTheme.bodySmall)
-              else if (duel.shieldReady)
-                Text(l10n.fightShieldReady, style: theme.textTheme.bodySmall),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  [
+                    if (duel.storyMode)
+                      l10n.fightSettingStory
+                    else if (duel.freeMissesLeft > 0)
+                      l10n.fightFreeMisses(duel.freeMissesLeft),
+                    if (duel.loadout.curse case final curse?)
+                      l10n.curseTitle(curseName(l10n, curse.family)),
+                  ].join(' · '),
+                  textAlign: TextAlign.end,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
             ],
           ),
         ],
@@ -563,12 +557,20 @@ class _Result extends ConsumerWidget {
     required this.family,
     required this.duel,
     required this.motifs,
+    required this.loot,
+    required this.curseWaits,
     required this.onSecondWind,
   });
 
   final BossFamily family;
   final EchoDuel duel;
   final List<BossFamily> motifs;
+
+  /// What the win dropped (`null`: nothing, or not recorded yet).
+  final ShopItem? loot;
+
+  /// Whether leaving a lost fight lets the boss curse the hero.
+  final bool curseWaits;
   final VoidCallback onSecondWind;
 
   @override
@@ -629,6 +631,20 @@ class _Result extends ConsumerWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium,
         ),
+        if (loot case final loot?) ...[
+          const SizedBox(height: 12),
+          _LootCard(item: loot),
+        ],
+        if (!won && curseWaits) ...[
+          const SizedBox(height: 12),
+          Text(
+            '${l10n.fightCurseWarning(boss, curseName(l10n, family))} '
+            '${curseEffect(l10n, curseOf(family))}.',
+            key: const ValueKey('curse-warning'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
         const SizedBox(height: 20),
         Row(
           children: [
@@ -676,10 +692,9 @@ class _Result extends ConsumerWidget {
           OutlinedButton(
             onPressed: () => Navigator.of(context).pushReplacement(
               MaterialPageRoute<void>(
-                builder: (_) => FightScreen(
+                builder: (_) => FightPrepScreen(
                   family: family,
                   tier: progress.tier(family),
-                  loadout: duel.loadout,
                   motifs: motifs,
                 ),
               ),
@@ -690,6 +705,63 @@ class _Result extends ConsumerWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+/// What a boss dropped, with a button to wear it if it isn't worn yet.
+class _LootCard extends ConsumerWidget {
+  const _LootCard({required this.item});
+
+  final ShopItem item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final worn = ref.watch(equippedProvider).value?[item.slot] == item.key;
+    return Card(
+      key: const ValueKey('loot'),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            ItemIcon(item, size: 48),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.fightLoot(itemName(l10n, item)),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  Text(
+                    itemDescription(l10n, item),
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  if (item.kind == ItemKind.gear) ...[
+                    const SizedBox(height: 6),
+                    if (worn)
+                      Chip(
+                        avatar: const Icon(Icons.check, size: 16),
+                        label: Text(l10n.shopWorn),
+                      )
+                    else
+                      FilledButton.tonal(
+                        key: const ValueKey('loot-wear'),
+                        onPressed: () => ref
+                            .read(shopRepositoryProvider)
+                            .wear(ref.read(currentProfileIdProvider), item),
+                        child: Text(l10n.fightLootWear),
+                      ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

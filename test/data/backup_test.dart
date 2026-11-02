@@ -302,6 +302,49 @@ void main() {
     expect((day.usedMinutes, day.budgetMinutes), (50, 90));
   });
 
+  test('worn gear comes along only for people who wear nothing', () async {
+    final phone = memory();
+    final here = memory();
+    Future<void> own(AppDatabase db, String key, {GearSlot? wear}) async {
+      final profile = await db.defaultProfileId();
+      await db
+          .into(db.inventory)
+          .insert(
+            InventoryCompanion.insert(
+              profileId: profile,
+              itemKey: key,
+              count: 1,
+            ),
+          );
+      if (wear != null) {
+        await db
+            .into(db.equipped)
+            .insert(
+              EquippedCompanion.insert(
+                profileId: profile,
+                slot: wear,
+                itemKey: key,
+              ),
+            );
+      }
+    }
+
+    await own(phone, 'turbo_mop', wear: GearSlot.weapon);
+    await own(phone, 'sponge_shield', wear: GearSlot.shield);
+    final report = await mergeBackup(here, phone);
+    expect(report.equipped, 2);
+    expect(await here.select(here.equipped).get(), hasLength(2));
+
+    // Someone who already wears something here keeps their choice.
+    final other = memory();
+    await own(other, 'spatula_of_flipping', wear: GearSlot.weapon);
+    expect((await mergeBackup(other, phone)).equipped, 0);
+    expect(
+      (await other.select(other.equipped).getSingle()).itemKey,
+      'spatula_of_flipping',
+    );
+  });
+
   test('a preview reports but writes nothing', () async {
     final phone = memory();
     await complete(phone, 'dusting', monday);
@@ -317,14 +360,14 @@ void main() {
       final phone = memory();
       final path = '${tmp.path}/b.sqlite';
       await writeSnapshot(phone, path);
-      expect(checkBackup(path, currentSchema: 8), 8);
+      expect(checkBackup(path, currentSchema: 9), 9);
     });
 
     test('a random file is not a backup', () {
       final path = '${tmp.path}/notes.txt';
       File(path).writeAsStringSync('shopping list: milk, eggs');
       expect(
-        () => checkBackup(path, currentSchema: 8),
+        () => checkBackup(path, currentSchema: 9),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -342,7 +385,7 @@ void main() {
         ..userVersion = 3
         ..close();
       expect(
-        () => checkBackup(path, currentSchema: 8),
+        () => checkBackup(path, currentSchema: 9),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -357,10 +400,10 @@ void main() {
       final path = '${tmp.path}/new.sqlite';
       await writeSnapshot(memory(), path);
       sqlite.sqlite3.open(path)
-        ..userVersion = 9
+        ..userVersion = 10
         ..close();
       expect(
-        () => checkBackup(path, currentSchema: 8),
+        () => checkBackup(path, currentSchema: 9),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -394,7 +437,7 @@ void main() {
       );
       await old.close();
 
-      expect(checkBackup(path, currentSchema: 8), version);
+      expect(checkBackup(path, currentSchema: 9), version);
       final here = memory();
       final report = await mergeBackup(here, fileDb(path));
       expect(report.completions, 1);

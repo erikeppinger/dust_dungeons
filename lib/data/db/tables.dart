@@ -1,9 +1,11 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/fight/boss.dart';
+import '../../domain/fight/shop.dart';
 import '../../domain/recurrence.dart';
 
 export '../../domain/fight/boss.dart' show BossFamily;
+export '../../domain/fight/shop.dart' show GearSlot;
 export '../../domain/recurrence.dart' show RepeatType;
 
 /// A person using the app (several share a phone since 0.9, schema v7).
@@ -28,6 +30,9 @@ class Profiles extends Table {
 
   /// Removed people are hidden but keep their history.
   DateTimeColumn get archivedAt => dateTime().nullable()();
+
+  /// The boss whose curse waits for the next fight (schema v9).
+  TextColumn get curseFamily => textEnum<BossFamily>().nullable()();
 }
 
 /// Who a chore is for. Stored by name: only ever add values.
@@ -148,6 +153,9 @@ class Fights extends Table {
   IntColumn get perfect => integer().withDefault(const Constant(0))();
   IntColumn get good => integer().withDefault(const Constant(0))();
   IntColumn get miss => integer().withDefault(const Constant(0))();
+
+  /// The item a won fight dropped (schema v9).
+  TextColumn get loot => text().nullable()();
 }
 
 /// Items bought in the shop (schema v5): gear and hats have count 1,
@@ -160,6 +168,17 @@ class Inventory extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {profileId, itemKey};
+}
+
+/// The gear each person wears (schema v9): one item per slot.
+@DataClassName('EquippedItem')
+class Equipped extends Table {
+  IntColumn get profileId => integer().references(Profiles, #id)();
+  TextColumn get slot => textEnum<GearSlot>()();
+  TextColumn get itemKey => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {profileId, slot};
 }
 
 /// Screen time per day (soft budget): saved so history, the Tired effect

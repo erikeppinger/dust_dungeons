@@ -37,6 +37,7 @@ variants. A new sprite needs a line there.
 |---|---|---|---|
 | Tab icons | 12×12 | `mask` | `icons/tab_*.png`. One color: draw in black, the app tints them. |
 | Coin, hearts, crown | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png`, `icons/crown.png` (the leaderboard's leader) |
+| Item icons | 16×16 | `items` | `items/<item key>.png`, e.g. `items/turbo_mop.png`: gear and fight consumables |
 | Launcher icon | 16×16 | `app` | `icons/app_shield.png`; run `python tool/generate_icon.py` after changing it |
 | Ground tiles | 16×16 | `map` | `map/grass_0..3`, `map/water_0..3`, `map/sand_0..3`: fill the whole tile |
 | Overlays | 16×16 | `map` | `map/forest_0..1`, `map/hill`, `map/mountain`: transparent background, drawn on grass |
@@ -61,6 +62,7 @@ open. Every color has a name; the app uses the names, so keep them when you chan
   same position. So a new tile gets all four seasons for free. A new color goes into all four
   files at the same position (shared colors like `rock` are simply the same in all four).
 - **`ui_day.gpl`**: draw the coin and hearts with it; `ui_night.gpl` is their night version.
+- **`items_day.gpl`**: the item icons; `items_night.gpl` is their night version.
 - **`mask.gpl`**: one color, for tab icons.
 - **`app.gpl`**: the launcher shield.
 - *(planned)* **`hero_keys.gpl`**: the hero is drawn with key colors (skin, hair, cape, each with a

@@ -19,6 +19,7 @@ class ChoreTile extends StatelessWidget {
     this.doneBy,
     this.status,
     this.overdue = false,
+    this.liftsCurse = false,
     this.onTap,
     this.onLongPress,
   });
@@ -41,6 +42,9 @@ class ChoreTile extends StatelessWidget {
 
   /// Highlights [status] as overdue (with an icon, not only color).
   final bool overdue;
+
+  /// Doing it lifts the curse waiting for the next fight.
+  final bool liftsCurse;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -105,6 +109,8 @@ class ChoreTile extends StatelessWidget {
                           alignment: AlignmentDirectional.topEnd,
                           child: doneToday > 0
                               ? _DoneBadge(count: doneToday, by: doneBy)
+                              : liftsCurse
+                              ? _CurseBadge(label: l10n.questLiftsCurse)
                               : null,
                         ),
                       ),
@@ -197,6 +203,50 @@ class _DoneBadge extends StatelessWidget {
                 style: TextStyle(
                   color: scheme.onSecondaryContainer,
                   fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Lifts curse": an icon with its words as tooltip and label.
+class _CurseBadge extends StatelessWidget {
+  const _CurseBadge({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Tooltip(
+      message: label,
+      child: Container(
+        key: const ValueKey('lifts-curse'),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: ShapeDecoration(
+          color: theme.colorScheme.errorContainer,
+          shape: const StadiumBorder(),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.auto_fix_high,
+              size: 14,
+              color: theme.colorScheme.onErrorContainer,
+            ),
+            const SizedBox(width: 3),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onErrorContainer,
                 ),
               ),
             ),

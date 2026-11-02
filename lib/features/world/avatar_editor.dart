@@ -7,6 +7,7 @@ import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/shop.dart';
 import '../fight/hero_art.dart';
+import 'items_text.dart';
 import 'shop_screen.dart';
 
 /// Choose the hero's look. Changes apply (and are saved) immediately.

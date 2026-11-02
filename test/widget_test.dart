@@ -77,6 +77,16 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  /// Taps "Fight" on a boss card and then "Fight!" on the start screen.
+  Future<void> startFight(WidgetTester tester, Finder fight) async {
+    await showInArena(tester, fight);
+    await tester.tap(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('prep-fight')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+  }
+
   testWidgets('starts on Today with built-in chores and 0 points', (
     tester,
   ) async {
@@ -327,9 +337,16 @@ void main() {
     final fight = find.descendant(of: dustCard(), matching: find.text('Fight'));
     await showInArena(tester, fight);
     await tester.pumpAndSettle();
-    // A double tap must start only one fight.
+    // A double tap must open one start screen and start only one fight.
     await tester.tap(fight);
     await tester.tap(fight, warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('prep-fight')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('prep-fight')));
+    await tester.tap(
+      find.byKey(const ValueKey('prep-fight')),
+      warnIfMissed: false,
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Get ready…'), findsOneWidget);
@@ -523,6 +540,15 @@ void main() {
               count: 1,
             ),
           );
+      await db
+          .into(db.equipped)
+          .insert(
+            EquippedCompanion.insert(
+              profileId: 1,
+              slot: GearSlot.body,
+              itemKey: 'rubber_gloves',
+            ),
+          );
       return db;
     });
     await pumpApp(tester, db: db);
@@ -534,11 +560,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await showInArena(tester, fight);
-    await tester.pumpAndSettle();
-    await tester.tap(fight);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await startFight(tester, fight);
     expect(find.bySemanticsLabel('Health 6 of 6'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Leave'));
@@ -570,9 +592,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await showInArena(tester, fight);
-    await tester.pumpAndSettle();
-    await tester.tap(fight);
+    await startFight(tester, fight);
     // Never tap: the fight is lost after a few rounds.
     for (
       var i = 0;
@@ -788,11 +808,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-overlord')),
       matching: find.text('Fight'),
     );
-    await showInArena(tester, fight);
-    await tester.pumpAndSettle();
-    await tester.tap(fight);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await startFight(tester, fight);
     expect(find.text('Tier 1 · phase 1 of 3'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Leave'));
@@ -830,6 +846,15 @@ void main() {
               count: 1,
             ),
           );
+      await db
+          .into(db.equipped)
+          .insert(
+            EquippedCompanion.insert(
+              profileId: 1,
+              slot: GearSlot.body,
+              itemKey: 'rubber_gloves',
+            ),
+          );
       return db;
     });
     await pumpApp(tester, db: db);
@@ -839,9 +864,7 @@ void main() {
       of: find.byKey(const ValueKey('boss-dust')),
       matching: find.text('Fight'),
     );
-    await showInArena(tester, fight);
-    await tester.pumpAndSettle();
-    await tester.tap(fight);
+    await startFight(tester, fight);
     // Never tap: the fight is lost after a few rounds.
     for (
       var i = 0;
@@ -850,9 +873,16 @@ void main() {
     ) {
       await tester.pump(const Duration(milliseconds: 100));
     }
-    await tester.ensureVisible(find.text('Fight again · 1 token left'));
+    // The curse warning pushes the buttons down; the list builds lazily.
+    expect(find.byKey(const ValueKey('curse-warning')), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Fight again · 1 token left'),
+      200,
+    );
     await tester.pump();
     await tester.tap(find.text('Fight again · 1 token left'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('prep-fight')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.bySemanticsLabel('Health 6 of 6'), findsOneWidget);

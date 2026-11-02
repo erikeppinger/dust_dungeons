@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'boss.dart';
 import 'lanes.dart';
-import 'shop.dart';
+import 'items.dart';
 
 /// Result of one expected beat in the player's echo.
 enum Hit { perfect, good, miss }
@@ -15,6 +15,9 @@ class TimingWindows {
 
   /// With the Metronome Charm.
   static const charmed = TimingWindows(perfectMs: 80, goodMs: 160);
+
+  /// Cursed: narrower than normal.
+  static const tight = TimingWindows(perfectMs: 45, goodMs: 95);
 
   /// Story mode: generous windows (and no damage to the hero).
   static const story = TimingWindows(perfectMs: 100, goodMs: 200);
@@ -122,15 +125,20 @@ class EchoDuel {
     this.slowMode = false,
     this.seed = 0,
     int? maxHp,
-  }) : hero = loadout.gloves
-           ? HeroStats(maxHp: hero.maxHp + 1, damage: hero.damage)
-           : hero,
+  }) : effects = loadout.against(family),
+       hero = HeroStats(
+         maxHp: heartsWith(hero.maxHp, loadout.against(family)),
+         damage: hero.damage,
+       ),
        bossMaxHp = maxHp ?? bossHpForTier(tier),
        bossHp = maxHp ?? bossHpForTier(tier),
-       heroHp = hero.maxHp + (loadout.gloves ? 1 : 0);
+       heroHp = heartsWith(hero.maxHp, loadout.against(family));
 
   /// Tempo factor in slow mode.
   static const slowTempo = 0.7;
+
+  /// Tempo factor with a slower boss (the Lost Remote).
+  static const slowerBossTempo = 0.9;
 
   final BossFamily family;
   final int tier;
@@ -138,6 +146,9 @@ class EchoDuel {
   /// The hero's stats including gear.
   final HeroStats hero;
   final Loadout loadout;
+
+  /// What the loadout does against this boss.
+  final Effects effects;
   final bool storyMode;
 
   /// Slow mode: everything plays at [slowTempo].
@@ -147,21 +158,25 @@ class EchoDuel {
   final int seed;
   final _generators = <BossFamily, PatternGenerator>{};
 
-  double get tempo => slowMode ? slowTempo : 1;
+  double get tempo =>
+      (slowMode ? slowTempo : 1) * (effects.slowerBoss ? slowerBossTempo : 1);
 
   final int bossMaxHp;
   int bossHp;
   int heroHp;
   int perfect = 0, good = 0, miss = 0;
   int combo = 0, bestCombo = 0;
-  bool _shieldUsed = false;
+  int _freeMissesUsed = 0;
+  bool _firstEcho = true;
 
-  /// Whether the Sponge Shield is still waiting for the first miss.
-  bool get shieldReady => loadout.shield && !_shieldUsed;
+  /// Misses that will still cost no heart (shields).
+  int get freeMissesLeft => effects.freeMisses - _freeMissesUsed;
 
   TimingWindows get windows => storyMode
       ? TimingWindows.story
-      : (loadout.metronome ? TimingWindows.charmed : TimingWindows.normal);
+      : effects.tightTiming
+      ? TimingWindows.tight
+      : (effects.wideTiming ? TimingWindows.charmed : TimingWindows.normal);
 
   /// Phase 1 below half the boss's health: longer, syncopated patterns.
   int get phase => bossHp * 2 <= bossMaxHp ? 1 : 0;
@@ -210,25 +225,33 @@ class EchoDuel {
   /// Applies judged hits to boss and hero.
   void applyHits(List<Hit> hits) {
     assert(outcome == DuelOutcome.ongoing);
+    // Sneak attack: the first echo (or lane note) hits half as hard again.
+    final sneak = effects.sneakAttack && _firstEcho;
+    _firstEcho = false;
+    int dealt(int damage) => sneak ? damage + (damage + 1) ~/ 2 : damage;
     for (final hit in hits) {
       switch (hit) {
         case Hit.perfect:
           perfect++;
           combo++;
-          bossHp -= hero.damage * (loadout.turboMop ? 3 : 2);
+          bossHp -= dealt(hero.damage * effects.perfectTimes + effects.damage);
         case Hit.good:
           good++;
           combo++;
-          bossHp -= hero.damage;
+          bossHp -= dealt(hero.damage + effects.damage + effects.goodDamage);
         case Hit.miss:
           miss++;
           combo = 0;
           if (storyMode) break;
-          if (shieldReady) {
-            _shieldUsed = true;
-          } else {
+          if (freeMissesLeft > 0) {
+            _freeMissesUsed++;
+          } else if (!(effects.thirdMissFree && miss % 3 == 0)) {
             heroHp -= 1;
           }
+      }
+      final heal = effects.comboHeal;
+      if (hit != Hit.miss && heal > 0 && combo % heal == 0) {
+        heroHp = min(heroHp + 1, hero.maxHp);
       }
       bestCombo = max(bestCombo, combo);
     }
@@ -238,10 +261,11 @@ class EchoDuel {
     heroHp = max(heroHp, 0);
   }
 
-  /// Second Wind: continue a lost fight with half the hearts.
+  /// Second Wind: continue a lost fight with half the hearts (all of them
+  /// with the Apron of Holding).
   void revive() {
     assert(outcome == DuelOutcome.lost);
-    heroHp = (hero.maxHp + 1) ~/ 2;
+    heroHp = effects.fullRevive ? hero.maxHp : (hero.maxHp + 1) ~/ 2;
     combo = 0;
   }
 }
