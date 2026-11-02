@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_background">#1C1A30</color>
+    <!-- Home screen widget: the dungeon at night. -->
+    <color name="widget_panel">#2B2848</color>
+    <color name="widget_frame">#0E0C1A</color>
+    <color name="widget_text">#F2F0E6</color>
+    <color name="widget_muted">#C8C4DC</color>
+    <color name="widget_overdue">#FFB4AB</color>
+    <color name="widget_accent">#7BC95F</color>
 </resources>

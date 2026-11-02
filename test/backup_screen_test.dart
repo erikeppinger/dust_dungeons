@@ -113,7 +113,7 @@ void main() {
     final MapEntry(key: name, value: bytes) = backup.saved.entries.single;
     expect(name, startsWith('homework-chores-backup-'));
     final copy = File('${tmp.path}/saved.sqlite')..writeAsBytesSync(bytes);
-    expect(checkBackup(copy.path, currentSchema: 7), 7);
+    expect(checkBackup(copy.path, currentSchema: 8), 8);
   });
 
   testWidgets('importing shows what it adds, merges, and can be undone', (
@@ -139,6 +139,16 @@ void main() {
     expect(find.text('Backup imported'), findsOneWidget);
     expect(await completions(tester, db), 1);
 
+    // The undo entry appears once the safety copy is found on disk.
+    for (var i = 0; i < 50; i++) {
+      if (find.byKey(const ValueKey('backup-undo')).evaluate().isNotEmpty) {
+        break;
+      }
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+    }
     await tapAndWait(tester, find.byKey(const ValueKey('backup-undo')));
     expect(find.text('Import undone'), findsOneWidget);
     expect(await completions(tester, db), 0);

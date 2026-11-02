@@ -14,6 +14,7 @@ import 'data/backup/merge.dart' show currentProfileSetting;
 import 'data/repositories/profile_repository.dart';
 import 'data/repositories/settings_repository.dart';
 import 'features/backup/backups.dart';
+import 'features/home_widget/home_widget_sync.dart';
 import 'features/notifications/notification_planner.dart';
 import 'features/notifications/notification_service.dart';
 import 'features/notifications/notification_sync.dart';
@@ -146,6 +147,9 @@ class _AppRootState extends State<_AppRoot> {
   /// Keeps the screen-time background check and daily totals up to date.
   late final ProviderSubscription<Object?> _screenSync;
 
+  /// Keeps the home screen widget's quest list up to date.
+  late final void Function() _stopWidgets;
+
   /// Writes the daily automatic backup, if a folder is chosen.
   late final void Function() _stopBackups;
 
@@ -155,6 +159,7 @@ class _AppRootState extends State<_AppRoot> {
     _sync = syncNotifications(widget.container);
     _screenSync = syncScreenTime(widget.container);
     _stopBackups = scheduleAutoBackups(widget.container);
+    _stopWidgets = syncHomeWidget(widget.container);
   }
 
   @override
@@ -162,6 +167,7 @@ class _AppRootState extends State<_AppRoot> {
     _sync.close();
     _screenSync.close();
     _stopBackups();
+    _stopWidgets();
     widget.container.dispose();
     super.dispose();
   }

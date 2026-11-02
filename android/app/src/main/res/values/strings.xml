@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home screen widgets, in Android's widget picker. -->
+    <string name="widget_board_label">Quest board</string>
+    <string name="widget_board_description">Your open quests with icons and badges</string>
+    <string name="widget_path_label">Quest path</string>
+    <string name="widget_path_description">Your next quests as a path, like a board game</string>
+    <string name="widget_next_label">Next quest</string>
+    <string name="widget_next_description">Your next quest, and what follows</string>
+    <string name="widget_setup">Tap to show your quests</string>
+    <string name="widget_picture_description">Your open quests</string>
+</resources>

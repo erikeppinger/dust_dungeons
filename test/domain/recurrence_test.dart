@@ -189,4 +189,129 @@ void main() {
     expect(a, b);
     expect(a.hashCode, b.hashCode);
   });
+
+  group('monthly on a weekday', () {
+    Recurrence nth(int week, int weekday, {int interval = 1}) => Recurrence(
+      type: RepeatType.monthly,
+      monthWeek: week,
+      weekdays: {weekday},
+      interval: interval,
+      start: d(2026, 1, 1),
+    );
+
+    test('1st Monday of each month', () {
+      final r = nth(1, DateTime.monday);
+      expect(r.firstOnOrAfter(d(2026, 11, 1)), d(2026, 11, 2));
+      expect(r.firstOnOrAfter(d(2026, 11, 3)), d(2026, 12, 7));
+    });
+
+    test('2nd, 3rd and 4th weekdays', () {
+      expect(
+        nth(2, DateTime.friday).firstOnOrAfter(d(2026, 11, 1)),
+        d(2026, 11, 13),
+      );
+      expect(
+        nth(3, DateTime.sunday).firstOnOrAfter(d(2026, 11, 1)),
+        d(2026, 11, 15),
+      );
+      expect(
+        nth(4, DateTime.thursday).firstOnOrAfter(d(2026, 11, 1)),
+        d(2026, 11, 26),
+      );
+    });
+
+    test('the last weekday, in months of every length', () {
+      final r = nth(-1, DateTime.friday);
+      expect(r.firstOnOrAfter(d(2026, 2, 1)), d(2026, 2, 27)); // 28 days
+      expect(r.firstOnOrAfter(d(2028, 2, 1)), d(2028, 2, 25)); // leap year
+      expect(r.firstOnOrAfter(d(2026, 4, 1)), d(2026, 4, 24)); // 30 days
+      expect(r.firstOnOrAfter(d(2026, 7, 1)), d(2026, 7, 31)); // 31 days
+    });
+
+    test('every 2 months, counted from the start month', () {
+      final r = nth(1, DateTime.monday, interval: 2);
+      expect(r.firstOnOrAfter(d(2026, 2, 1)), d(2026, 3, 2));
+      expect(r.firstOnOrAfter(d(2026, 3, 3)), d(2026, 5, 4));
+    });
+
+    test('done late counts for its cycle', () {
+      final r = nth(1, DateTime.monday);
+      expect(r.nextDue(lastDone: d(2026, 11, 10)), d(2026, 12, 7));
+    });
+  });
+
+  group('day windows', () {
+    test('a monthly quest open from the 1st to the 10th', () {
+      final r = Recurrence(
+        type: RepeatType.monthly,
+        dayOfMonth: 1,
+        windowDays: 10,
+        start: d(2026, 1, 1),
+      );
+      expect(r.windowEnd(d(2026, 11, 1)), d(2026, 11, 10));
+    });
+
+    test('never reaches the next occurrence', () {
+      final r = Recurrence(
+        type: RepeatType.daily,
+        interval: 3,
+        windowDays: 7,
+        start: monday,
+      );
+      expect(r.windowEnd(monday), d(2026, 10, 28));
+    });
+
+    test('"until the next time" ends the day before it', () {
+      final weekly = Recurrence(
+        type: RepeatType.weekly,
+        weekdays: {DateTime.monday, DateTime.thursday},
+        windowDays: 0,
+        start: monday,
+      );
+      expect(weekly.windowEnd(monday), d(2026, 10, 28)); // before Thursday
+      expect(weekly.windowEnd(d(2026, 10, 29)), d(2026, 11, 1)); // before Mon
+      final floating = Recurrence(
+        type: RepeatType.afterDone,
+        interval: 5,
+        windowDays: 0,
+        start: monday,
+      );
+      expect(floating.windowEnd(monday), d(2026, 10, 30));
+    });
+
+    test('one day is the due day only; once has no next time', () {
+      final daily = Recurrence(type: RepeatType.daily, start: monday);
+      expect(daily.windowEnd(monday), monday);
+      final once = Recurrence(
+        type: RepeatType.once,
+        windowDays: 0,
+        start: monday,
+      );
+      expect(once.windowEnd(monday), monday);
+      final onceThree = Recurrence(
+        type: RepeatType.once,
+        windowDays: 3,
+        start: monday,
+      );
+      expect(onceThree.windowEnd(monday), d(2026, 10, 28));
+    });
+
+    test('across the DST change', () {
+      final r = Recurrence(
+        type: RepeatType.weekly,
+        weekdays: {DateTime.saturday},
+        windowDays: 3,
+        start: d(2026, 10, 24),
+      );
+      expect(r.windowEnd(d(2026, 10, 24)), d(2026, 10, 26));
+    });
+  });
+
+  test('time windows include both ends', () {
+    const w = TimeWindow(18 * 60, 20 * 60);
+    expect(w.contains(DateTime(2026, 11, 2, 17, 59)), isFalse);
+    expect(w.contains(DateTime(2026, 11, 2, 18)), isTrue);
+    expect(w.contains(DateTime(2026, 11, 2, 20)), isTrue);
+    expect(w.contains(DateTime(2026, 11, 2, 20, 1)), isFalse);
+  });
 }

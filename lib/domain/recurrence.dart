@@ -17,7 +17,8 @@ enum RepeatType {
   weekly,
 
   /// Every [Recurrence.interval] months on [Recurrence.dayOfMonth]
-  /// (clamped to the month's last day).
+  /// (clamped to the month's last day), or with [Recurrence.monthWeek] on
+  /// the nth weekday ("1st Monday").
   monthly,
 
   /// [Recurrence.interval] days after the last completion ("floating").
@@ -36,14 +37,19 @@ class Recurrence {
     this.interval = 1,
     this.weekdays = const {},
     this.dayOfMonth,
+    this.monthWeek,
+    this.windowDays = 1,
     required this.start,
-  }) : assert(interval >= 1);
+  }) : assert(interval >= 1),
+       assert(windowDays >= 0);
 
   const Recurrence.anytime(this.start)
     : type = RepeatType.anytime,
       interval = 1,
       weekdays = const {},
-      dayOfMonth = null;
+      dayOfMonth = null,
+      monthWeek = null,
+      windowDays = 1;
 
   final RepeatType type;
   final int interval;
@@ -53,6 +59,15 @@ class Recurrence {
 
   /// Day of month for [RepeatType.monthly]; defaults to [start]'s day.
   final int? dayOfMonth;
+
+  /// Monthly on a weekday: 1–4 for the 1st–4th, -1 for the last; the
+  /// weekday is the single one in [weekdays]. `null`: on [dayOfMonth].
+  final int? monthWeek;
+
+  /// Days each occurrence stays open, from its due day: 1 = that day only.
+  /// 0 = until the day before the next occurrence. Never past that day, so
+  /// windows of one chore don't overlap (see docs/design/scheduling.md).
+  final int windowDays;
 
   /// First possible occurrence (the date for [RepeatType.once]).
   final DateTime start;
@@ -82,8 +97,18 @@ class Recurrence {
         return weekdays.contains(d.weekday) &&
             (daysBetween(weekStartOf(s), weekStartOf(d)) ~/ 7) % interval == 0;
       case RepeatType.monthly:
+        if (monthsBetween(s, d) % interval != 0) return false;
+        final week = monthWeek;
+        if (week != null) {
+          if (weekdays.length != 1 || d.weekday != weekdays.first) {
+            return false;
+          }
+          return week == -1
+              ? d.day + 7 > daysInMonth(d.year, d.month)
+              : (d.day - 1) ~/ 7 + 1 == week;
+        }
         final dom = min(dayOfMonth ?? s.day, daysInMonth(d.year, d.month));
-        return monthsBetween(s, d) % interval == 0 && d.day == dom;
+        return d.day == dom;
     }
   }
 
@@ -150,6 +175,21 @@ class Recurrence {
     }
   }
 
+  /// The last day the occurrence due on [due] is open (see [windowDays]):
+  /// never on or after the next occurrence.
+  DateTime windowEnd(DateTime due) {
+    final d = dayOf(due);
+    final DateTime? next = switch (type) {
+      RepeatType.anytime || RepeatType.once => null,
+      RepeatType.afterDone => addDays(d, interval),
+      _ => firstOnOrAfter(addDays(d, 1)),
+    };
+    final cap = next == null ? null : addDays(next, -1);
+    if (windowDays == 0) return cap ?? d;
+    final wanted = addDays(d, windowDays - 1);
+    return cap != null && cap.isBefore(wanted) ? cap : wanted;
+  }
+
   /// Future due days strictly after [today] up to [to], assuming the chore is
   /// done when due (an overdue chore is assumed done today).
   List<DateTime> upcomingDueDays({
@@ -190,12 +230,16 @@ class Recurrence {
     int? interval,
     Set<int>? weekdays,
     int? Function()? dayOfMonth,
+    int? Function()? monthWeek,
+    int? windowDays,
     DateTime? start,
   }) => Recurrence(
     type: type ?? this.type,
     interval: interval ?? this.interval,
     weekdays: weekdays ?? this.weekdays,
     dayOfMonth: dayOfMonth != null ? dayOfMonth() : this.dayOfMonth,
+    monthWeek: monthWeek != null ? monthWeek() : this.monthWeek,
+    windowDays: windowDays ?? this.windowDays,
     start: start ?? this.start,
   );
 
@@ -207,6 +251,8 @@ class Recurrence {
       other.weekdays.length == weekdays.length &&
       other.weekdays.containsAll(weekdays) &&
       other.dayOfMonth == dayOfMonth &&
+      other.monthWeek == monthWeek &&
+      other.windowDays == windowDays &&
       dayOf(other.start) == dayOf(start);
 
   @override
@@ -215,12 +261,15 @@ class Recurrence {
     interval,
     Object.hashAllUnordered(weekdays),
     dayOfMonth,
+    monthWeek,
+    windowDays,
     dayOf(start),
   );
 
   @override
   String toString() =>
-      'Recurrence($type, every $interval, $weekdays, dom $dayOfMonth, from $start)';
+      'Recurrence($type, every $interval, $weekdays, dom $dayOfMonth, '
+      'week $monthWeek, window $windowDays, from $start)';
 }
 
 /// Weekday set <-> bitmask (bit 0 = Monday) for storage.
@@ -231,3 +280,26 @@ Set<int> weekdaysFromMask(int mask) => {
   for (var d = DateTime.monday; d <= DateTime.sunday; d++)
     if (mask & (1 << (d - 1)) != 0) d,
 };
+
+/// Times of day a chore is meant to be done, as minutes after midnight
+/// ([from] < [to], within one day).
+class TimeWindow {
+  const TimeWindow(this.from, this.to);
+
+  final int from, to;
+
+  /// Minutes after midnight of [time].
+  static int minutesOf(DateTime time) => time.hour * 60 + time.minute;
+
+  bool contains(DateTime time) {
+    final m = minutesOf(time);
+    return m >= from && m <= to;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is TimeWindow && other.from == from && other.to == to;
+
+  @override
+  int get hashCode => Object.hash(from, to);
+}

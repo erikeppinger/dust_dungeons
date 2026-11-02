@@ -38,6 +38,7 @@ class ChoreRepository {
     required Recurrence recurrence,
     int? reminderMinutes,
     BossFamily? bossFamily,
+    TimeWindow? times,
   }) => _db.transaction(() async {
     final maxOrder = _db.chores.sortOrder.max();
     final row = await (_db.selectOnly(
@@ -54,6 +55,8 @@ class ChoreRepository {
             sortOrder: Value((row.read(maxOrder) ?? -1) + 1),
             reminderMinutes: Value(reminderMinutes),
             bossFamily: Value(bossFamily),
+            windowFrom: Value(times?.from),
+            windowTo: Value(times?.to),
           ).withSchedule(recurrence, _clock()),
         );
   });
@@ -70,6 +73,7 @@ class ChoreRepository {
     required Recurrence recurrence,
     int? reminderMinutes,
     BossFamily? bossFamily,
+    TimeWindow? times,
   }) => _db.transaction(() async {
     final current = await (_db.select(
       _db.chores,
@@ -81,6 +85,8 @@ class ChoreRepository {
       basePoints: Value(basePoints),
       reminderMinutes: Value(reminderMinutes),
       bossFamily: Value(bossFamily),
+      windowFrom: Value(times?.from),
+      windowTo: Value(times?.to),
     );
     if (current.recurrence != recurrence) {
       changes = changes.withSchedule(recurrence, _clock());

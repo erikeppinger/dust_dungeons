@@ -73,6 +73,13 @@ class FakeNotificationService implements NotificationService {
   ) async => shown.add(notification);
 }
 
+/// The time without the minute timer, so widget tests leave no timers
+/// behind.
+class FixedNow extends NowNotifier {
+  @override
+  DateTime build() => DateTime.now();
+}
+
 /// Usage per day and app, an app list and recorded snapshots, instead of
 /// Android's usage access.
 class FakeScreenTimeService implements ScreenTimeService {
@@ -200,6 +207,7 @@ Future<AppDatabase> pumpApp(
       notifications: notifications ?? FakeNotificationService(),
       overrides: [
         todayProvider.overrideWith(FixedToday.new),
+        nowProvider.overrideWith(FixedNow.new),
         fightSoundsProvider.overrideWithValue(SilentFightSounds()),
         screenTimeServiceProvider.overrideWithValue(
           screenTime ?? FakeScreenTimeService(),

@@ -46,6 +46,9 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   int? _reminderMinutes;
   late BossFamily _family;
 
+  /// Times of day it's meant to be done; `null` = any time.
+  TimeWindow? _times;
+
   /// Who the chore is for, and the people for one/each.
   late Assignment _assignment;
   late Set<int> _people;
@@ -70,6 +73,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
         chore?.recurrence ?? Recurrence.anytime(ref.read(todayProvider));
     _reminderMinutes = chore?.reminderMinutes;
     _family = chore?.family ?? BossFamily.clutter;
+    _times = chore?.timeWindow;
     _assignment = chore?.assignment ?? Assignment.anyone;
     _people = {
       ...?(chore == null
@@ -88,7 +92,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
   Future<void> _save() async {
     if (_saving) return;
     final formValid = _formKey.currentState!.validate();
-    if (!formValid || !RepeatEditor.isValid(_recurrence)) {
+    final times = _recurrence.type == RepeatType.anytime ? null : _times;
+    if (!formValid ||
+        !RepeatEditor.isValid(_recurrence) ||
+        (times != null && times.from >= times.to)) {
       setState(() => _showErrors = true);
       return;
     }
@@ -117,6 +124,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               recurrence: _recurrence,
               reminderMinutes: reminder,
               bossFamily: family,
+              times: times,
             )
           : chore.id;
       if (chore != null) {
@@ -129,6 +137,7 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
           recurrence: _recurrence,
           reminderMinutes: reminder,
           bossFamily: family,
+          times: times,
         );
       }
       await profiles.assign(id, _assignment, _people);
@@ -290,6 +299,14 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               },
             ),
             const SizedBox(height: 16),
+            if (_recurrence.type != RepeatType.anytime) ...[
+              _TimesEditor(
+                times: _times,
+                showErrors: _showErrors,
+                onChanged: (t) => setState(() => _times = t),
+              ),
+              const SizedBox(height: 16),
+            ],
             _ReminderEditor(
               minutes: _reminderMinutes,
               hasSchedule: _recurrence.type != RepeatType.anytime,
@@ -508,6 +525,86 @@ class _AssignmentEditor extends ConsumerWidget {
                 ),
             ],
           ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Optional times of day the quest is meant to be done ("18:00–20:00").
+class _TimesEditor extends StatelessWidget {
+  const _TimesEditor({
+    required this.times,
+    required this.showErrors,
+    required this.onChanged,
+  });
+
+  final TimeWindow? times;
+  final bool showErrors;
+  final ValueChanged<TimeWindow?> onChanged;
+
+  static const _defaultFrom = 18 * 60, _defaultTo = 20 * 60;
+
+  Future<int?> _pick(BuildContext context, int minutes) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60),
+    );
+    return picked == null ? null : picked.hour * 60 + picked.minute;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final t = times;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile(
+          key: const ValueKey('times-switch'),
+          contentPadding: EdgeInsets.zero,
+          secondary: const Icon(Icons.schedule),
+          title: Text(l10n.timesOn),
+          subtitle: Text(l10n.timesHelp),
+          value: t != null,
+          onChanged: (on) =>
+              onChanged(on ? const TimeWindow(_defaultFrom, _defaultTo) : null),
+        ),
+        if (t != null) ...[
+          Row(
+            children: [
+              Expanded(
+                child: ListTile(
+                  key: const ValueKey('times-from'),
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.timesFrom),
+                  subtitle: Text(formatMinutes(context, t.from)),
+                  onTap: () async {
+                    final m = await _pick(context, t.from);
+                    if (m != null) onChanged(TimeWindow(m, t.to));
+                  },
+                ),
+              ),
+              Expanded(
+                child: ListTile(
+                  key: const ValueKey('times-to'),
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(l10n.timesTo),
+                  subtitle: Text(formatMinutes(context, t.to)),
+                  onTap: () async {
+                    final m = await _pick(context, t.to);
+                    if (m != null) onChanged(TimeWindow(t.from, m));
+                  },
+                ),
+              ),
+            ],
+          ),
+          if (showErrors && t.from >= t.to)
+            Text(
+              l10n.timesOrder,
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
         ],
       ],
     );

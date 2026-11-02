@@ -149,6 +149,7 @@ final _scheduleProvider =
           lastDone: ref.watch(lastDoneByPersonProvider).requireValue,
           doneToday: ref.watch(todayByPersonProvider).requireValue,
           today: ref.watch(todayProvider),
+          now: ref.watch(nowProvider),
           person: person,
         ),
       );

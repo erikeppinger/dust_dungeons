@@ -10,17 +10,18 @@ import 'generated_migrations/schema_v3.dart' as v3;
 import 'generated_migrations/schema_v4.dart' as v4;
 import 'generated_migrations/schema_v5.dart' as v5;
 import 'generated_migrations/schema_v6.dart' as v6;
+import 'generated_migrations/schema_v7.dart' as v7;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4, 5, 6]) {
-    test('v$from -> v7 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5, 6, 7]) {
+    test('v$from -> v8 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 7);
+      await verifier.migrateAndValidate(db, 8);
       await db.close();
     });
   }
@@ -201,5 +202,28 @@ void main() {
     expect(keys, contains('fightSound'));
     expect(keys, isNot(contains('avatarSkin')));
     expect(keys, isNot(contains('fightStoryMode')));
+  });
+
+  test('v7 -> v8 keeps schedules; chores open one day at any time', () async {
+    final schema = await verifier.schemaAt(7);
+    final old = v7.DatabaseAtV7(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO chores (custom_title, icon_key, color_key, base_points, '
+      'repeat_type, repeat_interval, repeat_day_of_month) '
+      "VALUES ('Windows', 'window', 1, 20, 'monthly', 2, 15)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final windows = (await db.select(db.chores).get()).singleWhere(
+      (c) => c.customTitle == 'Windows',
+    );
+    expect(windows.recurrence.interval, 2);
+    expect(windows.recurrence.dayOfMonth, 15);
+    expect(windows.repeatMonthWeek, isNull);
+    expect(windows.windowDays, 1);
+    expect(windows.timeWindow, isNull);
   });
 }

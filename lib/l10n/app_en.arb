@@ -136,7 +136,7 @@
       }
     }
   },
-  "summaryAfterDone": "{n, plural, =1{1 day after it was last done} other{{n} days after it was last done}}",
+  "summaryAfterDone": "{n, plural, =1{1 day after it's done} other{{n} days after it's done}}",
   "@summaryAfterDone": {
     "placeholders": {
       "n": {
@@ -171,10 +171,10 @@
   "choreRepeat": "Repeat",
   "repeatAnytime": "No schedule (anytime)",
   "repeatOnce": "Once",
-  "repeatDaily": "Every few days",
+  "repeatDaily": "Every … days, fixed rhythm",
   "repeatWeekly": "Weekly on set days",
   "repeatMonthly": "Monthly",
-  "repeatAfterDone": "Some days after last done",
+  "repeatAfterDone": "… days after it's done",
   "repeatEvery": "Every",
   "unitDays": "{n, plural, =1{day} other{days}}",
   "@unitDays": {
@@ -1245,5 +1245,134 @@
         "type": "String"
       }
     }
-  }
+  },
+  "statusDueUntil": "Due until {date}",
+  "@statusDueUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "statusTodayFrom": "Today from {time}",
+  "@statusTodayFrom": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusTimesUp": "Time's up ({times})",
+  "@statusTimesUp": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "statusAgainTomorrow": "Tomorrow {times}",
+  "@statusAgainTomorrow": {
+    "placeholders": {
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionLaterToday": "Later today",
+  "windowLabel": "Time to do it",
+  "windowHelp": "Open this many days from the due day, all of them on time. Never past the next time.",
+  "windowOneDay": "The due day only",
+  "windowDays": "{n} days",
+  "@windowDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "windowUntilNext": "Until the next time",
+  "repeatNextDates": "Next: {dates}",
+  "@repeatNextDates": {
+    "placeholders": {
+      "dates": {
+        "type": "String"
+      }
+    }
+  },
+  "repeatNextIfDone": "If done today, next on {date}",
+  "@repeatNextIfDone": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "monthlyOnDate": "On a date",
+  "monthlyOnWeekday": "On a weekday",
+  "monthWeekName": "{n, select, 1{1st} 2{2nd} 3{3rd} 4{4th} other{last}}",
+  "@monthWeekName": {
+    "placeholders": {
+      "n": {
+        "type": "String"
+      }
+    }
+  },
+  "summaryMonthsWeekday": "{n, plural, =1{Monthly on the {week} {weekday}} other{Every {n} months on the {week} {weekday}}}",
+  "@summaryMonthsWeekday": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "week": {
+        "type": "String"
+      },
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "timesOn": "Only at certain times",
+  "timesHelp": "Doing it outside these times still counts, without the on-time bonus.",
+  "timesFrom": "From",
+  "timesTo": "To",
+  "timesOrder": "The end must be after the start.",
+  "planWindowContinues": "Still open",
+  "widgetNothingOpen": "No open quests. Well done!",
+  "widgetMore": "+{n} more",
+  "@widgetMore": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetTimeUp": "! time's up",
+  "widgetLate": "{n, plural, =1{! 1 day late} other{! {n} days late}}",
+  "@widgetLate": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetToday": "today",
+  "widgetPathTitle": "Path · {name}",
+  "@widgetPathTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "widgetPathLate": "{n, plural, =1{1 day!} other{{n} days!}}",
+  "@widgetPathLate": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "widgetPathNow": "now",
+  "widgetNextTitle": "Next quest",
+  "widgetThen": "Then:"
 }

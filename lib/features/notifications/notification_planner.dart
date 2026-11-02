@@ -112,14 +112,23 @@ List<PlannedNotification> planNotifications({
 
   // Which chores are open on each day: currently overdue ones stay open until
   // done; the rest are open on their (projected) due days.
+  // A window counts as open on each of its days (assuming it isn't done).
   final overdue = chores.where((c) => c.isOverdue).toList();
-  final dueByDay = <DateTime, List<ScheduledChore>>{
-    today: chores.where((c) => c.isDueToday).toList(),
-  };
+  final dueByDay = <DateTime, List<ScheduledChore>>{};
+  void open(ScheduledChore c, DateTime from) {
+    final end = c.recurrence.windowEnd(from);
+    for (var day = from; !day.isAfter(end); day = addDays(day, 1)) {
+      if (day.isBefore(today) || day.isAfter(lastDay)) continue;
+      final list = dueByDay[day] ??= [];
+      if (!list.contains(c)) list.add(c);
+    }
+  }
+
   for (final c in chores) {
     if (c.isOverdue) continue;
+    if (c.isDueToday) open(c, c.due!);
     for (final day in c.upcomingDueDays(lastDay)) {
-      (dueByDay[day] ??= []).add(c);
+      open(c, day);
     }
   }
 

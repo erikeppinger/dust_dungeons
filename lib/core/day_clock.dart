@@ -40,3 +40,37 @@ class TodayNotifier extends Notifier<DateTime> {
 final todayProvider = NotifierProvider<TodayNotifier, DateTime>(
   TodayNotifier.new,
 );
+
+/// The current time to the minute, for quests with times of day ("18:00 to
+/// 20:00"). Updates at each full minute and whenever the app resumes.
+class NowNotifier extends Notifier<DateTime> {
+  Timer? _timer;
+
+  @override
+  DateTime build() {
+    final listener = AppLifecycleListener(onResume: _refresh);
+    ref.onDispose(() {
+      listener.dispose();
+      _timer?.cancel();
+    });
+    return _scheduleNext();
+  }
+
+  DateTime _scheduleNext() {
+    final now = DateTime.now();
+    final minute = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    _timer?.cancel();
+    _timer = Timer(
+      minute.add(const Duration(minutes: 1)).difference(now),
+      _refresh,
+    );
+    return minute;
+  }
+
+  void _refresh() {
+    final now = _scheduleNext();
+    if (now != state) state = now;
+  }
+}
+
+final nowProvider = NotifierProvider<NowNotifier, DateTime>(NowNotifier.new);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../domain/dates.dart';
 import '../../domain/recurrence.dart';
@@ -26,7 +27,8 @@ class RepeatEditor extends StatelessWidget {
 
   /// Whether [r] can be saved.
   static bool isValid(Recurrence r) =>
-      r.type != RepeatType.weekly || r.weekdays.isNotEmpty;
+      (r.type != RepeatType.weekly || r.weekdays.isNotEmpty) &&
+      (r.monthWeek == null || r.weekdays.length == 1);
 
   void _setType(RepeatType type) {
     if (type == value.type) return;
@@ -134,6 +136,8 @@ class RepeatEditor extends StatelessWidget {
             ),
         ],
         if (value.type == RepeatType.monthly)
+          _MonthlyMode(value: value, today: today, onChanged: onChanged),
+        if (value.type == RepeatType.monthly && value.monthWeek == null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: DropdownButtonFormField<int>(
@@ -164,6 +168,34 @@ class RepeatEditor extends StatelessWidget {
             subtitle: Text(formatDay(context, value.start)),
             onTap: () => _pickStart(context),
           ),
+        if (value.type
+            case RepeatType.daily ||
+                RepeatType.weekly ||
+                RepeatType.monthly ||
+                RepeatType.afterDone)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: DropdownButtonFormField<int>(
+              key: const ValueKey('window-days'),
+              initialValue: value.windowDays,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: l10n.windowLabel,
+                helperText: l10n.windowHelp,
+                helperMaxLines: 3,
+                border: const OutlineInputBorder(),
+              ),
+              items: [
+                DropdownMenuItem(value: 1, child: Text(l10n.windowOneDay)),
+                for (var n = 2; n <= 7; n++)
+                  DropdownMenuItem(value: n, child: Text(l10n.windowDays(n))),
+                DropdownMenuItem(value: 0, child: Text(l10n.windowUntilNext)),
+              ],
+              onChanged: (n) {
+                if (n != null) onChanged(value.copyWith(windowDays: n));
+              },
+            ),
+          ),
         Text(
           recurrenceSummary(context, value),
           key: const ValueKey('repeat-summary'),
@@ -171,7 +203,143 @@ class RepeatEditor extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
         ),
+        if (_example(context) case final example?)
+          Text(
+            example,
+            key: const ValueKey('repeat-example'),
+            style: theme.textTheme.bodySmall,
+          ),
       ],
+    );
+  }
+
+  /// The next dates, so the difference between the repeat types is visible:
+  /// "Next: Thu 5 Nov, Sun 8 Nov, Wed 11 Nov".
+  String? _example(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final format = DateFormat.MMMEd(Localizations.localeOf(context).toString());
+    switch (value.type) {
+      case RepeatType.anytime || RepeatType.once:
+        return null;
+      case RepeatType.afterDone:
+        return l10n.repeatNextIfDone(
+          format.format(addDays(today, value.interval)),
+        );
+      case RepeatType.daily || RepeatType.weekly || RepeatType.monthly:
+        if (!isValid(value)) return null;
+        final dates = <DateTime>[];
+        var d = value.firstOnOrAfter(today);
+        while (d != null && dates.length < 3) {
+          dates.add(d);
+          d = value.firstOnOrAfter(addDays(d, 1));
+        }
+        if (dates.isEmpty) return null;
+        return l10n.repeatNextDates(dates.map(format.format).join(', '));
+    }
+  }
+}
+
+/// Monthly on a date ("on the 15th") or on a weekday ("on the 1st Monday").
+class _MonthlyMode extends StatelessWidget {
+  const _MonthlyMode({
+    required this.value,
+    required this.today,
+    required this.onChanged,
+  });
+
+  final Recurrence value;
+  final DateTime today;
+  final ValueChanged<Recurrence> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final week = value.monthWeek;
+    final weekday = value.weekdays.isEmpty
+        ? today.weekday
+        : value.weekdays.first;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SegmentedButton<bool>(
+            key: const ValueKey('monthly-mode'),
+            segments: [
+              ButtonSegment(value: false, label: Text(l10n.monthlyOnDate)),
+              ButtonSegment(value: true, label: Text(l10n.monthlyOnWeekday)),
+            ],
+            selected: {week != null},
+            showSelectedIcon: false,
+            onSelectionChanged: (s) {
+              if (s.first) {
+                // Today's place in the month (2nd Tuesday); a 5th becomes
+                // the last.
+                final nth = (today.day - 1) ~/ 7 + 1;
+                onChanged(
+                  value.copyWith(
+                    monthWeek: () => nth > 4 ? -1 : nth,
+                    weekdays: {today.weekday},
+                  ),
+                );
+              } else {
+                onChanged(
+                  value.copyWith(monthWeek: () => null, weekdays: const {}),
+                );
+              }
+            },
+          ),
+          if (week != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    key: const ValueKey('month-week'),
+                    initialValue: week,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [
+                      for (final n in [1, 2, 3, 4, -1])
+                        DropdownMenuItem(
+                          value: n,
+                          child: Text(
+                            l10n.monthWeekName(n == -1 ? 'last' : '$n'),
+                          ),
+                        ),
+                    ],
+                    onChanged: (n) =>
+                        onChanged(value.copyWith(monthWeek: () => n)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: DropdownButtonFormField<int>(
+                    key: const ValueKey('month-weekday'),
+                    initialValue: weekday,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [
+                      for (final d in localeWeekdays(context))
+                        DropdownMenuItem(
+                          value: d,
+                          child: Text(weekdayLong(context, d)),
+                        ),
+                    ],
+                    onChanged: (d) {
+                      if (d != null) onChanged(value.copyWith(weekdays: {d}));
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -851,6 +851,51 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         type: DriftSqlType.string,
         requiredDuringInsert: false,
       ).withConverter<BossFamily?>($ChoresTable.$converterbossFamilyn);
+  static const VerificationMeta _repeatMonthWeekMeta = const VerificationMeta(
+    'repeatMonthWeek',
+  );
+  @override
+  late final GeneratedColumn<int> repeatMonthWeek = GeneratedColumn<int>(
+    'repeat_month_week',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _windowDaysMeta = const VerificationMeta(
+    'windowDays',
+  );
+  @override
+  late final GeneratedColumn<int> windowDays = GeneratedColumn<int>(
+    'window_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _windowFromMeta = const VerificationMeta(
+    'windowFrom',
+  );
+  @override
+  late final GeneratedColumn<int> windowFrom = GeneratedColumn<int>(
+    'window_from',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _windowToMeta = const VerificationMeta(
+    'windowTo',
+  );
+  @override
+  late final GeneratedColumn<int> windowTo = GeneratedColumn<int>(
+    'window_to',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   late final GeneratedColumnWithTypeConverter<Assignment, String> assignment =
       GeneratedColumn<String>(
@@ -880,6 +925,10 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
     repeatSetAt,
     reminderMinutes,
     bossFamily,
+    repeatMonthWeek,
+    windowDays,
+    windowFrom,
+    windowTo,
     assignment,
   ];
   @override
@@ -1008,6 +1057,33 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
         ),
       );
     }
+    if (data.containsKey('repeat_month_week')) {
+      context.handle(
+        _repeatMonthWeekMeta,
+        repeatMonthWeek.isAcceptableOrUnknown(
+          data['repeat_month_week']!,
+          _repeatMonthWeekMeta,
+        ),
+      );
+    }
+    if (data.containsKey('window_days')) {
+      context.handle(
+        _windowDaysMeta,
+        windowDays.isAcceptableOrUnknown(data['window_days']!, _windowDaysMeta),
+      );
+    }
+    if (data.containsKey('window_from')) {
+      context.handle(
+        _windowFromMeta,
+        windowFrom.isAcceptableOrUnknown(data['window_from']!, _windowFromMeta),
+      );
+    }
+    if (data.containsKey('window_to')) {
+      context.handle(
+        _windowToMeta,
+        windowTo.isAcceptableOrUnknown(data['window_to']!, _windowToMeta),
+      );
+    }
     return context;
   }
 
@@ -1089,6 +1165,22 @@ class $ChoresTable extends Chores with TableInfo<$ChoresTable, Chore> {
           data['${effectivePrefix}boss_family'],
         ),
       ),
+      repeatMonthWeek: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repeat_month_week'],
+      ),
+      windowDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}window_days'],
+      )!,
+      windowFrom: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}window_from'],
+      ),
+      windowTo: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}window_to'],
+      ),
       assignment: $ChoresTable.$converterassignment.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
@@ -1144,6 +1236,18 @@ class Chore extends DataClass implements Insertable<Chore> {
   /// built-in chore, or the Clutter Imp for user chores.
   final BossFamily? bossFamily;
 
+  /// Monthly on a weekday (schema v8): 1–4 or -1 for the last; `null` =
+  /// on the day of the month. See `Recurrence.monthWeek`.
+  final int? repeatMonthWeek;
+
+  /// Days each occurrence stays open (schema v8); 0 = until the next one.
+  final int windowDays;
+
+  /// Times of day it's meant to be done, as minutes after midnight (schema
+  /// v8); both `null` = any time.
+  final int? windowFrom;
+  final int? windowTo;
+
   /// Who the chore is for (schema v7); the people are in [ChoreAssignees].
   final Assignment assignment;
   const Chore({
@@ -1164,6 +1268,10 @@ class Chore extends DataClass implements Insertable<Chore> {
     this.repeatSetAt,
     this.reminderMinutes,
     this.bossFamily,
+    this.repeatMonthWeek,
+    required this.windowDays,
+    this.windowFrom,
+    this.windowTo,
     required this.assignment,
   });
   @override
@@ -1206,6 +1314,16 @@ class Chore extends DataClass implements Insertable<Chore> {
         $ChoresTable.$converterbossFamilyn.toSql(bossFamily),
       );
     }
+    if (!nullToAbsent || repeatMonthWeek != null) {
+      map['repeat_month_week'] = Variable<int>(repeatMonthWeek);
+    }
+    map['window_days'] = Variable<int>(windowDays);
+    if (!nullToAbsent || windowFrom != null) {
+      map['window_from'] = Variable<int>(windowFrom);
+    }
+    if (!nullToAbsent || windowTo != null) {
+      map['window_to'] = Variable<int>(windowTo);
+    }
     {
       map['assignment'] = Variable<String>(
         $ChoresTable.$converterassignment.toSql(assignment),
@@ -1247,6 +1365,16 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: bossFamily == null && nullToAbsent
           ? const Value.absent()
           : Value(bossFamily),
+      repeatMonthWeek: repeatMonthWeek == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repeatMonthWeek),
+      windowDays: Value(windowDays),
+      windowFrom: windowFrom == null && nullToAbsent
+          ? const Value.absent()
+          : Value(windowFrom),
+      windowTo: windowTo == null && nullToAbsent
+          ? const Value.absent()
+          : Value(windowTo),
       assignment: Value(assignment),
     );
   }
@@ -1278,6 +1406,10 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: $ChoresTable.$converterbossFamilyn.fromJson(
         serializer.fromJson<String?>(json['bossFamily']),
       ),
+      repeatMonthWeek: serializer.fromJson<int?>(json['repeatMonthWeek']),
+      windowDays: serializer.fromJson<int>(json['windowDays']),
+      windowFrom: serializer.fromJson<int?>(json['windowFrom']),
+      windowTo: serializer.fromJson<int?>(json['windowTo']),
       assignment: $ChoresTable.$converterassignment.fromJson(
         serializer.fromJson<String>(json['assignment']),
       ),
@@ -1308,6 +1440,10 @@ class Chore extends DataClass implements Insertable<Chore> {
       'bossFamily': serializer.toJson<String?>(
         $ChoresTable.$converterbossFamilyn.toJson(bossFamily),
       ),
+      'repeatMonthWeek': serializer.toJson<int?>(repeatMonthWeek),
+      'windowDays': serializer.toJson<int>(windowDays),
+      'windowFrom': serializer.toJson<int?>(windowFrom),
+      'windowTo': serializer.toJson<int?>(windowTo),
       'assignment': serializer.toJson<String>(
         $ChoresTable.$converterassignment.toJson(assignment),
       ),
@@ -1332,6 +1468,10 @@ class Chore extends DataClass implements Insertable<Chore> {
     Value<DateTime?> repeatSetAt = const Value.absent(),
     Value<int?> reminderMinutes = const Value.absent(),
     Value<BossFamily?> bossFamily = const Value.absent(),
+    Value<int?> repeatMonthWeek = const Value.absent(),
+    int? windowDays,
+    Value<int?> windowFrom = const Value.absent(),
+    Value<int?> windowTo = const Value.absent(),
     Assignment? assignment,
   }) => Chore(
     id: id ?? this.id,
@@ -1355,6 +1495,12 @@ class Chore extends DataClass implements Insertable<Chore> {
         ? reminderMinutes.value
         : this.reminderMinutes,
     bossFamily: bossFamily.present ? bossFamily.value : this.bossFamily,
+    repeatMonthWeek: repeatMonthWeek.present
+        ? repeatMonthWeek.value
+        : this.repeatMonthWeek,
+    windowDays: windowDays ?? this.windowDays,
+    windowFrom: windowFrom.present ? windowFrom.value : this.windowFrom,
+    windowTo: windowTo.present ? windowTo.value : this.windowTo,
     assignment: assignment ?? this.assignment,
   );
   Chore copyWithCompanion(ChoresCompanion data) {
@@ -1398,6 +1544,16 @@ class Chore extends DataClass implements Insertable<Chore> {
       bossFamily: data.bossFamily.present
           ? data.bossFamily.value
           : this.bossFamily,
+      repeatMonthWeek: data.repeatMonthWeek.present
+          ? data.repeatMonthWeek.value
+          : this.repeatMonthWeek,
+      windowDays: data.windowDays.present
+          ? data.windowDays.value
+          : this.windowDays,
+      windowFrom: data.windowFrom.present
+          ? data.windowFrom.value
+          : this.windowFrom,
+      windowTo: data.windowTo.present ? data.windowTo.value : this.windowTo,
       assignment: data.assignment.present
           ? data.assignment.value
           : this.assignment,
@@ -1424,13 +1580,17 @@ class Chore extends DataClass implements Insertable<Chore> {
           ..write('repeatSetAt: $repeatSetAt, ')
           ..write('reminderMinutes: $reminderMinutes, ')
           ..write('bossFamily: $bossFamily, ')
+          ..write('repeatMonthWeek: $repeatMonthWeek, ')
+          ..write('windowDays: $windowDays, ')
+          ..write('windowFrom: $windowFrom, ')
+          ..write('windowTo: $windowTo, ')
           ..write('assignment: $assignment')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     seedKey,
     customTitle,
@@ -1448,8 +1608,12 @@ class Chore extends DataClass implements Insertable<Chore> {
     repeatSetAt,
     reminderMinutes,
     bossFamily,
+    repeatMonthWeek,
+    windowDays,
+    windowFrom,
+    windowTo,
     assignment,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1471,6 +1635,10 @@ class Chore extends DataClass implements Insertable<Chore> {
           other.repeatSetAt == this.repeatSetAt &&
           other.reminderMinutes == this.reminderMinutes &&
           other.bossFamily == this.bossFamily &&
+          other.repeatMonthWeek == this.repeatMonthWeek &&
+          other.windowDays == this.windowDays &&
+          other.windowFrom == this.windowFrom &&
+          other.windowTo == this.windowTo &&
           other.assignment == this.assignment);
 }
 
@@ -1492,6 +1660,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
   final Value<DateTime?> repeatSetAt;
   final Value<int?> reminderMinutes;
   final Value<BossFamily?> bossFamily;
+  final Value<int?> repeatMonthWeek;
+  final Value<int> windowDays;
+  final Value<int?> windowFrom;
+  final Value<int?> windowTo;
   final Value<Assignment> assignment;
   const ChoresCompanion({
     this.id = const Value.absent(),
@@ -1511,6 +1683,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     this.bossFamily = const Value.absent(),
+    this.repeatMonthWeek = const Value.absent(),
+    this.windowDays = const Value.absent(),
+    this.windowFrom = const Value.absent(),
+    this.windowTo = const Value.absent(),
     this.assignment = const Value.absent(),
   });
   ChoresCompanion.insert({
@@ -1531,6 +1707,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     this.repeatSetAt = const Value.absent(),
     this.reminderMinutes = const Value.absent(),
     this.bossFamily = const Value.absent(),
+    this.repeatMonthWeek = const Value.absent(),
+    this.windowDays = const Value.absent(),
+    this.windowFrom = const Value.absent(),
+    this.windowTo = const Value.absent(),
     this.assignment = const Value.absent(),
   }) : iconKey = Value(iconKey),
        colorKey = Value(colorKey),
@@ -1553,6 +1733,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Expression<DateTime>? repeatSetAt,
     Expression<int>? reminderMinutes,
     Expression<String>? bossFamily,
+    Expression<int>? repeatMonthWeek,
+    Expression<int>? windowDays,
+    Expression<int>? windowFrom,
+    Expression<int>? windowTo,
     Expression<String>? assignment,
   }) {
     return RawValuesInsertable({
@@ -1573,6 +1757,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       if (repeatSetAt != null) 'repeat_set_at': repeatSetAt,
       if (reminderMinutes != null) 'reminder_minutes': reminderMinutes,
       if (bossFamily != null) 'boss_family': bossFamily,
+      if (repeatMonthWeek != null) 'repeat_month_week': repeatMonthWeek,
+      if (windowDays != null) 'window_days': windowDays,
+      if (windowFrom != null) 'window_from': windowFrom,
+      if (windowTo != null) 'window_to': windowTo,
       if (assignment != null) 'assignment': assignment,
     });
   }
@@ -1595,6 +1783,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
     Value<DateTime?>? repeatSetAt,
     Value<int?>? reminderMinutes,
     Value<BossFamily?>? bossFamily,
+    Value<int?>? repeatMonthWeek,
+    Value<int>? windowDays,
+    Value<int?>? windowFrom,
+    Value<int?>? windowTo,
     Value<Assignment>? assignment,
   }) {
     return ChoresCompanion(
@@ -1615,6 +1807,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
       repeatSetAt: repeatSetAt ?? this.repeatSetAt,
       reminderMinutes: reminderMinutes ?? this.reminderMinutes,
       bossFamily: bossFamily ?? this.bossFamily,
+      repeatMonthWeek: repeatMonthWeek ?? this.repeatMonthWeek,
+      windowDays: windowDays ?? this.windowDays,
+      windowFrom: windowFrom ?? this.windowFrom,
+      windowTo: windowTo ?? this.windowTo,
       assignment: assignment ?? this.assignment,
     );
   }
@@ -1677,6 +1873,18 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
         $ChoresTable.$converterbossFamilyn.toSql(bossFamily.value),
       );
     }
+    if (repeatMonthWeek.present) {
+      map['repeat_month_week'] = Variable<int>(repeatMonthWeek.value);
+    }
+    if (windowDays.present) {
+      map['window_days'] = Variable<int>(windowDays.value);
+    }
+    if (windowFrom.present) {
+      map['window_from'] = Variable<int>(windowFrom.value);
+    }
+    if (windowTo.present) {
+      map['window_to'] = Variable<int>(windowTo.value);
+    }
     if (assignment.present) {
       map['assignment'] = Variable<String>(
         $ChoresTable.$converterassignment.toSql(assignment.value),
@@ -1705,6 +1913,10 @@ class ChoresCompanion extends UpdateCompanion<Chore> {
           ..write('repeatSetAt: $repeatSetAt, ')
           ..write('reminderMinutes: $reminderMinutes, ')
           ..write('bossFamily: $bossFamily, ')
+          ..write('repeatMonthWeek: $repeatMonthWeek, ')
+          ..write('windowDays: $windowDays, ')
+          ..write('windowFrom: $windowFrom, ')
+          ..write('windowTo: $windowTo, ')
           ..write('assignment: $assignment')
           ..write(')'))
         .toString();
@@ -5213,6 +5425,10 @@ typedef $$ChoresTableCreateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
   Value<BossFamily?> bossFamily,
+  Value<int?> repeatMonthWeek,
+  Value<int> windowDays,
+  Value<int?> windowFrom,
+  Value<int?> windowTo,
   Value<Assignment> assignment,
 });
 typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
@@ -5233,6 +5449,10 @@ typedef $$ChoresTableUpdateCompanionBuilder = ChoresCompanion Function({
   Value<DateTime?> repeatSetAt,
   Value<int?> reminderMinutes,
   Value<BossFamily?> bossFamily,
+  Value<int?> repeatMonthWeek,
+  Value<int> windowDays,
+  Value<int?> windowFrom,
+  Value<int?> windowTo,
   Value<Assignment> assignment,
 });
 
@@ -5371,6 +5591,26 @@ class $$ChoresTableFilterComposer
   get bossFamily => $composableBuilder(
     column: $table.bossFamily,
     builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get repeatMonthWeek => $composableBuilder(
+    column: $table.repeatMonthWeek,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get windowDays => $composableBuilder(
+    column: $table.windowDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get windowFrom => $composableBuilder(
+    column: $table.windowFrom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get windowTo => $composableBuilder(
+    column: $table.windowTo,
+    builder: (column) => ColumnFilters(column),
   );
 
   ColumnWithTypeConverterFilters<Assignment, Assignment, String>
@@ -5524,6 +5764,26 @@ class $$ChoresTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get repeatMonthWeek => $composableBuilder(
+    column: $table.repeatMonthWeek,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get windowDays => $composableBuilder(
+    column: $table.windowDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get windowFrom => $composableBuilder(
+    column: $table.windowFrom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get windowTo => $composableBuilder(
+    column: $table.windowTo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get assignment => $composableBuilder(
     column: $table.assignment,
     builder: (column) => ColumnOrderings(column),
@@ -5613,6 +5873,24 @@ class $$ChoresTableAnnotationComposer
         column: $table.bossFamily,
         builder: (column) => column,
       );
+
+  GeneratedColumn<int> get repeatMonthWeek => $composableBuilder(
+    column: $table.repeatMonthWeek,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get windowDays => $composableBuilder(
+    column: $table.windowDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get windowFrom => $composableBuilder(
+    column: $table.windowFrom,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get windowTo =>
+      $composableBuilder(column: $table.windowTo, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<Assignment, String> get assignment =>
       $composableBuilder(
@@ -5719,6 +5997,10 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
                 Value<BossFamily?> bossFamily = const Value.absent(),
+                Value<int?> repeatMonthWeek = const Value.absent(),
+                Value<int> windowDays = const Value.absent(),
+                Value<int?> windowFrom = const Value.absent(),
+                Value<int?> windowTo = const Value.absent(),
                 Value<Assignment> assignment = const Value.absent(),
               }) => ChoresCompanion(
                 id: id,
@@ -5738,6 +6020,10 @@ class $$ChoresTableTableManager
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
                 bossFamily: bossFamily,
+                repeatMonthWeek: repeatMonthWeek,
+                windowDays: windowDays,
+                windowFrom: windowFrom,
+                windowTo: windowTo,
                 assignment: assignment,
               ),
           createCompanionCallback:
@@ -5759,6 +6045,10 @@ class $$ChoresTableTableManager
                 Value<DateTime?> repeatSetAt = const Value.absent(),
                 Value<int?> reminderMinutes = const Value.absent(),
                 Value<BossFamily?> bossFamily = const Value.absent(),
+                Value<int?> repeatMonthWeek = const Value.absent(),
+                Value<int> windowDays = const Value.absent(),
+                Value<int?> windowFrom = const Value.absent(),
+                Value<int?> windowTo = const Value.absent(),
                 Value<Assignment> assignment = const Value.absent(),
               }) => ChoresCompanion.insert(
                 id: id,
@@ -5778,6 +6068,10 @@ class $$ChoresTableTableManager
                 repeatSetAt: repeatSetAt,
                 reminderMinutes: reminderMinutes,
                 bossFamily: bossFamily,
+                repeatMonthWeek: repeatMonthWeek,
+                windowDays: windowDays,
+                windowFrom: windowFrom,
+                windowTo: windowTo,
                 assignment: assignment,
               ),
           withReferenceMapper: (p0) => p0

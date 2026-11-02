@@ -28,6 +28,7 @@ Chore chore(
   basePoints: 10,
   isArchived: false,
   assignment: Assignment.anyone,
+  windowDays: 1,
   sortOrder: id,
   createdAt: DateTime(2026, 10, 1),
   repeatType: type,
@@ -206,6 +207,24 @@ void main() {
     expect(
       summaries(on.copyWith(screenTime: true, screenSummary: false)).first.body,
       'Dishes',
+    );
+  });
+
+  test('a window is open, and summarized, on each of its days', () {
+    // Weekly on Wednesdays, open 3 days; done last Wednesday.
+    final c = chore(
+      9,
+      'Bathroom',
+      RepeatType.weekly,
+    ).copyWith(repeatWeekdays: 1 << (DateTime.wednesday - 1), windowDays: 3);
+    final summaries = plan(
+      chores: [scheduled(c, lastDone: DateTime(2026, 10, 21, 9))],
+    ).where((n) => n.channel == NotificationChannel.summary);
+    expect(
+      [for (final n in summaries) n.when.day],
+      // Wed–Fri; the plan covers 7 days, so next week's Wednesday (4 Nov)
+      // isn't in it yet.
+      [28, 29, 30],
     );
   });
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_board_label">Questbrett</string>
+    <string name="widget_board_description">Deine offenen Quests mit Symbolen und Abzeichen</string>
+    <string name="widget_path_label">Questpfad</string>
+    <string name="widget_path_description">Deine nächsten Quests als Pfad, wie bei einem Brettspiel</string>
+    <string name="widget_next_label">Nächste Quest</string>
+    <string name="widget_next_description">Deine nächste Quest und was danach kommt</string>
+    <string name="widget_setup">Tippen, um deine Quests zu zeigen</string>
+    <string name="widget_picture_description">Deine offenen Quests</string>
+</resources>

@@ -26,6 +26,7 @@ void main() {
     repeatWeekdays: 0,
     repeatStart: DateTime(2026, 10, 1),
     assignment: assignment,
+    windowDays: 1,
   );
 
   group('who sees which quest, and when it is due', () {

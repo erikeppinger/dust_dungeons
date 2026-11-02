@@ -373,13 +373,13 @@ List<Widget> _dayEntries(
   final l10n = AppLocalizations.of(context);
   final rows = <Widget>[];
   if (day == today) {
-    for (final s in [...plan.overdue, ...plan.dueToday]) {
+    for (final s in [...plan.overdue, ...plan.dueToday, ...plan.laterToday]) {
       rows.add(
         _ChoreRow(
           chore: s.chore,
           who: names[s.person],
-          trailing: dueLabel(l10n, s.due, today),
-          overdue: s.isOverdue,
+          trailing: questStatus(context, s),
+          overdue: s.isOverdue || s.isTimesUp,
         ),
       );
     }
@@ -389,6 +389,15 @@ List<Widget> _dayEntries(
   } else if (day.isAfter(today)) {
     for (final s in plan.dueOn(day)) {
       rows.add(_ChoreRow(chore: s.chore, who: names[s.person]));
+    }
+    for (final s in plan.continuingOn(day)) {
+      rows.add(
+        _ChoreRow(
+          chore: s.chore,
+          who: names[s.person],
+          trailing: l10n.planWindowContinues,
+        ),
+      );
     }
   } else {
     for (final c in doneThatDay) {

@@ -9,12 +9,17 @@ class ScheduledChore {
     required DateTime? lastDone,
     required this.doneToday,
     required DateTime today,
+    DateTime? now,
     this.person,
     this.doneBy = const {},
   }) : today = dayOf(today),
+       now = now ?? dayOf(today),
        recurrence = chore.recurrence,
+       times = chore.timeWindow,
        lastDone = chore.countedLastDone(lastDone) {
     due = recurrence.nextDue(lastDone: this.lastDone);
+    final d = due;
+    windowEnd = d == null ? null : recurrence.windowEnd(d);
   }
 
   final Chore chore;
@@ -34,12 +39,43 @@ class ScheduledChore {
   /// Who did it today (profile ids).
   final Set<int> doneBy;
 
-  /// Next due day; `null` when the chore is never due.
+  /// The current time, for [times] (start of [today] when not given).
+  final DateTime now;
+
+  /// Times of day it's meant to be done; `null` = any time.
+  final TimeWindow? times;
+
+  /// Next due day, where its window opens; `null` when never due.
   late final DateTime? due;
 
-  bool get isOverdue => due != null && due!.isBefore(today);
-  bool get isDueToday => due == today;
+  /// The last day of that window (see `Recurrence.windowEnd`).
+  late final DateTime? windowEnd;
+
+  /// Its window ended before today.
+  bool get isOverdue => windowEnd != null && windowEnd!.isBefore(today);
+
+  /// Its window is open today (the due day itself for a 1-day window).
+  bool get isDueToday =>
+      due != null && !due!.isAfter(today) && !windowEnd!.isBefore(today);
   bool get isDoneToday => doneToday > 0;
+
+  int get _minutes => TimeWindow.minutesOf(now);
+
+  /// Open today, but its times haven't started yet.
+  bool get isLaterToday =>
+      isDueToday && times != null && _minutes < times!.from;
+
+  /// Open today and past its times, and today is the window's last day.
+  bool get isTimesUp =>
+      isDueToday && times != null && _minutes > times!.to && windowEnd == today;
+
+  /// Past today's times, but the window goes on: next chance tomorrow.
+  bool get isAgainTomorrow =>
+      isDueToday && times != null && _minutes > times!.to && windowEnd != today;
+
+  /// Doing it now earns the on-time bonus: inside the open window and, if it
+  /// has times, inside them (docs/design/scheduling.md).
+  bool get isOnTimeNow => isDueToday && (times == null || times!.contains(now));
 
   /// Due days after today up to [to] (for the plan views).
   List<DateTime> upcomingDueDays(DateTime to) =>
@@ -49,20 +85,38 @@ class ScheduledChore {
 /// Today's chores split into the sections of the Today screen.
 class TodaySections {
   TodaySections(List<ScheduledChore> all)
-    : overdue = all.where((c) => c.isOverdue).toList()
+    : overdue = all.where((c) => c.isOverdue || c.isTimesUp).toList()
         ..sort((a, b) => a.due!.compareTo(b.due!)),
-      dueToday = all.where((c) => c.isDueToday).toList(),
+      dueToday = all
+          .where(
+            (c) =>
+                c.isDueToday &&
+                !c.isLaterToday &&
+                !c.isTimesUp &&
+                !c.isAgainTomorrow,
+          )
+          .toList(),
+      laterToday = all.where((c) => c.isLaterToday).toList()
+        ..sort((a, b) => a.times!.from.compareTo(b.times!.from)),
       doneToday = all
           .where((c) => c.isDoneToday && !c.isOverdue && !c.isDueToday)
           .toList(),
       later =
           all
-              .where((c) => !c.isOverdue && !c.isDueToday && !c.isDoneToday)
+              .where(
+                (c) =>
+                    !c.isOverdue &&
+                    !c.isDoneToday &&
+                    (!c.isDueToday || c.isAgainTomorrow),
+              )
               .toList()
             ..sort(_byDueThenOrder);
 
   final List<ScheduledChore> overdue;
   final List<ScheduledChore> dueToday;
+
+  /// Open today, with times that haven't started yet.
+  final List<ScheduledChore> laterToday;
   final List<ScheduledChore> doneToday;
 
   /// Due later or never due ("anytime"), soonest first.
@@ -91,6 +145,7 @@ List<ScheduledChore> schedule({
   required Map<(int, int), DateTime> lastDone,
   required Map<(int, int), int> doneToday,
   required DateTime today,
+  DateTime? now,
   int? person,
 }) {
   final result = <ScheduledChore>[];
@@ -115,6 +170,7 @@ List<ScheduledChore> schedule({
           lastDone: last,
           doneToday: count,
           today: today,
+          now: now,
           doneBy: by,
         ),
       );
@@ -129,6 +185,7 @@ List<ScheduledChore> schedule({
           lastDone: lastDone[(chore.id, p)],
           doneToday: count,
           today: today,
+          now: now,
           person: p,
           doneBy: count > 0 ? {p} : const {},
         ),

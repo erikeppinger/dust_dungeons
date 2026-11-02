@@ -57,6 +57,17 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "home_widget")
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "placed" -> result.success(QuestWidget.placed(this))
+                    "refresh" -> {
+                        QuestWidget.refresh(this)
+                        result.success(null)
+                    }
+                    else -> result.notImplemented()
+                }
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "haptics")
             .setMethodCallHandler { call, result ->
                 when (call.method) {

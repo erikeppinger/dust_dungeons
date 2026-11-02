@@ -59,6 +59,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                   SliverToBoxAdapter(child: _Message(l10n.allCaughtUp)),
                 ..._section(l10n.sectionOverdue, sections.overdue),
                 ..._section(l10n.sectionDueToday, sections.dueToday),
+                ..._section(l10n.sectionLaterToday, sections.laterToday),
                 ..._section(l10n.sectionDoneToday, sections.doneToday),
                 ..._section(l10n.sectionLater, sections.later),
                 // Keeps the last row clear of the FAB.
@@ -101,7 +102,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
             // The points this tap would earn right now, bonuses included.
             final points = pointsFor(
               basePoints: s.chore.basePoints,
-              onTime: s.isDueToday,
+              onTime: s.isOnTimeNow,
               streakDays: streakBeforeToday,
             );
             return ChoreTile(
@@ -120,8 +121,8 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
                         if (s.doneBy.contains(p.id)) p.name,
                     ].join(', ')
                   : null,
-              status: dueLabel(l10n, s.due, s.today),
-              overdue: s.isOverdue,
+              status: questStatus(context, s),
+              overdue: s.isOverdue || s.isTimesUp,
               onTap: () => _complete(s),
               onLongPress: () => ChoreEditScreen.open(context, s.chore),
             );
@@ -145,7 +146,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final result = await progress.complete(
       choreId: chore.id,
       profileId: ref.read(currentProfileIdProvider),
-      onTime: scheduled.isDueToday,
+      onTime: scheduled.isOnTimeNow,
     );
     unawaited(HapticFeedback.lightImpact());
     final points = result.points;

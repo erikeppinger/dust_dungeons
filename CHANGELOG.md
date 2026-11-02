@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+
+## [0.10.0] - 2026-11-02
+### Added
+- **Better schedules** ([design](docs/design/scheduling.md)):
+  - **Clearer names:** "Every … days, fixed rhythm" and "… days after it's done", with the next dates
+    shown as an example under the choice.
+  - **Monthly on a weekday:** the 1st–4th or last Monday … Sunday, also every N months.
+  - **Time to do it:** a quest can stay open for 2–7 days, or until the next time, and counts as on
+    time on each of those days ("Due until Tue, 10 Nov").
+  - **Times of day:** a quest can be meant for e.g. 18:00–20:00. Before that it's under "Later
+    today", after it "Time's up". Doing it outside the times still counts, just without the on-time
+    bonus.
+  - The Quest Log lists a window on each of its days, and notifications summarize open windows.
+- **Three home screen widgets** to choose from in Android's widget picker. Each shows the current
+  person's quests with their icons, in the 16-bit look by day and at night:
+  - **Quest board:** rows of quest tiles with badges ("! 2 days late", "▶ today", "18:00", "→ Thu").
+  - **Quest path:** the next quests as a board-game path, joined by arrows.
+  - **Next quest:** the next quest large, the following ones small.
+  - The app draws the pictures for the coming week, so the widgets stay right after midnight
+    without the app. Only the widgets that are placed get drawn. Tap a widget to open the app.
+  - No extra permission and no extra library.
+- Database schema v8 (monthly weekday, window days, times) with tested migration.
+
+### Fixed
+- Upgrading from a very old database (schema v1) failed once newer schedule columns existed: the v2
+  step now writes only its own columns.
 ### Fixed
 - **Vibration in fights didn't work on many phones.** It went through Android's touch feedback,
   which phones turn off with "vibration on touch" or keep very faint. The beat now pulses the
@@ -269,6 +295,7 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.10.0]: #
 [0.9.0]: #
 [0.8.0]: #
 [0.7.2]: #

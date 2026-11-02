@@ -10,6 +10,7 @@ Chore chore(int id, {String? seedKey, BossFamily? family}) => Chore(
   basePoints: 10,
   isArchived: false,
   assignment: Assignment.anyone,
+  windowDays: 1,
   sortOrder: id,
   createdAt: DateTime(2026, 10, 1),
   repeatType: RepeatType.anytime,

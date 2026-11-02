@@ -79,6 +79,18 @@ class Chores extends Table {
   /// built-in chore, or the Clutter Imp for user chores.
   TextColumn get bossFamily => textEnum<BossFamily>().nullable()();
 
+  /// Monthly on a weekday (schema v8): 1–4 or -1 for the last; `null` =
+  /// on the day of the month. See `Recurrence.monthWeek`.
+  IntColumn get repeatMonthWeek => integer().nullable()();
+
+  /// Days each occurrence stays open (schema v8); 0 = until the next one.
+  IntColumn get windowDays => integer().withDefault(const Constant(1))();
+
+  /// Times of day it's meant to be done, as minutes after midnight (schema
+  /// v8); both `null` = any time.
+  IntColumn get windowFrom => integer().nullable()();
+  IntColumn get windowTo => integer().nullable()();
+
   /// Who the chore is for (schema v7); the people are in [ChoreAssignees].
   TextColumn get assignment =>
       textEnum<Assignment>().withDefault(const Constant('anyone'))();

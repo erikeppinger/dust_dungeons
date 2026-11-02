@@ -46,7 +46,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,7 +64,11 @@ class AppDatabase extends _$AppDatabase {
           await (update(
             chores,
           )..where((c) => c.seedKey.equals(seed.key))).write(
-            scheduleColumns(seed.defaultRecurrence(_clock(), i), _clock()),
+            // Only columns that exist at v2; later ones get their defaults
+            // when their own step adds them.
+            _v2ScheduleColumns(
+              scheduleColumns(seed.defaultRecurrence(_clock(), i), _clock()),
+            ),
           );
         }
       }
@@ -116,6 +120,14 @@ class AppDatabase extends _$AppDatabase {
           "DELETE FROM settings WHERE key IN ('avatarSkin', 'avatarHair', "
           "'avatarCape', 'avatarHat', 'fightStoryMode', 'fightSlowMode')",
         );
+      }
+      if (from < 8) {
+        // v8: better schedules. Existing chores keep their behaviour: on the
+        // day of the month, open for one day, at any time.
+        await m.addColumn(chores, chores.repeatMonthWeek);
+        await m.addColumn(chores, chores.windowDays);
+        await m.addColumn(chores, chores.windowFrom);
+        await m.addColumn(chores, chores.windowTo);
       }
     },
     beforeOpen: (details) async {
@@ -170,8 +182,16 @@ extension ChoreSchedule on Chore {
     interval: repeatInterval < 1 ? 1 : repeatInterval,
     weekdays: weekdaysFromMask(repeatWeekdays),
     dayOfMonth: repeatDayOfMonth,
+    monthWeek: repeatMonthWeek,
+    windowDays: windowDays < 0 ? 1 : windowDays,
     start: repeatStart ?? createdAt,
   );
+
+  /// The times of day it's meant to be done; `null` = any time.
+  TimeWindow? get timeWindow {
+    final from = windowFrom, to = windowTo;
+    return from == null || to == null ? null : TimeWindow(from, to);
+  }
 
   /// The last completion that counts for the schedule: one-off chores ignore
   /// completions from before the schedule was set.
@@ -196,11 +216,23 @@ extension ChoresCompanionSchedule on ChoresCompanion {
       repeatInterval: s.repeatInterval,
       repeatWeekdays: s.repeatWeekdays,
       repeatDayOfMonth: s.repeatDayOfMonth,
+      repeatMonthWeek: s.repeatMonthWeek,
+      windowDays: s.windowDays,
       repeatStart: s.repeatStart,
       repeatSetAt: s.repeatSetAt,
     );
   }
 }
+
+/// [all] limited to the schedule columns of schema v2.
+ChoresCompanion _v2ScheduleColumns(ChoresCompanion all) => ChoresCompanion(
+  repeatType: all.repeatType,
+  repeatInterval: all.repeatInterval,
+  repeatWeekdays: all.repeatWeekdays,
+  repeatDayOfMonth: all.repeatDayOfMonth,
+  repeatStart: all.repeatStart,
+  repeatSetAt: all.repeatSetAt,
+);
 
 /// Columns to write when a chore's schedule is set.
 ChoresCompanion scheduleColumns(Recurrence r, DateTime now) => ChoresCompanion(
@@ -208,6 +240,8 @@ ChoresCompanion scheduleColumns(Recurrence r, DateTime now) => ChoresCompanion(
   repeatInterval: Value(r.interval),
   repeatWeekdays: Value(weekdaysToMask(r.weekdays)),
   repeatDayOfMonth: Value(r.dayOfMonth),
+  repeatMonthWeek: Value(r.monthWeek),
+  windowDays: Value(r.windowDays),
   repeatStart: Value(r.start),
   repeatSetAt: Value(now),
 );

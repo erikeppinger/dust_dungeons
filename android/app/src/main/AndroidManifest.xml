@@ -68,6 +68,40 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Home screen widgets: three looks to choose from in the picker. -->
+        <receiver
+            android:name=".QuestBoardWidget"
+            android:exported="false"
+            android:label="@string/widget_board_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_board_info" />
+        </receiver>
+        <receiver
+            android:name=".QuestPathWidget"
+            android:exported="false"
+            android:label="@string/widget_path_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_path_info" />
+        </receiver>
+        <receiver
+            android:name=".NextQuestWidget"
+            android:exported="false"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_info" />
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
