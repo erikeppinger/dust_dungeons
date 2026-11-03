@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+
+## [0.13.1] - 2026-11-03
+The app is unchanged from 0.13.0; this is the first test release published on GitHub.
+
 ### Added
 - **CI on GitHub** (`.github/workflows/build.yml`): every push is formatted, analyzed and tested,
   and builds a test APK (an Actions artifact, kept 30 days). It also checks that the APK requests no
