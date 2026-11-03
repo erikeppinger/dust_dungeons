@@ -1,0 +1,173 @@
+#:schema ./schema/quests.json
+# The built-in quests every phone gets. A quest added here appears on every
+# phone after the update; existing ones are never changed on a phone, so
+# editing one only affects new installs. Keys are stored: never rename or
+# remove one.
+
+[quests.dusting]
+title = { en = "Dusting", de = "Staub wischen" }
+icon = "auto_awesome"
+color = 6
+points = 15
+repeat = { type = "after_done", every = 7 }
+boss = "dust"
+
+[quests.sweeping]
+title = { en = "Sweep the floor", de = "Boden kehren" }
+icon = "cleaning_services"
+color = 5
+points = 15
+repeat = { type = "after_done", every = 3 }
+boss = "dust"
+
+[quests.vacuuming]
+title = { en = "Vacuuming", de = "Staubsaugen" }
+icon = "air"
+color = 5
+points = 20
+repeat = { type = "after_done", every = 7 }
+boss = "dust"
+
+[quests.mopping]
+title = { en = "Mop the floor", de = "Boden wischen" }
+icon = "water_drop"
+color = 5
+points = 25
+repeat = { type = "after_done", every = 7 }
+boss = "dust"
+
+[quests.dishes]
+title = { en = "Wash the dishes", de = "Abwasch" }
+icon = "soap"
+color = 1
+points = 10
+repeat = { type = "daily" }
+boss = "kitchen"
+
+[quests.dishwasher]
+title = { en = "Load/unload dishwasher", de = "Spülmaschine ein-/ausräumen" }
+icon = "flatware"
+color = 1
+points = 5
+repeat = { type = "daily" }
+boss = "kitchen"
+
+[quests.laundry]
+title = { en = "Do the laundry", de = "Wäsche waschen" }
+icon = "local_laundry_service"
+color = 4
+points = 10
+repeat = { type = "after_done", every = 4 }
+boss = "laundry"
+
+[quests.hang_laundry]
+title = { en = "Hang up laundry", de = "Wäsche aufhängen" }
+icon = "checkroom"
+color = 4
+points = 10
+repeat = { type = "anytime" }
+boss = "laundry"
+
+[quests.fold_laundry]
+title = { en = "Fold laundry", de = "Wäsche falten" }
+icon = "layers"
+color = 4
+points = 10
+repeat = { type = "anytime" }
+boss = "laundry"
+
+[quests.ironing]
+title = { en = "Ironing", de = "Bügeln" }
+icon = "iron"
+color = 4
+points = 20
+repeat = { type = "after_done", every = 7 }
+boss = "laundry"
+
+[quests.clean_bathroom]
+title = { en = "Clean the bathroom", de = "Bad putzen" }
+icon = "bathtub"
+color = 7
+points = 30
+repeat = { type = "after_done", every = 7 }
+boss = "bath"
+
+[quests.clean_toilet]
+title = { en = "Clean the toilet", de = "Toilette putzen" }
+icon = "wc"
+color = 7
+points = 20
+repeat = { type = "after_done", every = 7 }
+boss = "bath"
+
+[quests.clean_kitchen]
+title = { en = "Clean the kitchen", de = "Küche putzen" }
+icon = "countertops"
+color = 1
+points = 25
+repeat = { type = "after_done", every = 7 }
+boss = "kitchen"
+
+[quests.take_out_trash]
+title = { en = "Take out the trash", de = "Müll rausbringen" }
+icon = "delete"
+color = 3
+points = 5
+repeat = { type = "after_done", every = 3 }
+boss = "trash"
+
+[quests.recycling]
+title = { en = "Take out recycling", de = "Altpapier/Gelber Sack" }
+icon = "recycling"
+color = 3
+points = 5
+repeat = { type = "after_done", every = 7 }
+boss = "trash"
+
+[quests.change_bed_sheets]
+title = { en = "Change bed sheets", de = "Betten beziehen" }
+icon = "bed"
+color = 7
+points = 20
+repeat = { type = "after_done", every = 14 }
+boss = "bedroom"
+
+[quests.clean_windows]
+title = { en = "Clean the windows", de = "Fenster putzen" }
+icon = "window"
+color = 6
+points = 40
+repeat = { type = "after_done", every = 30 }
+boss = "outside"
+
+[quests.clean_fridge]
+title = { en = "Clean the fridge", de = "Kühlschrank reinigen" }
+icon = "kitchen"
+color = 1
+points = 30
+repeat = { type = "after_done", every = 30 }
+boss = "kitchen"
+
+[quests.groceries]
+title = { en = "Grocery shopping", de = "Einkaufen" }
+icon = "shopping_cart"
+color = 2
+points = 15
+repeat = { type = "after_done", every = 7 }
+boss = "outside"
+
+[quests.water_plants]
+title = { en = "Water the plants", de = "Pflanzen gießen" }
+icon = "local_florist"
+color = 3
+points = 5
+repeat = { type = "after_done", every = 3 }
+boss = "outside"
+
+[quests.tidy_up]
+title = { en = "Tidy up", de = "Aufräumen" }
+icon = "inventory_2"
+color = 0
+points = 10
+repeat = { type = "daily" }
+boss = "bedroom"

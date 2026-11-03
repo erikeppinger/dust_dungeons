@@ -40,27 +40,6 @@
   "save": "Speichern",
   "archive": "Archivieren",
   "restore": "Wiederherstellen",
-  "choreDusting": "Staub wischen",
-  "choreSweeping": "Boden kehren",
-  "choreVacuuming": "Staubsaugen",
-  "choreMopping": "Boden wischen",
-  "choreDishes": "Abwasch",
-  "choreDishwasher": "Spülmaschine ein-/ausräumen",
-  "choreLaundry": "Wäsche waschen",
-  "choreHangLaundry": "Wäsche aufhängen",
-  "choreFoldLaundry": "Wäsche falten",
-  "choreIroning": "Bügeln",
-  "choreCleanBathroom": "Bad putzen",
-  "choreCleanToilet": "Toilette putzen",
-  "choreCleanKitchen": "Küche putzen",
-  "choreTakeOutTrash": "Müll rausbringen",
-  "choreRecycling": "Altpapier/Gelber Sack",
-  "choreChangeBedSheets": "Betten beziehen",
-  "choreCleanWindows": "Fenster putzen",
-  "choreCleanFridge": "Kühlschrank reinigen",
-  "choreGroceries": "Einkaufen",
-  "choreWaterPlants": "Pflanzen gießen",
-  "choreTidyUp": "Aufräumen",
   "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
   "startupError": "Die App konnte ihre Daten nicht öffnen. Deine Daten wurden nicht gelöscht. Bitte starte die App neu; falls das wieder passiert, melde den Fehler unten.",
   "summaryAnytime": "Jederzeit, ohne Zeitplan",
@@ -163,24 +142,6 @@
   "settingsAboutSubtitle": "Datenschutz, Lizenz, Version",
   "artGallery": "Pixel-Art-Galerie",
   "aboutVersion": "Version {version}",
-  "bossDust": "Staubhasen-König",
-  "bossLaundry": "Wäsche-Hydra",
-  "bossKitchen": "Spülbecken-Krake",
-  "bossBath": "Porzellan-Golem",
-  "bossTrash": "Müll-Titan",
-  "bossBedroom": "Kissen-Phantom",
-  "bossOutside": "Fenster-Geist",
-  "bossClutter": "Krempel-Kobold",
-  "bossSourceDust": "Staub, Böden",
-  "bossSourceLaundry": "Wäsche, Bügeln",
-  "bossSourceKitchen": "Abwasch, Küche",
-  "bossSourceBath": "Bad, Toilette",
-  "bossSourceTrash": "Müll, Altpapier",
-  "bossSourceBedroom": "Betten, Aufräumen",
-  "bossSourceOutside": "Fenster, Pflanzen, Besorgungen",
-  "bossSourceClutter": "deine eigenen Quests",
-  "trophyDust": "Goldener Staubwedel",
-  "trophyClutter": "Ordnungskrone",
   "trophyGeneric": "{boss}-Trophäe",
   "fightGetReady": "Mach dich bereit …",
   "fightListen": "{n, plural, =1{Hör zu · 1 Schlag} other{Hör zu · {n} Schläge}}",
@@ -234,20 +195,6 @@
   "fightSettingStorySubtitle": "Kämpfe können nicht verloren werden, das Timing ist großzügiger",
   "choreBoss": "Boss",
   "choreBossHelp": "Diese Quest bringt eine Kampfmarke für diesen Boss",
-  "itemShield": "Schwammschild",
-  "itemShieldDesc": "Verzeiht deinen ersten Fehler in jedem Kampf",
-  "itemMop": "Turbo-Mopp",
-  "itemMopDesc": "Perfekte Treffer putzen 50 % mehr",
-  "itemCharm": "Metronom-Anhänger",
-  "itemCharmDesc": "Großzügigeres Timing",
-  "itemGloves": "Gummihandschuhe",
-  "itemGlovesDesc": "Ein Herz mehr",
-  "itemSecondWind": "Zweiter Atem",
-  "itemSecondWindDesc": "Nach einer Niederlage einmal weiterkämpfen",
-  "hatCap": "Kappe",
-  "hatBandana": "Bandana",
-  "hatWizard": "Zauberhut",
-  "hatCrown": "Krone",
   "hatDesc": "Für deinen Helden",
   "shopTitle": "Rüstkammer",
   "shopBalance": "Du hast {points} Punkte",
@@ -269,9 +216,7 @@
   "avatarNoHat": "Kein Hut",
   "avatarMoreHats": "Gesperrte Hüte gibt es in der Rüstkammer.",
   "fightSecondWind": "{n, plural, =1{Zweiten Atem nutzen · 1 übrig} other{Zweiten Atem nutzen · {n} übrig}}",
-  "bossOverlord": "Haushalts-Overlord",
-  "bossSourceOverlord": "5 Siege in einer Woche",
-  "trophyOverlord": "Wochenkrone",
+  "bossSourceOverlord": "{n} Siege in einer Woche",
   "fightLanes": "Tippe jede Note auf der Linie",
   "fightLaneLabel": "Spur {n}",
   "fightLeaveBodyOverlord": "Der Overlord bleibt bis Sonntag, du kannst es also noch einmal versuchen.",
@@ -462,42 +407,6 @@
   "widgetPathNow": "jetzt",
   "widgetNextTitle": "Nächste Quest",
   "widgetThen": "Danach:",
-  "itemColander": "Sieb der Klarheit",
-  "itemColanderDesc": "Ein Herz mehr",
-  "itemSpatula": "Pfannenwender des Wendens",
-  "itemSpatulaDesc": "Gute Treffer putzen mehr",
-  "itemVest": "Warnweste",
-  "itemVestDesc": "Zwei Herzen mehr",
-  "itemBoots": "Gummistiefel",
-  "itemBootsDesc": "Zwei Herzen mehr gegen: {a}, {b}",
-  "itemSock": "Glückssocke ohne Partner",
-  "itemSockDesc": "Bosse lassen öfter Beute fallen",
-  "itemDuster": "Staubwedel des Zorns",
-  "itemDusterDesc": "Heilt ein Herz nach 10 Treffern am Stück · stärker gegen: {boss}",
-  "itemHelm": "Wäschekorb-Helm",
-  "itemHelmDesc": "Ein Herz mehr · zwei gegen: {boss}",
-  "itemApron": "Schürze der Vorräte",
-  "itemApronDesc": "Ein Herz mehr · Zweiter Atem bringt alle Herzen zurück",
-  "itemPlunger": "Pümpel des Schmetterns",
-  "itemPlungerDesc": "Perfekte Treffer putzen 50 % mehr · doppelt gegen: {boss}",
-  "itemLid": "Mülltonnendeckel",
-  "itemLidDesc": "Verzeiht deine ersten zwei Fehler in jedem Kampf",
-  "itemSlippers": "Flauschpantoffeln des Schleichens",
-  "itemSlippersDesc": "Schleichangriff: deine erste Runde putzt 50 % mehr",
-  "itemGnome": "Gartenzwerg",
-  "itemGnomeDesc": "Jeder dritte Fehler kostet kein Herz",
-  "itemRemote": "Verschollene Fernbedienung",
-  "itemRemoteDesc": "Bosse spielen 10 % langsamer",
-  "itemMopOfDoom": "Zweihändiger Mopp des Verderbens",
-  "itemMopOfDoomDesc": "Perfekte Treffer putzen 50 % mehr, gute auch mehr · zweihändig: kein Schild",
-  "itemCape": "Umhang des Großputzes",
-  "itemCapeDesc": "Zwei Herzen mehr · heilt ein Herz nach 10 Treffern am Stück",
-  "itemCoffee": "Kaffee der Eile",
-  "itemCoffeeDesc": "Für einen Kampf: gute Treffer putzen mehr",
-  "itemSnack": "Snackpause",
-  "itemSnackDesc": "Für einen Kampf: zwei Herzen mehr",
-  "itemSoap": "Seife der Entfluchung",
-  "itemSoapDesc": "Hebt deinen Fluch auf",
   "slotHead": "Kopf",
   "slotBody": "Körper",
   "slotWeapon": "Waffe",
@@ -515,15 +424,6 @@
   "gearNothingOwned": "Noch nichts für diesen Platz. Kauf Ausrüstung in der Rüstkammer oder gewinn sie von Bossen.",
   "gearTwoHanded": "Zweihändig: belegt auch den Schild-Platz",
   "gearCollection": "{owned} von {total} Gegenständen gefunden",
-  "curseDust": "Niesanfall",
-  "curseLaundry": "Nasse Socken",
-  "curseKitchen": "Fettige Finger",
-  "curseBath": "Seife im Auge",
-  "curseTrash": "Stinkwolke",
-  "curseBedroom": "Strubbelkopf",
-  "curseOutside": "Matschstiefel",
-  "curseClutter": "Gestoßener Zeh",
-  "curseOverlord": "Groll des Overlords",
   "curseEffectHeart": "Ein Herz weniger im nächsten Kampf",
   "curseEffectTight": "Strengeres Timing im nächsten Kampf",
   "curseEffectSlot": "Ausrüstung für {slot} wirkt im nächsten Kampf nicht",
@@ -546,5 +446,341 @@
   "prepFight": "Kämpfen!",
   "fightFreeMisses": "{n, plural, =1{1 Fehler frei} other{{n} Fehler frei}}",
   "fightLoot": "Beute: {item}",
-  "fightLootWear": "Anlegen"
+  "fightLootWear": "Anlegen",
+  "effectHearts": "{n, plural, =1{+1 Herz} other{+{n} Herzen}}",
+  "effectDamage": "+{n} Schaden bei jedem Treffer",
+  "effectGoodDamage": "+{n} Schaden bei guten Treffern",
+  "effectPerfectTimes": "perfekte Treffer ×{n} (sonst ×2)",
+  "effectFreeMisses": "{n, plural, =1{verzeiht deinen ersten Fehler in jedem Kampf} other{verzeiht deine ersten {n} Fehler in jedem Kampf}}",
+  "effectWideTiming": "großzügigeres Timing",
+  "effectComboHeal": "heilt ein Herz nach {n} Treffern am Stück",
+  "effectSneakAttack": "Schleichangriff: deine erste Runde putzt 50 % mehr",
+  "effectSlowerBoss": "Bosse spielen 10 % langsamer",
+  "effectThirdMissFree": "jeder dritte Fehler kostet kein Herz",
+  "effectFullRevive": "Zweiter Atem bringt alle Herzen zurück",
+  "effectLootBonus": "+{n} % Beutechance",
+  "effectAgainst": "gegen {bosses}: {effects}",
+  "effectTwoHanded": "zweihändig: kein Schild",
+  "effectForOneFight": "für einen Kampf: {effects}",
+  "difficultyEasy": "Leicht",
+  "difficultyBalanced": "Ausgewogen",
+  "difficultyHard": "Schwer",
+  "fightSettingDifficulty": "Schwierigkeit",
+  "fightSettingDifficultySubtitle": "Lebenspunkte, Tempo und Timing der Bosse. Punkte und Beute bleiben gleich.",
+  "gameItemColanderOfClarity": "Sieb der Klarheit",
+  "@gameItemColanderOfClarity": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemRubberGloves": "Gummihandschuhe",
+  "@gameItemRubberGloves": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHiVisVest": "Warnweste",
+  "@gameItemHiVisVest": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemTurboMop": "Turbo-Mopp",
+  "@gameItemTurboMop": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSpatulaOfFlipping": "Pfannenwender des Wendens",
+  "@gameItemSpatulaOfFlipping": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSpongeShield": "Schwammschild",
+  "@gameItemSpongeShield": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemRubberBoots": "Gummistiefel",
+  "@gameItemRubberBoots": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemMetronomeCharm": "Metronom-Anhänger",
+  "@gameItemMetronomeCharm": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLuckyOddSock": "Glückssocke ohne Partner",
+  "@gameItemLuckyOddSock": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemFeatherDuster": "Staubwedel des Zorns",
+  "@gameItemFeatherDuster": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLaundryBasketHelm": "Wäschekorb-Helm",
+  "@gameItemLaundryBasketHelm": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemApronOfHolding": "Schürze der Vorräte",
+  "@gameItemApronOfHolding": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemPlungerOfSmiting": "Pümpel des Schmetterns",
+  "@gameItemPlungerOfSmiting": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemTrashCanLid": "Mülltonnendeckel",
+  "@gameItemTrashCanLid": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemFuzzySlippers": "Flauschpantoffeln des Schleichens",
+  "@gameItemFuzzySlippers": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemGardenGnome": "Gartenzwerg",
+  "@gameItemGardenGnome": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLostRemote": "Verschollene Fernbedienung",
+  "@gameItemLostRemote": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemMopOfDoom": "Zweihändiger Mopp des Verderbens",
+  "@gameItemMopOfDoom": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemCapeOfCleanSweep": "Umhang des Großputzes",
+  "@gameItemCapeOfCleanSweep": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSecondWind": "Zweiter Atem",
+  "@gameItemSecondWind": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSecondWindDesc": "Nach einer Niederlage einmal weiterkämpfen",
+  "@gameItemSecondWindDesc": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemCoffeeOfHaste": "Kaffee der Eile",
+  "@gameItemCoffeeOfHaste": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSnackBreak": "Snackpause",
+  "@gameItemSnackBreak": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSoapOfUncursing": "Seife der Entfluchung",
+  "@gameItemSoapOfUncursing": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSoapOfUncursingDesc": "Hebt deinen Fluch auf",
+  "@gameItemSoapOfUncursingDesc": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatCap": "Kappe",
+  "@gameItemHatCap": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatBandana": "Bandana",
+  "@gameItemHatBandana": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatWizard": "Zauberhut",
+  "@gameItemHatWizard": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatCrown": "Krone",
+  "@gameItemHatCrown": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameBossDust": "Staubhasen-König",
+  "@gameBossDust": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseDust": "Niesanfall",
+  "@gameCurseDust": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustFedBy": "Staub, Böden",
+  "@gameBossDustFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustTrophy": "Goldener Staubwedel",
+  "@gameBossDustTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossLaundry": "Wäsche-Hydra",
+  "@gameBossLaundry": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseLaundry": "Nasse Socken",
+  "@gameCurseLaundry": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossLaundryFedBy": "Wäsche, Bügeln",
+  "@gameBossLaundryFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchen": "Spülbecken-Krake",
+  "@gameBossKitchen": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseKitchen": "Fettige Finger",
+  "@gameCurseKitchen": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchenFedBy": "Abwasch, Küche",
+  "@gameBossKitchenFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBath": "Porzellan-Golem",
+  "@gameBossBath": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseBath": "Seife im Auge",
+  "@gameCurseBath": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBathFedBy": "Bad, Toilette",
+  "@gameBossBathFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrash": "Müll-Titan",
+  "@gameBossTrash": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseTrash": "Stinkwolke",
+  "@gameCurseTrash": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrashFedBy": "Müll, Altpapier",
+  "@gameBossTrashFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBedroom": "Kissen-Phantom",
+  "@gameBossBedroom": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseBedroom": "Strubbelkopf",
+  "@gameCurseBedroom": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBedroomFedBy": "Betten, Aufräumen",
+  "@gameBossBedroomFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutside": "Fenster-Geist",
+  "@gameBossOutside": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseOutside": "Matschstiefel",
+  "@gameCurseOutside": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutsideFedBy": "Fenster, Pflanzen, Besorgungen",
+  "@gameBossOutsideFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutter": "Krempel-Kobold",
+  "@gameBossClutter": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseClutter": "Gestoßener Zeh",
+  "@gameCurseClutter": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutterFedBy": "deine eigenen Quests",
+  "@gameBossClutterFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutterTrophy": "Ordnungskrone",
+  "@gameBossClutterTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOverlord": "Haushalts-Overlord",
+  "@gameBossOverlord": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseOverlord": "Groll des Overlords",
+  "@gameCurseOverlord": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOverlordTrophy": "Wochenkrone",
+  "@gameBossOverlordTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameQuestDusting": "Staub wischen",
+  "@gameQuestDusting": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestSweeping": "Boden kehren",
+  "@gameQuestSweeping": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestVacuuming": "Staubsaugen",
+  "@gameQuestVacuuming": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestMopping": "Boden wischen",
+  "@gameQuestMopping": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestDishes": "Abwasch",
+  "@gameQuestDishes": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestDishwasher": "Spülmaschine ein-/ausräumen",
+  "@gameQuestDishwasher": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestLaundry": "Wäsche waschen",
+  "@gameQuestLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestHangLaundry": "Wäsche aufhängen",
+  "@gameQuestHangLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestFoldLaundry": "Wäsche falten",
+  "@gameQuestFoldLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestIroning": "Bügeln",
+  "@gameQuestIroning": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanBathroom": "Bad putzen",
+  "@gameQuestCleanBathroom": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanToilet": "Toilette putzen",
+  "@gameQuestCleanToilet": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanKitchen": "Küche putzen",
+  "@gameQuestCleanKitchen": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestTakeOutTrash": "Müll rausbringen",
+  "@gameQuestTakeOutTrash": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestRecycling": "Altpapier/Gelber Sack",
+  "@gameQuestRecycling": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestChangeBedSheets": "Betten beziehen",
+  "@gameQuestChangeBedSheets": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanWindows": "Fenster putzen",
+  "@gameQuestCleanWindows": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanFridge": "Kühlschrank reinigen",
+  "@gameQuestCleanFridge": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestGroceries": "Einkaufen",
+  "@gameQuestGroceries": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestWaterPlants": "Pflanzen gießen",
+  "@gameQuestWaterPlants": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestTidyUp": "Aufräumen",
+  "@gameQuestTidyUp": {
+    "description": "Generated from game/quests.toml"
+  }
 }

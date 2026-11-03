@@ -74,27 +74,6 @@
   "save": "Save",
   "archive": "Archive",
   "restore": "Restore",
-  "choreDusting": "Dusting",
-  "choreSweeping": "Sweep the floor",
-  "choreVacuuming": "Vacuuming",
-  "choreMopping": "Mop the floor",
-  "choreDishes": "Wash the dishes",
-  "choreDishwasher": "Load/unload dishwasher",
-  "choreLaundry": "Do the laundry",
-  "choreHangLaundry": "Hang up laundry",
-  "choreFoldLaundry": "Fold laundry",
-  "choreIroning": "Ironing",
-  "choreCleanBathroom": "Clean the bathroom",
-  "choreCleanToilet": "Clean the toilet",
-  "choreCleanKitchen": "Clean the kitchen",
-  "choreTakeOutTrash": "Take out the trash",
-  "choreRecycling": "Take out recycling",
-  "choreChangeBedSheets": "Change bed sheets",
-  "choreCleanWindows": "Clean the windows",
-  "choreCleanFridge": "Clean the fridge",
-  "choreGroceries": "Grocery shopping",
-  "choreWaterPlants": "Water the plants",
-  "choreTidyUp": "Tidy up",
   "errorGeneric": "Something went wrong. Please try again.",
   "startupError": "The app could not open its data. Your data has not been deleted. Please restart the app; if this keeps happening, report the error below.",
   "summaryAnytime": "Anytime, no schedule",
@@ -447,24 +426,6 @@
       }
     }
   },
-  "bossDust": "Dust Bunny King",
-  "bossLaundry": "Laundry Hydra",
-  "bossKitchen": "Sink Kraken",
-  "bossBath": "Porcelain Golem",
-  "bossTrash": "Trash Titan",
-  "bossBedroom": "Pillow Phantom",
-  "bossOutside": "Window Wraith",
-  "bossClutter": "Clutter Imp",
-  "bossSourceDust": "dusting, floors",
-  "bossSourceLaundry": "laundry, ironing",
-  "bossSourceKitchen": "dishes, kitchen",
-  "bossSourceBath": "bathroom, toilet",
-  "bossSourceTrash": "trash, recycling",
-  "bossSourceBedroom": "beds, tidying",
-  "bossSourceOutside": "windows, plants, errands",
-  "bossSourceClutter": "your own quests",
-  "trophyDust": "Golden Feather Duster",
-  "trophyClutter": "Tidy Crown",
   "trophyGeneric": "{boss} trophy",
   "@trophyGeneric": {
     "placeholders": {
@@ -668,20 +629,6 @@
   "fightSettingStorySubtitle": "Fights can't be lost, and the timing is more forgiving",
   "choreBoss": "Boss",
   "choreBossHelp": "Doing this quest earns a fight token for this boss",
-  "itemShield": "Sponge Shield",
-  "itemShieldDesc": "Forgives your first miss in every fight",
-  "itemMop": "Turbo Mop",
-  "itemMopDesc": "Perfect hits clean 50% more",
-  "itemCharm": "Metronome Charm",
-  "itemCharmDesc": "More forgiving timing",
-  "itemGloves": "Rubber Gloves",
-  "itemGlovesDesc": "One extra heart",
-  "itemSecondWind": "Second Wind",
-  "itemSecondWindDesc": "Continue once after losing a fight",
-  "hatCap": "Cap",
-  "hatBandana": "Bandana",
-  "hatWizard": "Wizard hat",
-  "hatCrown": "Crown",
   "hatDesc": "For your hero",
   "shopTitle": "Armory",
   "shopBalance": "You have {points} points",
@@ -752,9 +699,7 @@
       }
     }
   },
-  "bossOverlord": "Chore Overlord",
-  "bossSourceOverlord": "5 wins in one week",
-  "trophyOverlord": "Crown of the Week",
+  "bossSourceOverlord": "{n} wins in one week",
   "fightLanes": "Tap each note on the line",
   "fightLaneLabel": "Lane {n}",
   "@fightLaneLabel": {
@@ -1374,46 +1319,6 @@
   "widgetPathNow": "now",
   "widgetNextTitle": "Next quest",
   "widgetThen": "Then:",
-  "itemColander": "Colander of Clarity",
-  "itemColanderDesc": "One extra heart",
-  "itemSpatula": "Spatula of Flipping",
-  "itemSpatulaDesc": "Good hits clean more",
-  "itemVest": "Hi-Vis Vest",
-  "itemVestDesc": "Two extra hearts",
-  "itemBoots": "Rubber Boots",
-  "itemBootsDesc": "Two extra hearts against: {a}, {b}",
-  "@itemBootsDesc": {"placeholders": {"a": {"type": "String"}, "b": {"type": "String"}}},
-  "itemSock": "Lucky Odd Sock",
-  "itemSockDesc": "Bosses drop loot more often",
-  "itemDuster": "Feather Duster of Fury",
-  "itemDusterDesc": "Heals a heart after 10 hits in a row · stronger against: {boss}",
-  "@itemDusterDesc": {"placeholders": {"boss": {"type": "String"}}},
-  "itemHelm": "Laundry-Basket Helm",
-  "itemHelmDesc": "One extra heart · two against: {boss}",
-  "@itemHelmDesc": {"placeholders": {"boss": {"type": "String"}}},
-  "itemApron": "Apron of Holding",
-  "itemApronDesc": "One extra heart · Second Wind brings back all hearts",
-  "itemPlunger": "Plunger of Smiting",
-  "itemPlungerDesc": "Perfect hits clean 50% more · double against: {boss}",
-  "@itemPlungerDesc": {"placeholders": {"boss": {"type": "String"}}},
-  "itemLid": "Trash-Can Lid",
-  "itemLidDesc": "Forgives your first two misses in every fight",
-  "itemSlippers": "Fuzzy Slippers of Sneaking",
-  "itemSlippersDesc": "Sneak attack: your first round cleans 50% more",
-  "itemGnome": "Garden Gnome",
-  "itemGnomeDesc": "Every third miss costs no heart",
-  "itemRemote": "Lost Remote",
-  "itemRemoteDesc": "Bosses play 10% slower",
-  "itemMopOfDoom": "Two-Handed Mop of Doom",
-  "itemMopOfDoomDesc": "Perfect hits clean 50% more, good hits more too · two-handed: no shield",
-  "itemCape": "Cape of the Clean Sweep",
-  "itemCapeDesc": "Two extra hearts · heals a heart after 10 hits in a row",
-  "itemCoffee": "Coffee of Haste",
-  "itemCoffeeDesc": "For one fight: good hits clean more",
-  "itemSnack": "Snack Break",
-  "itemSnackDesc": "For one fight: two extra hearts",
-  "itemSoap": "Soap of Uncursing",
-  "itemSoapDesc": "Lifts your curse",
   "slotHead": "Head",
   "slotBody": "Body",
   "slotWeapon": "Weapon",
@@ -1422,7 +1327,13 @@
   "slotCharm": "Charm",
   "shopLoot": "Boss loot",
   "shopLootUnknown": "Not found yet · dropped by: {boss}",
-  "@shopLootUnknown": {"placeholders": {"boss": {"type": "String"}}},
+  "@shopLootUnknown": {
+    "placeholders": {
+      "boss": {
+        "type": "String"
+      }
+    }
+  },
   "shopWorn": "Worn",
   "worldGear": "Gear",
   "gearTitle": "Gear",
@@ -1432,31 +1343,64 @@
   "gearNothingOwned": "Nothing for this slot yet. Buy gear in the Armory or win it from bosses.",
   "gearTwoHanded": "Two-handed: also takes the shield slot",
   "gearCollection": "{owned} of {total} items found",
-  "@gearCollection": {"placeholders": {"owned": {"type": "int"}, "total": {"type": "int"}}},
-  "curseDust": "Sneezing Fit",
-  "curseLaundry": "Wet Socks",
-  "curseKitchen": "Greasy Fingers",
-  "curseBath": "Soap in the Eyes",
-  "curseTrash": "Stinky Cloud",
-  "curseBedroom": "Bed Head",
-  "curseOutside": "Muddy Boots",
-  "curseClutter": "Stubbed Toe",
-  "curseOverlord": "Overlord's Grudge",
+  "@gearCollection": {
+    "placeholders": {
+      "owned": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "curseEffectHeart": "One heart fewer in your next fight",
   "curseEffectTight": "Stricter timing in your next fight",
   "curseEffectSlot": "{slot} gear does nothing in your next fight",
-  "@curseEffectSlot": {"placeholders": {"slot": {"type": "String"}}},
+  "@curseEffectSlot": {
+    "placeholders": {
+      "slot": {
+        "type": "String"
+      }
+    }
+  },
   "curseTitle": "Cursed: {curse}",
-  "@curseTitle": {"placeholders": {"curse": {"type": "String"}}},
+  "@curseTitle": {
+    "placeholders": {
+      "curse": {
+        "type": "String"
+      }
+    }
+  },
   "curseLift": "A quest like {quests} lifts it, or Soap of Uncursing.",
-  "@curseLift": {"placeholders": {"quests": {"type": "String"}}},
+  "@curseLift": {
+    "placeholders": {
+      "quests": {
+        "type": "String"
+      }
+    }
+  },
   "curseLiftAny": "Any quest lifts it, or Soap of Uncursing.",
   "curseUseSoap": "Use soap ({n} left)",
-  "@curseUseSoap": {"placeholders": {"n": {"type": "int"}}},
+  "@curseUseSoap": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "curseLifted": "Curse lifted!",
   "questLiftsCurse": "Lifts curse",
   "fightCurseWarning": "If you leave now, {boss} curses you: {curse}.",
-  "@fightCurseWarning": {"placeholders": {"boss": {"type": "String"}, "curse": {"type": "String"}}},
+  "@fightCurseWarning": {
+    "placeholders": {
+      "boss": {
+        "type": "String"
+      },
+      "curse": {
+        "type": "String"
+      }
+    }
+  },
   "fightSettingCurses": "Curses after a lost fight",
   "fightSettingCursesSubtitle": "A lost fight makes the next one a bit harder, unless a quest lifts the curse first",
   "prepGear": "Your gear",
@@ -1464,15 +1408,457 @@
   "prepNoGear": "No gear yet",
   "prepExtras": "Before the fight",
   "prepInStock": "{item} · {n} left",
-  "@prepInStock": {"placeholders": {"item": {"type": "String"}, "n": {"type": "int"}}},
+  "@prepInStock": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "prepStrong": "{item}: strong here",
-  "@prepStrong": {"placeholders": {"item": {"type": "String"}}},
+  "@prepStrong": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
   "prepStrongInBag": "{item} is strong here (in your bag)",
-  "@prepStrongInBag": {"placeholders": {"item": {"type": "String"}}},
+  "@prepStrongInBag": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
   "prepFight": "Fight!",
   "fightFreeMisses": "{n, plural, =1{1 free miss} other{{n} free misses}}",
-  "@fightFreeMisses": {"placeholders": {"n": {"type": "int"}}},
+  "@fightFreeMisses": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "fightLoot": "Loot: {item}",
-  "@fightLoot": {"placeholders": {"item": {"type": "String"}}},
-  "fightLootWear": "Wear it"
+  "@fightLoot": {
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "fightLootWear": "Wear it",
+  "@bossSourceOverlord": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectHearts": "{n, plural, =1{+1 heart} other{+{n} hearts}}",
+  "@effectHearts": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectDamage": "+{n} damage on every hit",
+  "@effectDamage": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectGoodDamage": "+{n} damage on good hits",
+  "@effectGoodDamage": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectPerfectTimes": "perfect hits ×{n} (normally ×2)",
+  "@effectPerfectTimes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectFreeMisses": "{n, plural, =1{forgives your first miss in every fight} other{forgives your first {n} misses in every fight}}",
+  "@effectFreeMisses": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectWideTiming": "more forgiving timing",
+  "effectComboHeal": "heals a heart after {n} hits in a row",
+  "@effectComboHeal": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectSneakAttack": "sneak attack: your first round cleans 50% more",
+  "effectSlowerBoss": "bosses play 10% slower",
+  "effectThirdMissFree": "every third miss costs no heart",
+  "effectFullRevive": "Second Wind brings back all hearts",
+  "effectLootBonus": "+{n}% loot chance",
+  "@effectLootBonus": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "effectAgainst": "against {bosses}: {effects}",
+  "@effectAgainst": {
+    "placeholders": {
+      "bosses": {
+        "type": "String"
+      },
+      "effects": {
+        "type": "String"
+      }
+    }
+  },
+  "effectTwoHanded": "two-handed: no shield",
+  "effectForOneFight": "for one fight: {effects}",
+  "@effectForOneFight": {
+    "placeholders": {
+      "effects": {
+        "type": "String"
+      }
+    }
+  },
+  "difficultyEasy": "Easy",
+  "difficultyBalanced": "Balanced",
+  "difficultyHard": "Hard",
+  "fightSettingDifficulty": "Difficulty",
+  "fightSettingDifficultySubtitle": "Boss health, tempo and timing. Points and loot stay the same.",
+  "gameItemColanderOfClarity": "Colander of Clarity",
+  "@gameItemColanderOfClarity": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemRubberGloves": "Rubber Gloves",
+  "@gameItemRubberGloves": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHiVisVest": "Hi-Vis Vest",
+  "@gameItemHiVisVest": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemTurboMop": "Turbo Mop",
+  "@gameItemTurboMop": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSpatulaOfFlipping": "Spatula of Flipping",
+  "@gameItemSpatulaOfFlipping": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSpongeShield": "Sponge Shield",
+  "@gameItemSpongeShield": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemRubberBoots": "Rubber Boots",
+  "@gameItemRubberBoots": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemMetronomeCharm": "Metronome Charm",
+  "@gameItemMetronomeCharm": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLuckyOddSock": "Lucky Odd Sock",
+  "@gameItemLuckyOddSock": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemFeatherDuster": "Feather Duster of Fury",
+  "@gameItemFeatherDuster": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLaundryBasketHelm": "Laundry-Basket Helm",
+  "@gameItemLaundryBasketHelm": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemApronOfHolding": "Apron of Holding",
+  "@gameItemApronOfHolding": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemPlungerOfSmiting": "Plunger of Smiting",
+  "@gameItemPlungerOfSmiting": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemTrashCanLid": "Trash-Can Lid",
+  "@gameItemTrashCanLid": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemFuzzySlippers": "Fuzzy Slippers of Sneaking",
+  "@gameItemFuzzySlippers": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemGardenGnome": "Garden Gnome",
+  "@gameItemGardenGnome": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemLostRemote": "Lost Remote",
+  "@gameItemLostRemote": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemMopOfDoom": "Two-Handed Mop of Doom",
+  "@gameItemMopOfDoom": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemCapeOfCleanSweep": "Cape of the Clean Sweep",
+  "@gameItemCapeOfCleanSweep": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSecondWind": "Second Wind",
+  "@gameItemSecondWind": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSecondWindDesc": "Continue once after losing a fight",
+  "@gameItemSecondWindDesc": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemCoffeeOfHaste": "Coffee of Haste",
+  "@gameItemCoffeeOfHaste": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSnackBreak": "Snack Break",
+  "@gameItemSnackBreak": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSoapOfUncursing": "Soap of Uncursing",
+  "@gameItemSoapOfUncursing": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSoapOfUncursingDesc": "Lifts your curse",
+  "@gameItemSoapOfUncursingDesc": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatCap": "Cap",
+  "@gameItemHatCap": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatBandana": "Bandana",
+  "@gameItemHatBandana": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatWizard": "Wizard hat",
+  "@gameItemHatWizard": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHatCrown": "Crown",
+  "@gameItemHatCrown": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameBossDust": "Dust Bunny King",
+  "@gameBossDust": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseDust": "Sneezing Fit",
+  "@gameCurseDust": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustFedBy": "dusting, floors",
+  "@gameBossDustFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustTrophy": "Golden Feather Duster",
+  "@gameBossDustTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossLaundry": "Laundry Hydra",
+  "@gameBossLaundry": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseLaundry": "Wet Socks",
+  "@gameCurseLaundry": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossLaundryFedBy": "laundry, ironing",
+  "@gameBossLaundryFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchen": "Sink Kraken",
+  "@gameBossKitchen": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseKitchen": "Greasy Fingers",
+  "@gameCurseKitchen": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchenFedBy": "dishes, kitchen",
+  "@gameBossKitchenFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBath": "Porcelain Golem",
+  "@gameBossBath": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseBath": "Soap in the Eyes",
+  "@gameCurseBath": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBathFedBy": "bathroom, toilet",
+  "@gameBossBathFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrash": "Trash Titan",
+  "@gameBossTrash": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseTrash": "Stinky Cloud",
+  "@gameCurseTrash": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrashFedBy": "trash, recycling",
+  "@gameBossTrashFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBedroom": "Pillow Phantom",
+  "@gameBossBedroom": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseBedroom": "Bed Head",
+  "@gameCurseBedroom": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBedroomFedBy": "beds, tidying",
+  "@gameBossBedroomFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutside": "Window Wraith",
+  "@gameBossOutside": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseOutside": "Muddy Boots",
+  "@gameCurseOutside": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutsideFedBy": "windows, plants, errands",
+  "@gameBossOutsideFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutter": "Clutter Imp",
+  "@gameBossClutter": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseClutter": "Stubbed Toe",
+  "@gameCurseClutter": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutterFedBy": "your own quests",
+  "@gameBossClutterFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutterTrophy": "Tidy Crown",
+  "@gameBossClutterTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOverlord": "Chore Overlord",
+  "@gameBossOverlord": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseOverlord": "Overlord's Grudge",
+  "@gameCurseOverlord": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOverlordTrophy": "Crown of the Week",
+  "@gameBossOverlordTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameQuestDusting": "Dusting",
+  "@gameQuestDusting": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestSweeping": "Sweep the floor",
+  "@gameQuestSweeping": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestVacuuming": "Vacuuming",
+  "@gameQuestVacuuming": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestMopping": "Mop the floor",
+  "@gameQuestMopping": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestDishes": "Wash the dishes",
+  "@gameQuestDishes": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestDishwasher": "Load/unload dishwasher",
+  "@gameQuestDishwasher": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestLaundry": "Do the laundry",
+  "@gameQuestLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestHangLaundry": "Hang up laundry",
+  "@gameQuestHangLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestFoldLaundry": "Fold laundry",
+  "@gameQuestFoldLaundry": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestIroning": "Ironing",
+  "@gameQuestIroning": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanBathroom": "Clean the bathroom",
+  "@gameQuestCleanBathroom": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanToilet": "Clean the toilet",
+  "@gameQuestCleanToilet": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanKitchen": "Clean the kitchen",
+  "@gameQuestCleanKitchen": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestTakeOutTrash": "Take out the trash",
+  "@gameQuestTakeOutTrash": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestRecycling": "Take out recycling",
+  "@gameQuestRecycling": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestChangeBedSheets": "Change bed sheets",
+  "@gameQuestChangeBedSheets": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanWindows": "Clean the windows",
+  "@gameQuestCleanWindows": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanFridge": "Clean the fridge",
+  "@gameQuestCleanFridge": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestGroceries": "Grocery shopping",
+  "@gameQuestGroceries": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestWaterPlants": "Water the plants",
+  "@gameQuestWaterPlants": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestTidyUp": "Tidy up",
+  "@gameQuestTidyUp": {
+    "description": "Generated from game/quests.toml"
+  }
 }

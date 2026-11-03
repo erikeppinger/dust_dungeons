@@ -12,17 +12,18 @@ import 'generated_migrations/schema_v5.dart' as v5;
 import 'generated_migrations/schema_v6.dart' as v6;
 import 'generated_migrations/schema_v7.dart' as v7;
 import 'generated_migrations/schema_v8.dart' as v8;
+import 'generated_migrations/schema_v9.dart' as v9;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4, 5, 6, 7, 8]) {
-    test('v$from -> v9 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
+    test('v$from -> v10 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 9);
+      await verifier.migrateAndValidate(db, 10);
       await db.close();
     });
   }
@@ -261,5 +262,23 @@ void main() {
     final people = await db.select(db.profiles).get();
     expect(people.map((p) => p.curseFamily), [null, null]);
     expect((await db.select(db.fights).getSingle()).loot, isNull);
+  });
+
+  test('v9 -> v10: everyone fights on balanced', () async {
+    final schema = await verifier.schemaAt(9);
+    final old = v9.DatabaseAtV9(schema.newConnection());
+    await old.customStatement(
+      "INSERT INTO profiles (name, curse_family) VALUES ('Me', 'dust'), ('Sam', NULL)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final people = await db.select(db.profiles).get();
+    expect(people.map((p) => p.difficulty), [
+      Difficulty.balanced,
+      Difficulty.balanced,
+    ]);
+    expect(people.first.curseFamily, BossFamily.dust);
   });
 }

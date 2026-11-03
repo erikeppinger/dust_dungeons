@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Balance",
+  "description": "game/balance.toml: the numbers behind fights and points. See game/README.md.",
+  "type": "object",
+  "required": ["hero", "bosses", "timing", "loot", "curses", "points", "difficulty"],
+  "additionalProperties": false,
+  "properties": {
+    "hero": {
+      "type": "object",
+      "required": ["hearts", "damage"],
+      "additionalProperties": false,
+      "properties": {
+        "hearts": { "$ref": "#/$defs/growth" },
+        "damage": { "$ref": "#/$defs/growth" }
+      }
+    },
+    "bosses": {
+      "type": "object",
+      "required": ["tier_wins", "health_base", "health_per_tier", "overlord_health_times", "overlord_wins_needed"],
+      "additionalProperties": false,
+      "properties": {
+        "tier_wins": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2 },
+        "health_base": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "health_per_tier": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "overlord_health_times": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "overlord_wins_needed": { "type": "integer", "minimum": 2, "maximum": 8 }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "required": ["normal", "wide", "tight", "story"],
+      "additionalProperties": false,
+      "properties": {
+        "normal": { "$ref": "#/$defs/window" },
+        "wide": { "$ref": "#/$defs/window" },
+        "tight": { "$ref": "#/$defs/window" },
+        "story": { "$ref": "#/$defs/window" }
+      }
+    },
+    "loot": {
+      "type": "object",
+      "required": ["chance_by_tier", "sure_after_dry_wins"],
+      "additionalProperties": false,
+      "properties": {
+        "chance_by_tier": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 100 }, "minItems": 3, "maxItems": 3 },
+        "sure_after_dry_wins": { "type": "integer", "minimum": 1, "maximum": 20 }
+      }
+    },
+    "curses": {
+      "type": "object",
+      "required": ["min_hearts"],
+      "additionalProperties": false,
+      "properties": { "min_hearts": { "type": "integer", "minimum": 1, "maximum": 10 } }
+    },
+    "points": {
+      "type": "object",
+      "required": ["min_base", "max_base", "on_time_bonus_percent", "streak_bonus_percent_per_day", "max_streak_bonus_days"],
+      "additionalProperties": false,
+      "properties": {
+        "min_base": { "type": "integer", "minimum": 1 },
+        "max_base": { "type": "integer", "minimum": 1 },
+        "on_time_bonus_percent": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "streak_bonus_percent_per_day": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "max_streak_bonus_days": { "type": "integer", "minimum": 0, "maximum": 60 }
+      }
+    },
+    "difficulty": {
+      "type": "object",
+      "required": ["easy", "balanced", "hard"],
+      "additionalProperties": false,
+      "properties": {
+        "easy": { "$ref": "#/$defs/preset" },
+        "balanced": { "$ref": "#/$defs/preset" },
+        "hard": { "$ref": "#/$defs/preset" }
+      }
+    }
+  },
+  "$defs": {
+    "growth": {
+      "type": "object",
+      "required": ["base", "every", "offset", "min", "max"],
+      "additionalProperties": false,
+      "properties": {
+        "base": { "type": "integer", "minimum": 0 },
+        "every": { "type": "integer", "minimum": 1 },
+        "offset": { "type": "integer", "minimum": 0 },
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "window": {
+      "description": "[perfect, good] in milliseconds either side of a beat.",
+      "type": "array",
+      "items": { "type": "integer", "minimum": 10, "maximum": 400 },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "preset": {
+      "type": "object",
+      "required": ["boss_health", "timing_ms", "tempo"],
+      "additionalProperties": false,
+      "properties": {
+        "boss_health": { "type": "number", "minimum": 0.25, "maximum": 3 },
+        "timing_ms": { "type": "integer", "minimum": -40, "maximum": 60 },
+        "tempo": { "type": "number", "minimum": 0.5, "maximum": 1.5 }
+      }
+    }
+  }
+}

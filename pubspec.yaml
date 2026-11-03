@@ -4,7 +4,7 @@ publish_to: 'none'
 
 # SemVer: MAJOR.MINOR.PATCH+BUILD. BUILD = Android versionCode and must always increase.
 # Bump with tool/bump_version.ps1 and record changes in CHANGELOG.md.
-version: 0.11.0+18
+version: 0.12.0+19
 environment:
   sdk: ^3.13.1
 

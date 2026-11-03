@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../domain/dates.dart';
 import '../../domain/fight/boss.dart';
 import '../db/app_database.dart';
@@ -69,9 +71,9 @@ class FightProgress {
   /// Every won fight with its start, oldest first.
   final List<(BossFamily, DateTime)> _won;
 
-  /// Usable tokens (never negative; a debt shows as 0).
-  int tokens(BossFamily family) =>
-      (_balance[family] ?? 0) < 0 ? 0 : _balance[family]!;
+  /// Usable tokens (never negative; a debt shows as 0). The Overlord needs
+  /// none and has none.
+  int tokens(BossFamily family) => max(0, _balance[family] ?? 0);
 
   int get totalTokens => choreFamilies.fold(0, (sum, f) => sum + tokens(f));
 

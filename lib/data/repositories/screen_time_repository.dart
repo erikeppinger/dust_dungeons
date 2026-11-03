@@ -53,7 +53,7 @@ class ScreenTimeRepository {
       _db.transaction(() async {
         if (!await ShopRepository(_db).use(profileId, voucher)) return false;
         final row = await _row(profileId, day);
-        final minutes = (row?.voucherMinutes ?? 0) + voucherMinutes(voucher);
+        final minutes = (row?.voucherMinutes ?? 0) + voucher.minutes;
         await _db
             .into(_db.screenDays)
             .insert(

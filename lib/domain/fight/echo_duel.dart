@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import '../../game/game_data.dart';
 import 'boss.dart';
+import 'difficulty.dart';
 import 'lanes.dart';
 import 'items.dart';
 
@@ -11,16 +13,16 @@ enum Hit { perfect, good, miss }
 class TimingWindows {
   const TimingWindows({required this.perfectMs, required this.goodMs});
 
-  static const normal = TimingWindows(perfectMs: 60, goodMs: 120);
+  static const normal = timingNormal;
 
-  /// With the Metronome Charm.
-  static const charmed = TimingWindows(perfectMs: 80, goodMs: 160);
+  /// With wide timing (the Metronome Charm).
+  static const charmed = timingWide;
 
   /// Cursed: narrower than normal.
-  static const tight = TimingWindows(perfectMs: 45, goodMs: 95);
+  static const tight = timingTight;
 
   /// Story mode: generous windows (and no damage to the hero).
-  static const story = TimingWindows(perfectMs: 100, goodMs: 200);
+  static const story = timingStory;
 
   final int perfectMs;
   final int goodMs;
@@ -123,6 +125,7 @@ class EchoDuel {
     this.loadout = Loadout.none,
     this.storyMode = false,
     this.slowMode = false,
+    this.difficulty = Difficulty.balanced,
     this.seed = 0,
     int? maxHp,
   }) : effects = loadout.against(family),
@@ -130,12 +133,15 @@ class EchoDuel {
          maxHp: heartsWith(hero.maxHp, loadout.against(family)),
          damage: hero.damage,
        ),
-       bossMaxHp = maxHp ?? bossHpForTier(tier),
-       bossHp = maxHp ?? bossHpForTier(tier),
+       bossMaxHp = _health(maxHp ?? bossHpForTier(tier), difficulty),
+       bossHp = _health(maxHp ?? bossHpForTier(tier), difficulty),
        heroHp = heartsWith(hero.maxHp, loadout.against(family));
 
   /// Tempo factor in slow mode.
   static const slowTempo = 0.7;
+
+  static int _health(int base, Difficulty difficulty) =>
+      max(1, (base * difficultyPresets[difficulty]!.bossHealth).round());
 
   /// Tempo factor with a slower boss (the Lost Remote).
   static const slowerBossTempo = 0.9;
@@ -151,6 +157,11 @@ class EchoDuel {
   final Effects effects;
   final bool storyMode;
 
+  /// Easy, balanced or hard: boss health, timing and tempo.
+  final Difficulty difficulty;
+
+  DifficultyPreset get _preset => difficultyPresets[difficulty]!;
+
   /// Slow mode: everything plays at [slowTempo].
   final bool slowMode;
 
@@ -159,7 +170,9 @@ class EchoDuel {
   final _generators = <BossFamily, PatternGenerator>{};
 
   double get tempo =>
-      (slowMode ? slowTempo : 1) * (effects.slowerBoss ? slowerBossTempo : 1);
+      (slowMode ? slowTempo : 1) *
+      (effects.slowerBoss ? slowerBossTempo : 1) *
+      _preset.tempo;
 
   final int bossMaxHp;
   int bossHp;
@@ -172,11 +185,21 @@ class EchoDuel {
   /// Misses that will still cost no heart (shields).
   int get freeMissesLeft => effects.freeMisses - _freeMissesUsed;
 
-  TimingWindows get windows => storyMode
-      ? TimingWindows.story
-      : effects.tightTiming
-      ? TimingWindows.tight
-      : (effects.wideTiming ? TimingWindows.charmed : TimingWindows.normal);
+  /// Story mode keeps its own windows; otherwise the difficulty widens or
+  /// narrows them.
+  TimingWindows get windows {
+    if (storyMode) return TimingWindows.story;
+    final base = effects.tightTiming
+        ? TimingWindows.tight
+        : (effects.wideTiming ? TimingWindows.charmed : TimingWindows.normal);
+    final ms = _preset.timingMs;
+    return ms == 0
+        ? base
+        : TimingWindows(
+            perfectMs: max(10, base.perfectMs + ms),
+            goodMs: max(20, base.goodMs + ms),
+          );
+  }
 
   /// Phase 1 below half the boss's health: longer, syncopated patterns.
   int get phase => bossHp * 2 <= bossMaxHp ? 1 : 0;
@@ -280,6 +303,7 @@ class OverlordDuel extends EchoDuel {
     super.loadout,
     super.storyMode,
     super.slowMode,
+    super.difficulty,
     super.seed,
   }) : motifs = motifs.isEmpty ? const [BossFamily.clutter] : motifs,
        super(family: BossFamily.overlord, maxHp: overlordHpForTier(tier));

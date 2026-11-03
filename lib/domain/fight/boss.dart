@@ -1,3 +1,7 @@
+import '../../game/game_data.dart';
+
+export '../../game/game_data.dart' show bossStyles, seedFamilies;
+
 /// Boss families: every chore belongs to one, and completing it earns a
 /// fight token for that family. Stored by name: never rename values.
 enum BossFamily {
@@ -28,33 +32,10 @@ const choreFamilies = [
 ];
 
 /// Wins against chore bosses in one week (Mon–Sun) that call the Overlord.
-const overlordWinsNeeded = 5;
+const overlordWinsNeeded = bossesOverlordWinsNeeded;
 
-/// Default family of each built-in chore; user chores are [BossFamily.clutter].
-const seedFamilies = <String, BossFamily>{
-  'dusting': BossFamily.dust,
-  'sweeping': BossFamily.dust,
-  'vacuuming': BossFamily.dust,
-  'mopping': BossFamily.dust,
-  'laundry': BossFamily.laundry,
-  'hang_laundry': BossFamily.laundry,
-  'fold_laundry': BossFamily.laundry,
-  'ironing': BossFamily.laundry,
-  'dishes': BossFamily.kitchen,
-  'dishwasher': BossFamily.kitchen,
-  'clean_kitchen': BossFamily.kitchen,
-  'clean_fridge': BossFamily.kitchen,
-  'clean_bathroom': BossFamily.bath,
-  'clean_toilet': BossFamily.bath,
-  'take_out_trash': BossFamily.trash,
-  'recycling': BossFamily.trash,
-  'change_bed_sheets': BossFamily.bedroom,
-  'tidy_up': BossFamily.bedroom,
-  'clean_windows': BossFamily.outside,
-  'water_plants': BossFamily.outside,
-  'groceries': BossFamily.outside,
-};
-
+/// Default family of each built-in chore (game/quests.toml); user chores
+/// are [BossFamily.clutter].
 BossFamily familyOfSeed(String? seedKey) =>
     seedFamilies[seedKey] ?? BossFamily.clutter;
 
@@ -75,70 +56,26 @@ class BossStyle {
   final double eighthChance;
 }
 
-const bossStyles = <BossFamily, BossStyle>{
-  // Light, bouncy, even beats.
-  BossFamily.dust: BossStyle(baseBpm: 96, offbeatChance: 0, eighthChance: 0.3),
-  // A random mix with some off-beats.
-  BossFamily.clutter: BossStyle(
-    baseBpm: 104,
-    offbeatChance: 0.25,
-    eighthChance: 0.35,
-  ),
-  BossFamily.laundry: BossStyle(
-    baseBpm: 100,
-    offbeatChance: 0.1,
-    eighthChance: 0.3,
-  ),
-  BossFamily.kitchen: BossStyle(
-    baseBpm: 108,
-    offbeatChance: 0.15,
-    eighthChance: 0.4,
-  ),
-  BossFamily.bath: BossStyle(
-    baseBpm: 84,
-    offbeatChance: 0.05,
-    eighthChance: 0.1,
-  ),
-  BossFamily.trash: BossStyle(
-    baseBpm: 100,
-    offbeatChance: 0.35,
-    eighthChance: 0.2,
-  ),
-  BossFamily.bedroom: BossStyle(
-    baseBpm: 92,
-    offbeatChance: 0.2,
-    eighthChance: 0.2,
-  ),
-  BossFamily.outside: BossStyle(
-    baseBpm: 112,
-    offbeatChance: 0.1,
-    eighthChance: 0.5,
-  ),
-  // Only its lane phase uses this tempo; its echo phases borrow the styles
-  // of the bosses beaten that week.
-  BossFamily.overlord: BossStyle(
-    baseBpm: 100,
-    offbeatChance: 0.2,
-    eighthChance: 0.3,
-  ),
-};
-
 /// Boss tier grows with how often you have beaten it: 1, 2 or 3.
-int tierForWins(int wins) => wins >= 8 ? 3 : (wins >= 3 ? 2 : 1);
+int tierForWins(int wins) =>
+    wins >= bossesTierWins[1] ? 3 : (wins >= bossesTierWins[0] ? 2 : 1);
 
 /// Cleaning points needed to win, by tier.
-int bossHpForTier(int tier) => 10 + 6 * tier;
+int bossHpForTier(int tier) => bossesHealthBase + bossesHealthPerTier * tier;
 
-/// The Overlord has three phases and twice the health.
-int overlordHpForTier(int tier) => 2 * bossHpForTier(tier);
+/// The Overlord has three phases and more health.
+int overlordHpForTier(int tier) =>
+    bossesOverlordHealthTimes * bossHpForTier(tier);
 
 /// Hero strength from the player's level (XP from chores).
 class HeroStats {
   const HeroStats({required this.maxHp, required this.damage});
 
   factory HeroStats.forLevel(int level) => HeroStats(
-    maxHp: (4 + (level + 1) ~/ 2).clamp(5, 12),
-    damage: (1 + level ~/ 4).clamp(1, 4),
+    maxHp: (heroHeartsBase + (level + heroHeartsOffset) ~/ heroHeartsEvery)
+        .clamp(heroHeartsMin, heroHeartsMax),
+    damage: (heroDamageBase + (level + heroDamageOffset) ~/ heroDamageEvery)
+        .clamp(heroDamageMin, heroDamageMax),
   );
 
   final int maxHp;

@@ -153,6 +153,16 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
         requiredDuringInsert: false,
       ).withConverter<BossFamily?>($ProfilesTable.$convertercurseFamilyn);
   @override
+  late final GeneratedColumnWithTypeConverter<Difficulty, String> difficulty =
+      GeneratedColumn<String>(
+        'difficulty',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(Difficulty.balanced.name),
+      ).withConverter<Difficulty>($ProfilesTable.$converterdifficulty);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     name,
@@ -166,6 +176,7 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
     slowMode,
     archivedAt,
     curseFamily,
+    difficulty,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -303,6 +314,12 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
           data['${effectivePrefix}curse_family'],
         ),
       ),
+      difficulty: $ProfilesTable.$converterdifficulty.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}difficulty'],
+        )!,
+      ),
     );
   }
 
@@ -315,6 +332,8 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
       const EnumNameConverter<BossFamily>(BossFamily.values);
   static JsonTypeConverter2<BossFamily?, String?, String?>
   $convertercurseFamilyn = JsonTypeConverter2.asNullable($convertercurseFamily);
+  static JsonTypeConverter2<Difficulty, String, String> $converterdifficulty =
+      const EnumNameConverter<Difficulty>(Difficulty.values);
 }
 
 class Profile extends DataClass implements Insertable<Profile> {
@@ -338,6 +357,9 @@ class Profile extends DataClass implements Insertable<Profile> {
 
   /// The boss whose curse waits for the next fight (schema v9).
   final BossFamily? curseFamily;
+
+  /// How hard fights are for this person (schema v10).
+  final Difficulty difficulty;
   const Profile({
     required this.id,
     required this.name,
@@ -351,6 +373,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     required this.slowMode,
     this.archivedAt,
     this.curseFamily,
+    required this.difficulty,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -371,6 +394,11 @@ class Profile extends DataClass implements Insertable<Profile> {
     if (!nullToAbsent || curseFamily != null) {
       map['curse_family'] = Variable<String>(
         $ProfilesTable.$convertercurseFamilyn.toSql(curseFamily),
+      );
+    }
+    {
+      map['difficulty'] = Variable<String>(
+        $ProfilesTable.$converterdifficulty.toSql(difficulty),
       );
     }
     return map;
@@ -394,6 +422,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       curseFamily: curseFamily == null && nullToAbsent
           ? const Value.absent()
           : Value(curseFamily),
+      difficulty: Value(difficulty),
     );
   }
 
@@ -417,6 +446,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       curseFamily: $ProfilesTable.$convertercurseFamilyn.fromJson(
         serializer.fromJson<String?>(json['curseFamily']),
       ),
+      difficulty: $ProfilesTable.$converterdifficulty.fromJson(
+        serializer.fromJson<String>(json['difficulty']),
+      ),
     );
   }
   @override
@@ -437,6 +469,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       'curseFamily': serializer.toJson<String?>(
         $ProfilesTable.$convertercurseFamilyn.toJson(curseFamily),
       ),
+      'difficulty': serializer.toJson<String>(
+        $ProfilesTable.$converterdifficulty.toJson(difficulty),
+      ),
     };
   }
 
@@ -453,6 +488,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     bool? slowMode,
     Value<DateTime?> archivedAt = const Value.absent(),
     Value<BossFamily?> curseFamily = const Value.absent(),
+    Difficulty? difficulty,
   }) => Profile(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -466,6 +502,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     slowMode: slowMode ?? this.slowMode,
     archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
     curseFamily: curseFamily.present ? curseFamily.value : this.curseFamily,
+    difficulty: difficulty ?? this.difficulty,
   );
   Profile copyWithCompanion(ProfilesCompanion data) {
     return Profile(
@@ -491,6 +528,9 @@ class Profile extends DataClass implements Insertable<Profile> {
       curseFamily: data.curseFamily.present
           ? data.curseFamily.value
           : this.curseFamily,
+      difficulty: data.difficulty.present
+          ? data.difficulty.value
+          : this.difficulty,
     );
   }
 
@@ -508,7 +548,8 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('storyMode: $storyMode, ')
           ..write('slowMode: $slowMode, ')
           ..write('archivedAt: $archivedAt, ')
-          ..write('curseFamily: $curseFamily')
+          ..write('curseFamily: $curseFamily, ')
+          ..write('difficulty: $difficulty')
           ..write(')'))
         .toString();
   }
@@ -527,6 +568,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     slowMode,
     archivedAt,
     curseFamily,
+    difficulty,
   );
   @override
   bool operator ==(Object other) =>
@@ -543,7 +585,8 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.storyMode == this.storyMode &&
           other.slowMode == this.slowMode &&
           other.archivedAt == this.archivedAt &&
-          other.curseFamily == this.curseFamily);
+          other.curseFamily == this.curseFamily &&
+          other.difficulty == this.difficulty);
 }
 
 class ProfilesCompanion extends UpdateCompanion<Profile> {
@@ -559,6 +602,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<bool> slowMode;
   final Value<DateTime?> archivedAt;
   final Value<BossFamily?> curseFamily;
+  final Value<Difficulty> difficulty;
   const ProfilesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -572,6 +616,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.slowMode = const Value.absent(),
     this.archivedAt = const Value.absent(),
     this.curseFamily = const Value.absent(),
+    this.difficulty = const Value.absent(),
   });
   ProfilesCompanion.insert({
     this.id = const Value.absent(),
@@ -586,6 +631,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.slowMode = const Value.absent(),
     this.archivedAt = const Value.absent(),
     this.curseFamily = const Value.absent(),
+    this.difficulty = const Value.absent(),
   }) : name = Value(name);
   static Insertable<Profile> custom({
     Expression<int>? id,
@@ -600,6 +646,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<bool>? slowMode,
     Expression<DateTime>? archivedAt,
     Expression<String>? curseFamily,
+    Expression<String>? difficulty,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -614,6 +661,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (slowMode != null) 'slow_mode': slowMode,
       if (archivedAt != null) 'archived_at': archivedAt,
       if (curseFamily != null) 'curse_family': curseFamily,
+      if (difficulty != null) 'difficulty': difficulty,
     });
   }
 
@@ -630,6 +678,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Value<bool>? slowMode,
     Value<DateTime?>? archivedAt,
     Value<BossFamily?>? curseFamily,
+    Value<Difficulty>? difficulty,
   }) {
     return ProfilesCompanion(
       id: id ?? this.id,
@@ -644,6 +693,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       slowMode: slowMode ?? this.slowMode,
       archivedAt: archivedAt ?? this.archivedAt,
       curseFamily: curseFamily ?? this.curseFamily,
+      difficulty: difficulty ?? this.difficulty,
     );
   }
 
@@ -688,6 +738,11 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
         $ProfilesTable.$convertercurseFamilyn.toSql(curseFamily.value),
       );
     }
+    if (difficulty.present) {
+      map['difficulty'] = Variable<String>(
+        $ProfilesTable.$converterdifficulty.toSql(difficulty.value),
+      );
+    }
     return map;
   }
 
@@ -705,7 +760,8 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('storyMode: $storyMode, ')
           ..write('slowMode: $slowMode, ')
           ..write('archivedAt: $archivedAt, ')
-          ..write('curseFamily: $curseFamily')
+          ..write('curseFamily: $curseFamily, ')
+          ..write('difficulty: $difficulty')
           ..write(')'))
         .toString();
   }
@@ -4915,6 +4971,7 @@ typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
   Value<bool> slowMode,
   Value<DateTime?> archivedAt,
   Value<BossFamily?> curseFamily,
+  Value<Difficulty> difficulty,
 });
 typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<int> id,
@@ -4929,6 +4986,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<bool> slowMode,
   Value<DateTime?> archivedAt,
   Value<BossFamily?> curseFamily,
+  Value<Difficulty> difficulty,
 });
 
 final class $$ProfilesTableReferences
@@ -5130,6 +5188,12 @@ class $$ProfilesTableFilterComposer
   ColumnWithTypeConverterFilters<BossFamily?, BossFamily, String>
   get curseFamily => $composableBuilder(
     column: $table.curseFamily,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Difficulty, Difficulty, String>
+  get difficulty => $composableBuilder(
+    column: $table.difficulty,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
@@ -5377,6 +5441,11 @@ class $$ProfilesTableOrderingComposer
     column: $table.curseFamily,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get difficulty => $composableBuilder(
+    column: $table.difficulty,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProfilesTableAnnotationComposer
@@ -5432,6 +5501,12 @@ class $$ProfilesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<BossFamily?, String> get curseFamily =>
       $composableBuilder(
         column: $table.curseFamily,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<Difficulty, String> get difficulty =>
+      $composableBuilder(
+        column: $table.difficulty,
         builder: (column) => column,
       );
 
@@ -5659,6 +5734,7 @@ class $$ProfilesTableTableManager
                 Value<bool> slowMode = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
                 Value<BossFamily?> curseFamily = const Value.absent(),
+                Value<Difficulty> difficulty = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
                 name: name,
@@ -5672,6 +5748,7 @@ class $$ProfilesTableTableManager
                 slowMode: slowMode,
                 archivedAt: archivedAt,
                 curseFamily: curseFamily,
+                difficulty: difficulty,
               ),
           createCompanionCallback:
               ({
@@ -5687,6 +5764,7 @@ class $$ProfilesTableTableManager
                 Value<bool> slowMode = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
                 Value<BossFamily?> curseFamily = const Value.absent(),
+                Value<Difficulty> difficulty = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
                 name: name,
@@ -5700,6 +5778,7 @@ class $$ProfilesTableTableManager
                 slowMode: slowMode,
                 archivedAt: archivedAt,
                 curseFamily: curseFamily,
+                difficulty: difficulty,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -3,42 +3,23 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../domain/fight/boss.dart';
+import '../../game/game_texts.dart';
 import '../../l10n/app_localizations.dart';
 
 /// How a boss looks right now.
 enum BossMood { idle, hit, defeated }
 
-String bossName(AppLocalizations l10n, BossFamily family) => switch (family) {
-  BossFamily.dust => l10n.bossDust,
-  BossFamily.laundry => l10n.bossLaundry,
-  BossFamily.kitchen => l10n.bossKitchen,
-  BossFamily.bath => l10n.bossBath,
-  BossFamily.trash => l10n.bossTrash,
-  BossFamily.bedroom => l10n.bossBedroom,
-  BossFamily.outside => l10n.bossOutside,
-  BossFamily.clutter => l10n.bossClutter,
-  BossFamily.overlord => l10n.bossOverlord,
-};
+String bossName(AppLocalizations l10n, BossFamily family) =>
+    gameBossName(l10n, family);
 
 /// Which chores feed a family's tokens, in a few words.
-String bossSource(AppLocalizations l10n, BossFamily family) => switch (family) {
-  BossFamily.dust => l10n.bossSourceDust,
-  BossFamily.laundry => l10n.bossSourceLaundry,
-  BossFamily.kitchen => l10n.bossSourceKitchen,
-  BossFamily.bath => l10n.bossSourceBath,
-  BossFamily.trash => l10n.bossSourceTrash,
-  BossFamily.bedroom => l10n.bossSourceBedroom,
-  BossFamily.outside => l10n.bossSourceOutside,
-  BossFamily.clutter => l10n.bossSourceClutter,
-  BossFamily.overlord => l10n.bossSourceOverlord,
-};
+String bossSource(AppLocalizations l10n, BossFamily family) =>
+    family == BossFamily.overlord
+    ? l10n.bossSourceOverlord(overlordWinsNeeded)
+    : gameBossFedBy(l10n, family) ?? '';
 
-String trophyName(AppLocalizations l10n, BossFamily family) => switch (family) {
-  BossFamily.dust => l10n.trophyDust,
-  BossFamily.clutter => l10n.trophyClutter,
-  BossFamily.overlord => l10n.trophyOverlord,
-  _ => l10n.trophyGeneric(bossName(l10n, family)),
-};
+String trophyName(AppLocalizations l10n, BossFamily family) =>
+    gameBossTrophy(l10n, family) ?? l10n.trophyGeneric(bossName(l10n, family));
 
 /// Main and light color of each boss. Families also differ in silhouette,
 /// so color is never the only way to tell them apart.

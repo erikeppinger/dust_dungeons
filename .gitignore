@@ -62,3 +62,6 @@ lib/l10n/app_localizations*.dart
 
 # Test APKs for phones, synced by Dropbox, never committed.
 /apk/
+
+# Python
+__pycache__/

@@ -1,13 +1,15 @@
+import '../game/game_data.dart';
+
 /// Smallest and largest base points a chore can have.
-const minBasePoints = 5;
-const maxBasePoints = 100;
+const minBasePoints = pointsMinBase;
+const maxBasePoints = pointsMaxBase;
 
 /// Bonus for doing a scheduled chore on its due day (not when overdue).
-const onTimeBonusPercent = 10;
+const onTimeBonusPercent = pointsOnTimeBonusPercent;
 
 /// Bonus per day of the current streak, capped at [maxStreakBonusDays].
-const streakBonusPercentPerDay = 2;
-const maxStreakBonusDays = 10;
+const streakBonusPercentPerDay = pointsStreakBonusPercentPerDay;
+const maxStreakBonusDays = pointsMaxStreakBonusDays;
 
 /// A chore's base points, clamped to the allowed range.
 int basePointsOf(int basePoints) =>

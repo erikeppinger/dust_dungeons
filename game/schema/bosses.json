@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bosses",
+  "description": "game/bosses.toml: names, tempos and curses. See game/README.md.",
+  "type": "object",
+  "required": ["bosses"],
+  "additionalProperties": false,
+  "properties": {
+    "bosses": {
+      "type": "object",
+      "propertyNames": {
+        "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"]
+      },
+      "additionalProperties": { "$ref": "#/$defs/boss" }
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "object",
+      "required": ["en", "de"],
+      "additionalProperties": false,
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "de": { "type": "string", "minLength": 1 }
+      }
+    },
+    "boss": {
+      "type": "object",
+      "required": ["name", "tempo", "curse"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "fed_by": { "$ref": "#/$defs/text", "description": "Which quests feed it, in a few words. Not for the Overlord." },
+        "trophy": { "$ref": "#/$defs/text", "description": "Optional; otherwise \"<name> trophy\"." },
+        "tempo": {
+          "type": "object",
+          "required": ["bpm", "offbeat", "eighth"],
+          "additionalProperties": false,
+          "properties": {
+            "bpm": { "type": "integer", "minimum": 60, "maximum": 160, "description": "Beats per minute at tier 1." },
+            "offbeat": { "type": "number", "minimum": 0, "maximum": 1, "description": "Chance of a beat between two pulses." },
+            "eighth": { "type": "number", "minimum": 0, "maximum": 1, "description": "Chance of an eighth instead of a quarter." }
+          }
+        },
+        "curse": {
+          "type": "object",
+          "required": ["kind", "name"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["heart", "tight_timing", "slot_off"] },
+            "slot": {
+              "enum": ["head", "body", "weapon", "shield", "feet", "charm"],
+              "description": "For slot_off: the slot whose item does nothing."
+            },
+            "name": { "$ref": "#/$defs/text" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+#:schema ./schema/bosses.json
+# The bosses: names, which quests feed them, how they play and the curse they
+# leave after winning. Keys are stored in people's databases: never rename or
+# remove one. A new boss also needs its drawing in code (see README.md).
+
+[bosses.dust]
+name = { en = "Dust Bunny King", de = "Staubhasen-König" }
+fed_by = { en = "dusting, floors", de = "Staub, Böden" }
+trophy = { en = "Golden Feather Duster", de = "Goldener Staubwedel" }
+tempo = { bpm = 96, offbeat = 0.0, eighth = 0.3 }
+curse = { kind = "tight_timing", name = { en = "Sneezing Fit", de = "Niesanfall" } }
+
+[bosses.laundry]
+name = { en = "Laundry Hydra", de = "Wäsche-Hydra" }
+fed_by = { en = "laundry, ironing", de = "Wäsche, Bügeln" }
+tempo = { bpm = 100, offbeat = 0.1, eighth = 0.3 }
+curse = { kind = "heart", name = { en = "Wet Socks", de = "Nasse Socken" } }
+
+[bosses.kitchen]
+name = { en = "Sink Kraken", de = "Spülbecken-Krake" }
+fed_by = { en = "dishes, kitchen", de = "Abwasch, Küche" }
+tempo = { bpm = 108, offbeat = 0.15, eighth = 0.4 }
+curse = { kind = "slot_off", slot = "weapon", name = { en = "Greasy Fingers", de = "Fettige Finger" } }
+
+[bosses.bath]
+name = { en = "Porcelain Golem", de = "Porzellan-Golem" }
+fed_by = { en = "bathroom, toilet", de = "Bad, Toilette" }
+tempo = { bpm = 84, offbeat = 0.05, eighth = 0.1 }
+curse = { kind = "tight_timing", name = { en = "Soap in the Eyes", de = "Seife im Auge" } }
+
+[bosses.trash]
+name = { en = "Trash Titan", de = "Müll-Titan" }
+fed_by = { en = "trash, recycling", de = "Müll, Altpapier" }
+tempo = { bpm = 100, offbeat = 0.35, eighth = 0.2 }
+curse = { kind = "heart", name = { en = "Stinky Cloud", de = "Stinkwolke" } }
+
+[bosses.bedroom]
+name = { en = "Pillow Phantom", de = "Kissen-Phantom" }
+fed_by = { en = "beds, tidying", de = "Betten, Aufräumen" }
+tempo = { bpm = 92, offbeat = 0.2, eighth = 0.2 }
+curse = { kind = "slot_off", slot = "head", name = { en = "Bed Head", de = "Strubbelkopf" } }
+
+[bosses.outside]
+name = { en = "Window Wraith", de = "Fenster-Geist" }
+fed_by = { en = "windows, plants, errands", de = "Fenster, Pflanzen, Besorgungen" }
+tempo = { bpm = 112, offbeat = 0.1, eighth = 0.5 }
+curse = { kind = "slot_off", slot = "feet", name = { en = "Muddy Boots", de = "Matschstiefel" } }
+
+[bosses.clutter]
+name = { en = "Clutter Imp", de = "Krempel-Kobold" }
+fed_by = { en = "your own quests", de = "deine eigenen Quests" }
+trophy = { en = "Tidy Crown", de = "Ordnungskrone" }
+tempo = { bpm = 104, offbeat = 0.25, eighth = 0.35 }
+curse = { kind = "heart", name = { en = "Stubbed Toe", de = "Gestoßener Zeh" } }
+
+[bosses.overlord]
+name = { en = "Chore Overlord", de = "Haushalts-Overlord" }
+trophy = { en = "Crown of the Week", de = "Wochenkrone" }
+tempo = { bpm = 100, offbeat = 0.2, eighth = 0.3 }
+curse = { kind = "heart", name = { en = "Overlord's Grudge", de = "Groll des Overlords" } }

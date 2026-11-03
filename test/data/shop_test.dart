@@ -4,6 +4,7 @@ import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/progress_repository.dart';
 import 'package:homework_and_chores/data/repositories/screen_time_repository.dart';
 import 'package:homework_and_chores/data/repositories/shop_repository.dart';
+import 'package:homework_and_chores/game/game_data.dart';
 import 'package:homework_and_chores/domain/fight/shop.dart';
 
 import '../helpers.dart';
@@ -36,9 +37,12 @@ void main() {
   Future<int> balance() => progress.watchBalance(profile).first;
 
   test('buying costs points, never XP, and needs enough of them', () async {
-    expect(await shop.buy(profile, charmItem), PurchaseResult.notEnoughPoints);
+    expect(
+      await shop.buy(profile, metronomeCharmItem),
+      PurchaseResult.notEnoughPoints,
+    );
     await earn(3); // 120 points
-    expect(await shop.buy(profile, charmItem), PurchaseResult.bought);
+    expect(await shop.buy(profile, metronomeCharmItem), PurchaseResult.bought);
     expect(await balance(), 20);
     expect(await shop.watchInventory(profile).first, {'metronome_charm': 1});
 
@@ -52,8 +56,11 @@ void main() {
 
   test('gear and hats are bought once; consumables stack', () async {
     await earn(10); // 400 points
-    expect(await shop.buy(profile, charmItem), PurchaseResult.bought);
-    expect(await shop.buy(profile, charmItem), PurchaseResult.alreadyOwned);
+    expect(await shop.buy(profile, metronomeCharmItem), PurchaseResult.bought);
+    expect(
+      await shop.buy(profile, metronomeCharmItem),
+      PurchaseResult.alreadyOwned,
+    );
     expect(await shop.buy(profile, hats.first), PurchaseResult.bought);
     expect(await shop.buy(profile, hats.first), PurchaseResult.alreadyOwned);
     expect(await shop.buy(profile, secondWindItem), PurchaseResult.bought);
@@ -74,8 +81,8 @@ void main() {
 
   test('new gear is worn when its slot is free', () async {
     await earn(15);
-    await shop.buy(profile, mopItem);
-    await shop.buy(profile, spatulaItem);
+    await shop.buy(profile, turboMopItem);
+    await shop.buy(profile, spatulaOfFlippingItem);
     expect(await worn(), {GearSlot.weapon: 'turbo_mop'});
     await shop.buy(profile, secondWindItem);
     expect(await worn(), hasLength(1));
@@ -83,10 +90,10 @@ void main() {
 
   test('wearing swaps the slot; two hands push out the shield', () async {
     await earn(20);
-    await shop.buy(profile, mopItem);
-    await shop.buy(profile, spatulaItem);
-    await shop.buy(profile, shieldItem);
-    await shop.wear(profile, spatulaItem);
+    await shop.buy(profile, turboMopItem);
+    await shop.buy(profile, spatulaOfFlippingItem);
+    await shop.buy(profile, spongeShieldItem);
+    await shop.wear(profile, spatulaOfFlippingItem);
     expect(await worn(), {
       GearSlot.weapon: 'spatula_of_flipping',
       GearSlot.shield: 'sponge_shield',
@@ -102,20 +109,20 @@ void main() {
         );
     await shop.wear(profile, mopOfDoomItem);
     expect(await worn(), {GearSlot.weapon: 'mop_of_doom'});
-    await shop.wear(profile, shieldItem);
+    await shop.wear(profile, spongeShieldItem);
     expect(await worn(), {GearSlot.shield: 'sponge_shield'});
     await shop.takeOff(profile, GearSlot.shield);
     expect(await worn(), isEmpty);
   });
 
   test('only owned gear can be worn', () async {
-    await shop.wear(profile, vestItem);
+    await shop.wear(profile, hiVisVestItem);
     expect(await worn(), isEmpty);
   });
 
   test('soap lifts a curse, and is kept without one', () async {
     await earn(1);
-    await shop.buy(profile, soapItem);
+    await shop.buy(profile, soapOfUncursingItem);
     expect(await shop.useSoap(profile), isFalse);
     await (db.update(db.profiles)..where((p) => p.id.equals(profile))).write(
       const ProfilesCompanion(curseFamily: Value(BossFamily.trash)),
@@ -125,13 +132,16 @@ void main() {
       db.profiles,
     )..where((p) => p.id.equals(profile))).getSingle();
     expect(p.curseFamily, isNull);
-    expect((await shop.watchInventory(profile).first)[soapItem.key], 0);
+    expect(
+      (await shop.watchInventory(profile).first)[soapOfUncursingItem.key],
+      0,
+    );
   });
 
   test('every shop item key is unique', () {
     final keys = shopItems.map((i) => i.key).toList();
     expect(keys.toSet(), hasLength(keys.length));
-    expect(shopItem('turbo_mop'), mopItem);
+    expect(shopItem('turbo_mop'), turboMopItem);
     expect(shopItem('nope'), isNull);
   });
 
@@ -164,7 +174,7 @@ void main() {
     );
 
     test('vouchers are consumables that add 15 or 30 minutes', () {
-      expect(screenVouchers.map(voucherMinutes), [15, 30]);
+      expect(screenVouchers.map((v) => v.minutes), [15, 30]);
       expect(
         screenVouchers.every((v) => v.kind == ItemKind.consumable),
         isTrue,

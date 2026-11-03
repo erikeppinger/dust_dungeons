@@ -22,7 +22,10 @@ class GearScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final equipped = ref.watch(equippedProvider).value ?? const {};
     final owned = ref.watch(inventoryProvider).value ?? const {};
-    final found = allGear.where((i) => (owned[i.key] ?? 0) > 0).length;
+    bool has(ShopItem i) => (owned[i.key] ?? 0) > 0;
+    final found = allGear.where(has).length;
+    // Retired items count only for people who have them.
+    final total = allGear.where((i) => !i.retired || has(i)).length;
     final curse = ref.watch(curseProvider);
     // The shield slot under a two-handed weapon.
     final twoHanded = shopItem(equipped[GearSlot.weapon] ?? '')?.twoHanded;
@@ -77,7 +80,7 @@ class GearScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: Text(
-              l10n.gearCollection(found, allGear.length),
+              l10n.gearCollection(found, total),
               style: theme.textTheme.bodySmall,
             ),
           ),
@@ -175,7 +178,7 @@ class CurseCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final soap = ref.watch(inventoryProvider).value?[soapItem.key] ?? 0;
+    final soap = ref.watch(inventoryProvider).value?[curseLiftItem.key] ?? 0;
     return Card(
       key: const ValueKey('curse'),
       color: theme.colorScheme.errorContainer,
@@ -223,7 +226,7 @@ class CurseCard extends ConsumerWidget {
                     );
                   }
                 },
-                icon: const ItemIcon(soapItem, size: 20),
+                icon: const ItemIcon(curseLiftItem, size: 20),
                 label: Text(l10n.curseUseSoap(soap)),
               ),
             ],

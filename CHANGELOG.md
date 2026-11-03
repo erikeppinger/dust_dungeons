@@ -8,6 +8,37 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-03
+### Added
+- **Game data catalog** ([design](docs/design/game-data.md), [how to](game/README.md)): items,
+  bosses, built-in quests and balance numbers live in TOML files under `game/`.
+  - `tool/build_game_data.py` checks them and writes the Dart catalog and the texts in both
+    languages. Its check mode runs in the tests.
+  - The checks cover the schema, icons, both languages, and keys that must never disappear
+    (`game/keys.lock`). Every check names the file, key and field.
+  - Adding a piece of gear is now: draw the icon, add a few lines to `game/items.toml`, run the
+    tool.
+  - JSON schemas give editors autocompletion.
+- **Item descriptions are written from their effects**, so they always say what the item does.
+- **Difficulty per person:** Easy, Balanced or Hard in Settings → Boss fights. It changes boss
+  health, timing and tempo. Points, loot and curses stay the same. Shown on the start screen and
+  in the fight's header.
+
+### Changed
+- New item icons need no line in `assets/art/art.json` (`items/*` rule).
+- Schema v10 (`profiles.difficulty`); everyone starts on Balanced.
+- Roadmap: the beta moves to 0.13.0.
+- The Armory lists loot by boss, and item effects in a steadier order (hearts, Perfect,
+  damage, …).
+- The gear collection ("7 of 19 items found") only counts retired items for people who have them.
+
+### Fixed
+- **The Overlord's result screen crashed** ("Null check operator") after every finished Overlord
+  fight, won or lost: it asked for the Overlord's fight tokens, which it never has. This bug has
+  been there since 0.6.1.
+- **Fights could crash the app** when sounds started and stopped very quickly (fast tapping). Fight
+  sounds now use Android's low-latency SoundPool as intended, instead of MediaPlayer.
+
 ## [0.11.0] - 2026-11-02
 ### Added
 - **Loot & gear** ([design](docs/design/items.md)):

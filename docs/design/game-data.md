@@ -224,5 +224,18 @@ catalog with today's values before the old code is deleted.
 - **Adding bosses without code** (needs the pixel redraw).
 - **Editing the catalog inside the app.**
 
+## As built (changes to the plan)
+- **Generated ARB keys** start with `game` (`gameItemTurboMop`, `gameBossDust`, `gameQuestDusting`).
+  The old hand-written keys for these texts are gone.
+- **Hand-written texts with placeholders stay in ARB:** the voucher names ("Screen time +15 min"),
+  the generic trophy ("… trophy") and the Overlord's "5 wins in one week", which now takes its number
+  from `balance.toml`.
+- **The tool's tests** are Python unit tests (`tool/test_build_game_data.py`): one broken file per
+  check. `test/game_data_test.dart` runs them together with the check mode, so `flutter test` covers
+  them.
+- **Quest points** must be a multiple of 5 (the editor's slider steps).
+- **0.11.0's numbers** are unchanged. The existing effect, loot and curse tests ran on the generated
+  data before anything else changed.
+
 ## Version
 **0.12.0**, decided 2026-11-02. The beta moves to 0.13.0.

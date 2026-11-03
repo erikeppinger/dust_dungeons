@@ -111,7 +111,7 @@ class ShopRepository {
     final profile = await (_db.select(
       _db.profiles,
     )..where((p) => p.id.equals(profileId))).getSingle();
-    if (profile.curseFamily == null || !await use(profileId, soapItem)) {
+    if (profile.curseFamily == null || !await use(profileId, curseLiftItem)) {
       return false;
     }
     await (_db.update(_db.profiles)..where((p) => p.id.equals(profileId)))

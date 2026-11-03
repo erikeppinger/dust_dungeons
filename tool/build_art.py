@@ -113,10 +113,21 @@ def sprite_rows(path, w, h, lookup):
     return rows
 
 
+def expand(entries):
+    """A `folder/*` entry stands for every PNG in that folder, by name."""
+    for name, spec in entries.items():
+        if name.endswith("/*"):
+            folder = name[:-2]
+            for png in sorted((ART / folder).glob("*.png")):
+                yield f"{folder}/{png.stem}", spec
+        else:
+            yield name, spec
+
+
 def load_sprites(manifest, groups):
     sprites = {}
     used = set()
-    for name, spec in manifest["sprites"].items():
+    for name, spec in expand(manifest["sprites"]):
         group = spec["palette"]
         if group not in groups:
             raise ArtError(f"{name}: unknown palette {group!r}")

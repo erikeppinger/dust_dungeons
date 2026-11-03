@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:homework_and_chores/game/game_data.dart';
 import 'package:homework_and_chores/domain/fight/boss.dart';
+import 'package:homework_and_chores/domain/fight/difficulty.dart';
 import 'package:homework_and_chores/domain/fight/echo_duel.dart';
 import 'package:homework_and_chores/domain/fight/items.dart';
 import 'package:homework_and_chores/domain/fight/shop.dart';
@@ -186,7 +188,7 @@ void main() {
     const oneMiss = [0, 500, 750];
 
     test('Sponge Shield forgives the first miss of the fight only', () {
-      final d = geared(wearing([shieldItem]));
+      final d = geared(wearing([spongeShieldItem]));
       expect(d.freeMissesLeft, 1);
       d.applyEcho(pattern, oneMiss);
       expect(d.heroHp, 5);
@@ -196,7 +198,7 @@ void main() {
     });
 
     test('Trash-Can Lid forgives two misses', () {
-      final d = geared(wearing([lidItem]));
+      final d = geared(wearing([trashCanLidItem]));
       d
         ..applyEcho(pattern, oneMiss)
         ..applyEcho(pattern, oneMiss)
@@ -206,23 +208,26 @@ void main() {
 
     test('Turbo Mop: perfect hits deal triple damage', () {
       expect(perfectEcho(Loadout.none), 8);
-      expect(perfectEcho(wearing([mopItem])), 12);
+      expect(perfectEcho(wearing([turboMopItem])), 12);
     });
 
     test('Plunger: ×3, and ×4 against the bath boss', () {
-      expect(perfectEcho(wearing([plungerItem])), 12);
-      expect(perfectEcho(wearing([plungerItem]), family: BossFamily.bath), 16);
+      expect(perfectEcho(wearing([plungerOfSmitingItem])), 12);
+      expect(
+        perfectEcho(wearing([plungerOfSmitingItem]), family: BossFamily.bath),
+        16,
+      );
     });
 
     test('Spatula and Coffee add to good hits only', () {
       expect(goodEcho(Loadout.none), 4);
-      expect(goodEcho(wearing([spatulaItem])), 8);
-      expect(perfectEcho(wearing([spatulaItem])), 8);
+      expect(goodEcho(wearing([spatulaOfFlippingItem])), 8);
+      expect(perfectEcho(wearing([spatulaOfFlippingItem])), 8);
       expect(
         goodEcho(
           const Loadout(
-            gear: {GearSlot.weapon: spatulaItem},
-            consumables: [coffeeItem],
+            gear: {GearSlot.weapon: spatulaOfFlippingItem},
+            consumables: [coffeeOfHasteItem],
           ),
         ),
         12,
@@ -235,43 +240,58 @@ void main() {
     });
 
     test('Feather Duster: +1 damage on every hit against dust only', () {
-      expect(perfectEcho(wearing([dusterItem])), 12);
-      expect(perfectEcho(wearing([dusterItem]), family: BossFamily.kitchen), 8);
+      expect(perfectEcho(wearing([featherDusterItem])), 12);
+      expect(
+        perfectEcho(wearing([featherDusterItem]), family: BossFamily.kitchen),
+        8,
+      );
     });
 
     test('Fuzzy Slippers: the first echo deals half as much again', () {
       final good = [for (final b in pattern.beatsMs) b + 100];
-      final d = geared(wearing([slippersItem]))..applyEcho(pattern, good);
+      final d = geared(wearing([fuzzySlippersItem]))..applyEcho(pattern, good);
       expect(d.bossMaxHp - d.bossHp, 8); // 1 + 1 per good hit
       d.applyEcho(pattern, good);
       expect(d.bossMaxHp - d.bossHp, 12);
-      expect(perfectEcho(wearing([slippersItem])), 12); // 2 + 1 per perfect
+      expect(
+        perfectEcho(wearing([fuzzySlippersItem])),
+        12,
+      ); // 2 + 1 per perfect
     });
 
     test('Metronome Charm widens the windows; a curse tightens them', () {
-      final d = geared(wearing([charmItem]));
+      final d = geared(wearing([metronomeCharmItem]));
       expect(d.windows.goodMs, greaterThan(TimingWindows.normal.goodMs));
       expect(d.applyEcho(pattern, const [150, 500, 750, 1000]).first, Hit.good);
       final cursed = geared(
-        wearing([charmItem], curse: curseOf(BossFamily.dust)),
+        wearing([metronomeCharmItem], curse: curseOf(BossFamily.dust)),
       );
       expect(cursed.windows, TimingWindows.tight);
     });
 
     test('hearts from gear, boots against bath and outside only', () {
-      expect(geared(wearing([glovesItem])).hero.maxHp, 6);
-      expect(geared(wearing([vestItem, colanderItem])).heroHp, 8);
-      expect(geared(wearing([bootsItem])).hero.maxHp, 5);
+      expect(geared(wearing([rubberGlovesItem])).hero.maxHp, 6);
+      expect(geared(wearing([hiVisVestItem, colanderOfClarityItem])).heroHp, 8);
+      expect(geared(wearing([rubberBootsItem])).hero.maxHp, 5);
       expect(
-        geared(wearing([bootsItem]), family: BossFamily.outside).hero.maxHp,
+        geared(
+          wearing([rubberBootsItem]),
+          family: BossFamily.outside,
+        ).hero.maxHp,
         7,
       );
-      expect(geared(wearing([helmItem])).hero.maxHp, 6);
+      expect(geared(wearing([laundryBasketHelmItem])).hero.maxHp, 6);
       expect(
-        geared(wearing([helmItem]), family: BossFamily.laundry).hero.maxHp,
+        geared(
+          wearing([laundryBasketHelmItem]),
+          family: BossFamily.laundry,
+        ).hero.maxHp,
         7,
       );
-      expect(geared(const Loadout(consumables: [snackItem])).hero.maxHp, 7);
+      expect(
+        geared(const Loadout(consumables: [snackBreakItem])).hero.maxHp,
+        7,
+      );
     });
 
     test('a heart curse never leaves fewer than three hearts', () {
@@ -283,13 +303,16 @@ void main() {
 
     test('a slot curse switches that item off', () {
       final curse = curseOf(BossFamily.kitchen); // weapon off
-      expect(perfectEcho(wearing([mopItem], curse: curse)), 8);
+      expect(perfectEcho(wearing([turboMopItem], curse: curse)), 8);
       final bedHead = curseOf(BossFamily.bedroom); // head off
-      expect(geared(wearing([colanderItem], curse: bedHead)).hero.maxHp, 5);
+      expect(
+        geared(wearing([colanderOfClarityItem], curse: bedHead)).hero.maxHp,
+        5,
+      );
     });
 
     test('Garden Gnome: every third miss costs no heart', () {
-      final d = geared(wearing([gnomeItem]));
+      final d = geared(wearing([gardenGnomeItem]));
       for (var i = 0; i < 3; i++) {
         d.applyEcho(pattern, oneMiss);
       }
@@ -301,7 +324,7 @@ void main() {
         family: BossFamily.kitchen,
         tier: 3,
         hero: const HeroStats(maxHp: 5, damage: 1),
-        loadout: wearing([capeItem]),
+        loadout: wearing([capeOfCleanSweepItem]),
       );
       expect(d.heroHp, 7);
       d.applyEcho(pattern, oneMiss); // 3 hits, 1 miss
@@ -314,7 +337,7 @@ void main() {
     });
 
     test('Lost Remote slows the boss by 10 %', () {
-      expect(geared(wearing([remoteItem])).tempo, closeTo(0.9, 1e-9));
+      expect(geared(wearing([lostRemoteItem])).tempo, closeTo(0.9, 1e-9));
     });
 
     test('a fully geared level-1 hero still needs two echoes', () {
@@ -323,20 +346,20 @@ void main() {
       final d = geared(
         const Loadout(
           gear: {
-            GearSlot.head: helmItem,
-            GearSlot.body: capeItem,
+            GearSlot.head: laundryBasketHelmItem,
+            GearSlot.body: capeOfCleanSweepItem,
             GearSlot.weapon: mopOfDoomItem,
-            GearSlot.feet: slippersItem,
-            GearSlot.charm: gnomeItem,
+            GearSlot.feet: fuzzySlippersItem,
+            GearSlot.charm: gardenGnomeItem,
           },
-          consumables: [coffeeItem, snackItem],
+          consumables: [coffeeOfHasteItem, snackBreakItem],
         ),
       )..applyEcho(tierOne, tierOne.beatsMs);
       expect(d.outcome, DuelOutcome.ongoing);
     });
 
     test('Apron of Holding: Second Wind brings back all hearts', () {
-      final d = geared(wearing([apronItem]));
+      final d = geared(wearing([apronOfHoldingItem]));
       while (d.outcome == DuelOutcome.ongoing) {
         d.applyEcho(d.nextPattern(), const []);
       }
@@ -353,6 +376,44 @@ void main() {
       d.revive();
       expect(d.outcome, DuelOutcome.ongoing);
       expect(d.heroHp, 3);
+    });
+  });
+
+  group('difficulty', () {
+    EchoDuel at(Difficulty d, {bool story = false}) => EchoDuel(
+      family: BossFamily.dust,
+      tier: 1,
+      hero: const HeroStats(maxHp: 5, damage: 1),
+      difficulty: d,
+      storyMode: story,
+    );
+
+    test('changes boss health, timing and tempo', () {
+      final easy = at(Difficulty.easy);
+      final balanced = at(Difficulty.balanced);
+      final hard = at(Difficulty.hard);
+      expect([easy, balanced, hard].map((d) => d.bossMaxHp), [12, 16, 20]);
+      expect(balanced.windows, TimingWindows.normal);
+      expect(easy.windows.goodMs, TimingWindows.normal.goodMs + 20);
+      expect(hard.windows.perfectMs, TimingWindows.normal.perfectMs - 10);
+      expect(easy.tempo, closeTo(0.9, 1e-9));
+      expect(hard.tempo, closeTo(1.08, 1e-9));
+    });
+
+    test('story mode keeps its windows; health and tempo still change', () {
+      final d = at(Difficulty.hard, story: true);
+      expect(d.windows, TimingWindows.story);
+      expect(d.bossMaxHp, 20);
+    });
+
+    test('the Overlord scales too', () {
+      final d = OverlordDuel(
+        tier: 1,
+        hero: const HeroStats(maxHp: 5, damage: 1),
+        motifs: const [],
+        difficulty: Difficulty.easy,
+      );
+      expect(d.bossMaxHp, 24);
     });
   });
 

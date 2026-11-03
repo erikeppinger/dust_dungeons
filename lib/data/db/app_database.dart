@@ -47,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -151,6 +151,10 @@ class AppDatabase extends _$AppDatabase {
           WHERE count > 0 AND item_key IN
             ('sponge_shield', 'turbo_mop', 'metronome_charm', 'rubber_gloves')
         ''');
+      }
+      if (from < 10) {
+        // v10: fight difficulty per person; everyone starts on balanced.
+        await m.addColumn(profiles, profiles.difficulty);
       }
     },
     beforeOpen: (details) async {

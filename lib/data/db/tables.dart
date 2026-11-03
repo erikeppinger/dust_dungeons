@@ -1,10 +1,12 @@
 import 'package:drift/drift.dart';
 
 import '../../domain/fight/boss.dart';
+import '../../domain/fight/difficulty.dart';
 import '../../domain/fight/shop.dart';
 import '../../domain/recurrence.dart';
 
 export '../../domain/fight/boss.dart' show BossFamily;
+export '../../domain/fight/difficulty.dart' show Difficulty;
 export '../../domain/fight/shop.dart' show GearSlot;
 export '../../domain/recurrence.dart' show RepeatType;
 
@@ -33,6 +35,10 @@ class Profiles extends Table {
 
   /// The boss whose curse waits for the next fight (schema v9).
   TextColumn get curseFamily => textEnum<BossFamily>().nullable()();
+
+  /// How hard fights are for this person (schema v10).
+  TextColumn get difficulty =>
+      textEnum<Difficulty>().withDefault(Constant(Difficulty.balanced.name))();
 }
 
 /// Who a chore is for. Stored by name: only ever add values.

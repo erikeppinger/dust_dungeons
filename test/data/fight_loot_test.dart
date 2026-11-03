@@ -4,6 +4,7 @@ import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/fight_repository.dart';
 import 'package:homework_and_chores/data/repositories/profile_repository.dart';
 import 'package:homework_and_chores/data/repositories/progress_repository.dart';
+import 'package:homework_and_chores/game/game_data.dart';
 import 'package:homework_and_chores/domain/fight/items.dart';
 import 'package:homework_and_chores/domain/fight/shop.dart';
 
@@ -122,7 +123,7 @@ void main() {
       last = await finish(await start(BossFamily.bath), FightResult.won);
       if (last != null) break;
     }
-    expect(last, plungerItem);
+    expect(last, plungerOfSmitingItem);
   });
 
   test('a fight is recorded once and drops loot once', () async {

@@ -1,0 +1,198 @@
+#:schema ./schema/items.json
+# Everything a hero can own: gear, consumables, hats and screen-time vouchers.
+# See README.md for the fields and the effects. Keys are stored in people's
+# databases: never rename or remove one; set `retired = true` instead.
+#
+# Gear needs an icon at assets/art/items/<key>.png (16x16, items palette).
+# Descriptions are written from the effects; `flavor` adds an optional line.
+
+# ---- Armory gear ----
+
+[items.colander_of_clarity]
+slot = "head"
+price = 150
+name = { en = "Colander of Clarity", de = "Sieb der Klarheit" }
+effects = { hearts = 1 }
+
+[items.rubber_gloves]
+slot = "body"
+price = 200
+name = { en = "Rubber Gloves", de = "Gummihandschuhe" }
+effects = { hearts = 1 }
+
+[items.hi_vis_vest]
+slot = "body"
+price = 350
+name = { en = "Hi-Vis Vest", de = "Warnweste" }
+effects = { hearts = 2 }
+
+[items.turbo_mop]
+slot = "weapon"
+price = 300
+name = { en = "Turbo Mop", de = "Turbo-Mopp" }
+effects = { perfect_times = 3 }
+
+[items.spatula_of_flipping]
+slot = "weapon"
+price = 200
+name = { en = "Spatula of Flipping", de = "Pfannenwender des Wendens" }
+effects = { good_damage = 1 }
+
+[items.sponge_shield]
+slot = "shield"
+price = 150
+name = { en = "Sponge Shield", de = "Schwammschild" }
+effects = { free_misses = 1 }
+
+[items.rubber_boots]
+slot = "feet"
+price = 120
+name = { en = "Rubber Boots", de = "Gummistiefel" }
+against.bath = { hearts = 2 }
+against.outside = { hearts = 2 }
+
+[items.metronome_charm]
+slot = "charm"
+price = 100
+name = { en = "Metronome Charm", de = "Metronom-Anhänger" }
+effects = { wide_timing = true }
+
+[items.lucky_odd_sock]
+slot = "charm"
+price = 150
+name = { en = "Lucky Odd Sock", de = "Glückssocke ohne Partner" }
+effects = { loot_bonus = 15 }
+
+# ---- Boss loot ----
+
+[items.feather_duster]
+slot = "weapon"
+dropped_by = "dust"
+name = { en = "Feather Duster of Fury", de = "Staubwedel des Zorns" }
+effects = { combo_heal = 10 }
+against.dust = { damage = 1 }
+
+[items.laundry_basket_helm]
+slot = "head"
+dropped_by = "laundry"
+name = { en = "Laundry-Basket Helm", de = "Wäschekorb-Helm" }
+effects = { hearts = 1 }
+against.laundry = { hearts = 2 }
+
+[items.apron_of_holding]
+slot = "body"
+dropped_by = "kitchen"
+name = { en = "Apron of Holding", de = "Schürze der Vorräte" }
+effects = { hearts = 1, full_revive = true }
+
+[items.plunger_of_smiting]
+slot = "weapon"
+dropped_by = "bath"
+name = { en = "Plunger of Smiting", de = "Pümpel des Schmetterns" }
+effects = { perfect_times = 3 }
+against.bath = { perfect_times = 4 }
+
+[items.trash_can_lid]
+slot = "shield"
+dropped_by = "trash"
+name = { en = "Trash-Can Lid", de = "Mülltonnendeckel" }
+effects = { free_misses = 2 }
+
+[items.fuzzy_slippers]
+slot = "feet"
+dropped_by = "bedroom"
+name = { en = "Fuzzy Slippers of Sneaking", de = "Flauschpantoffeln des Schleichens" }
+effects = { sneak_attack = true }
+
+[items.garden_gnome]
+slot = "charm"
+dropped_by = "outside"
+name = { en = "Garden Gnome", de = "Gartenzwerg" }
+effects = { third_miss_free = true }
+
+[items.lost_remote]
+slot = "charm"
+dropped_by = "clutter"
+name = { en = "Lost Remote", de = "Verschollene Fernbedienung" }
+effects = { slower_boss = true }
+
+[items.mop_of_doom]
+slot = "weapon"
+two_handed = true
+dropped_by = "overlord"
+name = { en = "Two-Handed Mop of Doom", de = "Zweihändiger Mopp des Verderbens" }
+effects = { perfect_times = 3, good_damage = 1 }
+
+[items.cape_of_clean_sweep]
+slot = "body"
+dropped_by = "overlord"
+name = { en = "Cape of the Clean Sweep", de = "Umhang des Großputzes" }
+effects = { hearts = 2, combo_heal = 10 }
+
+# ---- Consumables ----
+
+[items.second_wind]
+kind = "consumable"
+price = 60
+use = "revive"
+name = { en = "Second Wind", de = "Zweiter Atem" }
+description = { en = "Continue once after losing a fight", de = "Nach einer Niederlage einmal weiterkämpfen" }
+
+[items.coffee_of_haste]
+kind = "consumable"
+price = 50
+before_fight = true
+name = { en = "Coffee of Haste", de = "Kaffee der Eile" }
+effects = { good_damage = 1 }
+
+[items.snack_break]
+kind = "consumable"
+price = 40
+before_fight = true
+name = { en = "Snack Break", de = "Snackpause" }
+effects = { hearts = 2 }
+
+[items.soap_of_uncursing]
+kind = "consumable"
+price = 30
+use = "lift_curse"
+name = { en = "Soap of Uncursing", de = "Seife der Entfluchung" }
+description = { en = "Lifts your curse", de = "Hebt deinen Fluch auf" }
+
+# ---- Screen-time vouchers (shown only with screen time on) ----
+
+[items.screen_15]
+kind = "voucher"
+price = 40
+minutes = 15
+
+[items.screen_30]
+kind = "voucher"
+price = 75
+minutes = 30
+
+# ---- Hats (looks only; `look` is the number stored for the hero) ----
+
+[items.hat_cap]
+kind = "hat"
+price = 80
+look = 1
+name = { en = "Cap", de = "Kappe" }
+
+[items.hat_bandana]
+kind = "hat"
+price = 80
+look = 2
+name = { en = "Bandana", de = "Bandana" }
+
+[items.hat_wizard]
+kind = "hat"
+price = 200
+look = 3
+name = { en = "Wizard hat", de = "Zauberhut" }
+
+[items.hat_crown]
+kind = "hat"
+price = 250
+look = 4
+name = { en = "Crown", de = "Krone" }

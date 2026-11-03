@@ -237,7 +237,7 @@ class _TodayCard extends ConsumerWidget {
                       icon: const Icon(Icons.hourglass_bottom),
                       label: Text(
                         l10n.screenUseVoucher(
-                          voucherMinutes(voucher),
+                          voucher.minutes,
                           owned[voucher.key]!,
                         ),
                       ),

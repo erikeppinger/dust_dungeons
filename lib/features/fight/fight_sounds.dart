@@ -28,18 +28,37 @@ class PooledFightSounds implements FightSounds {
     Cue.count => 'count',
   };
 
+  /// How long a cue plays (the files are 0.05–0.72 s), with some margin:
+  /// low-latency players don't report when they're done.
+  static Duration _length(Cue cue) => Duration(
+    milliseconds: switch (cue) {
+      Cue.win => 700,
+      Cue.lose => 900,
+      _ => 350,
+    },
+  );
+
   /// Loads every cue up front so the first beat is not late.
   Future<void> preload() => Future.wait(Cue.values.map(_pool));
 
   Future<AudioPool> _pool(Cue cue) => _pools[cue] ??= AudioPool.createFromAsset(
     path: 'sounds/${_file(cue)}.wav',
     maxPlayers: 4,
+    // SoundPool on Android. The default (MediaPlayer) is slower and can
+    // crash natively when many short sounds start and end at once.
+    playerMode: PlayerMode.lowLatency,
   );
 
   @override
   Future<void> play(Cue cue) async {
     try {
-      await (await _pool(cue)).start();
+      final stop = await (await _pool(cue)).start();
+      // Hands the player back to the pool once the sound is over.
+      Timer(_length(cue), () {
+        stop().catchError((Object error) {
+          debugPrint('Sound $cue stop failed: $error');
+        });
+      });
     } catch (error) {
       // A missing sound must never break a fight.
       debugPrint('Sound $cue failed: $error');

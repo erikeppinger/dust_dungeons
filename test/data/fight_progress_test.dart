@@ -196,6 +196,9 @@ void main() {
       );
       expect(p.tokens(BossFamily.dust), 1);
       expect(p.totalTokens, 1);
+      // The fight's result screen asks for the Overlord's tokens too.
+      expect(p.tokens(BossFamily.overlord), 0);
+      expect(p.tokens(BossFamily.kitchen), 0);
     });
   });
 

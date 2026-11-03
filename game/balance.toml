@@ -1,0 +1,74 @@
+#:schema ./schema/balance.json
+# The numbers behind fights and points. Change one, run
+# `python tool/build_game_data.py`, then `flutter test`.
+
+# Hero strength from the level: base + (level + offset) / every, kept
+# between min and max.
+[hero.hearts]
+base = 4
+every = 2
+offset = 1
+min = 5
+max = 12
+
+[hero.damage]
+base = 1
+every = 4
+offset = 0
+min = 1
+max = 4
+
+[bosses]
+# Wins against a boss that reach tier 2 and tier 3.
+tier_wins = [3, 8]
+# Boss health: base + per_tier * tier. The Overlord has overlord_times that.
+health_base = 10
+health_per_tier = 6
+overlord_health_times = 2
+# Wins in one week (Mon-Sun) that call the Overlord.
+overlord_wins_needed = 5
+
+[timing]
+# Milliseconds either side of a beat: [perfect, good].
+normal = [60, 120]
+# With wide_timing (e.g. the Metronome Charm).
+wide = [80, 160]
+# Cursed.
+tight = [45, 95]
+# Story mode.
+story = [100, 200]
+
+[loot]
+# Chance in percent that a won fight drops loot, at tier 1, 2 and 3.
+chance_by_tier = [20, 30, 40]
+# After this many wins without loot, the next win always drops.
+sure_after_dry_wins = 4
+
+[curses]
+# A curse never leaves fewer hearts than this.
+min_hearts = 3
+
+# Quests, not fights: difficulty never changes these.
+[points]
+min_base = 5
+max_base = 100
+on_time_bonus_percent = 10
+streak_bonus_percent_per_day = 2
+max_streak_bonus_days = 10
+
+# Fight difficulty, chosen per person. Health and tempo are factors; timing_ms
+# is added to both timing windows (story mode keeps its own windows).
+[difficulty.easy]
+boss_health = 0.75
+timing_ms = 20
+tempo = 0.9
+
+[difficulty.balanced]
+boss_health = 1.0
+timing_ms = 0
+tempo = 1.0
+
+[difficulty.hard]
+boss_health = 1.25
+timing_ms = -10
+tempo = 1.08

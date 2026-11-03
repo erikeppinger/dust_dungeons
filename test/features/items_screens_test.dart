@@ -214,4 +214,45 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('difficulty is chosen per person and shown before a fight', (
+    tester,
+  ) async {
+    final db = await gearDb(tester);
+    await pumpApp(tester, db: db);
+    await openArena(tester);
+    final settings = find.text('Boss fights');
+    await showInArena(tester, settings);
+    await tester.tap(settings);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Hard'));
+    await tester.pumpAndSettle();
+    final person = (await tester.runAsync(
+      () => db.select(db.profiles).getSingle(),
+    ))!;
+    expect(person.difficulty, Difficulty.hard);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    final fight = find.descendant(
+      of: find.byKey(const ValueKey('boss-dust')),
+      matching: find.text('Fight'),
+    );
+    // The settings link is at the end of the list: scroll back up.
+    await tester.scrollUntilVisible(
+      fight,
+      -200,
+      scrollable: find
+          .descendant(
+            of: find.byType(WorldScreen),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(fight);
+    await tester.pumpAndSettle();
+    await tester.tap(fight);
+    await tester.pumpAndSettle();
+    expect(find.text('Tier 1 · Hard'), findsOneWidget);
+  });
 }

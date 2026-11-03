@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Items",
+  "description": "game/items.toml: everything a hero can own. See game/README.md.",
+  "type": "object",
+  "required": ["items"],
+  "additionalProperties": false,
+  "properties": {
+    "items": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/item" }
+    }
+  },
+  "$defs": {
+    "text": {
+      "description": "A text in English and German. No { or } (they are placeholders in the app).",
+      "type": "object",
+      "required": ["en", "de"],
+      "additionalProperties": false,
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "de": { "type": "string", "minLength": 1 }
+      }
+    },
+    "effects": {
+      "description": "What an item does in a fight. Unset values do nothing.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hearts": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Extra hearts." },
+        "damage": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Extra damage on every hit." },
+        "good_damage": { "type": "integer", "minimum": 1, "maximum": 5, "description": "Extra damage on Good hits." },
+        "perfect_times": { "type": "integer", "minimum": 3, "maximum": 6, "description": "A Perfect hit deals this many times the hero's damage (normally 2)." },
+        "free_misses": { "type": "integer", "minimum": 1, "maximum": 5, "description": "The first misses of a fight that cost no heart." },
+        "wide_timing": { "type": "boolean", "description": "Wider timing windows." },
+        "combo_heal": { "type": "integer", "minimum": 3, "maximum": 50, "description": "Heals a heart after this many hits in a row." },
+        "sneak_attack": { "type": "boolean", "description": "The first echo deals 50 % more." },
+        "slower_boss": { "type": "boolean", "description": "The boss plays 10 % slower." },
+        "third_miss_free": { "type": "boolean", "description": "Every third miss costs no heart." },
+        "full_revive": { "type": "boolean", "description": "Second Wind brings back all hearts, not half." },
+        "loot_bonus": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Percentage points added to the loot chance." }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": ["gear", "consumable", "hat", "voucher"],
+          "description": "Defaults to gear."
+        },
+        "slot": {
+          "enum": ["head", "body", "weapon", "shield", "feet", "charm"],
+          "description": "Gear only: where it's worn."
+        },
+        "two_handed": { "type": "boolean", "description": "A weapon that also takes the shield slot." },
+        "price": { "type": "integer", "minimum": 1, "maximum": 10000, "description": "Points in the Armory." },
+        "dropped_by": {
+          "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"],
+          "description": "Loot: the boss that drops it (instead of a price)."
+        },
+        "name": { "$ref": "#/$defs/text" },
+        "description": { "$ref": "#/$defs/text", "description": "Only for items without effects." },
+        "flavor": { "$ref": "#/$defs/text", "description": "An optional fun line under the effects." },
+        "effects": { "$ref": "#/$defs/effects" },
+        "against": {
+          "type": "object",
+          "description": "Values that replace the general effects in fights against one boss.",
+          "propertyNames": {
+            "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"]
+          },
+          "additionalProperties": { "$ref": "#/$defs/effects" }
+        },
+        "use": {
+          "enum": ["revive", "lift_curse"],
+          "description": "Consumables with a special use, handled in code."
+        },
+        "before_fight": { "type": "boolean", "description": "A consumable picked on a fight's start screen." },
+        "minutes": { "type": "integer", "minimum": 1, "maximum": 240, "description": "Vouchers: extra screen minutes." },
+        "look": { "type": "integer", "minimum": 1, "maximum": 50, "description": "Hats: the number stored for the hero. Never change it." },
+        "retired": { "type": "boolean", "description": "No longer sold or dropped; owners keep it." }
+      }
+    }
+  }
+}

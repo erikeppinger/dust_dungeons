@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:homework_and_chores/game/game_data.dart';
 import 'package:homework_and_chores/domain/fight/boss.dart';
 import 'package:homework_and_chores/domain/fight/items.dart';
 import 'package:homework_and_chores/domain/fight/shop.dart';
@@ -19,12 +20,17 @@ void main() {
       expect(armoryGear.every((i) => !i.isLoot && i.price > 0), isTrue);
     });
 
+    test('loot is listed by boss', () {
+      final order = [for (final i in lootItems) i.dropsFrom!.index];
+      expect(order, [...order]..sort());
+    });
+
     test('two hands clash with shields, slots with themselves', () {
-      expect(mopOfDoomItem.clashesWith(shieldItem), isTrue);
-      expect(shieldItem.clashesWith(mopOfDoomItem), isTrue);
-      expect(mopItem.clashesWith(shieldItem), isFalse);
-      expect(mopItem.clashesWith(spatulaItem), isTrue);
-      expect(colanderItem.clashesWith(vestItem), isFalse);
+      expect(mopOfDoomItem.clashesWith(spongeShieldItem), isTrue);
+      expect(spongeShieldItem.clashesWith(mopOfDoomItem), isTrue);
+      expect(turboMopItem.clashesWith(spongeShieldItem), isFalse);
+      expect(turboMopItem.clashesWith(spatulaOfFlippingItem), isTrue);
+      expect(colanderOfClarityItem.clashesWith(hiVisVestItem), isFalse);
     });
   });
 
@@ -40,20 +46,25 @@ void main() {
     });
 
     test('strong here: only items with a boss bonus, against that boss', () {
-      expect(strongAgainst(plungerItem, BossFamily.bath), isTrue);
-      expect(strongAgainst(plungerItem, BossFamily.dust), isFalse);
-      expect(strongAgainst(bootsItem, BossFamily.outside), isTrue);
-      expect(strongAgainst(mopItem, BossFamily.bath), isFalse);
+      expect(strongAgainst(plungerOfSmitingItem, BossFamily.bath), isTrue);
+      expect(strongAgainst(plungerOfSmitingItem, BossFamily.dust), isFalse);
+      expect(strongAgainst(rubberBootsItem, BossFamily.outside), isTrue);
+      expect(strongAgainst(turboMopItem, BossFamily.bath), isFalse);
       final strong = {
         for (final f in BossFamily.values)
           for (final i in allGear)
             if (strongAgainst(i, f)) i,
       };
-      expect(strong, {bootsItem, dusterItem, helmItem, plungerItem});
+      expect(strong, {
+        rubberBootsItem,
+        featherDusterItem,
+        laundryBasketHelmItem,
+        plungerOfSmitingItem,
+      });
     });
 
     test('in general, effects against one boss are left out', () {
-      const l = Loadout(gear: {GearSlot.feet: bootsItem});
+      const l = Loadout(gear: {GearSlot.feet: rubberBootsItem});
       expect(l.against().hearts, 0);
       expect(l.against(BossFamily.bath).hearts, 2);
     });
@@ -63,7 +74,7 @@ void main() {
         GearSlot.head: 'colander_of_clarity',
         GearSlot.body: 'no_such_item',
       });
-      expect(l.gear, {GearSlot.head: colanderItem});
+      expect(l.gear, {GearSlot.head: colanderOfClarityItem});
     });
   });
 
@@ -122,7 +133,10 @@ void main() {
     test('the Overlord always drops; after 4 dry wins the 5th drops', () {
       for (var seed = 0; seed < 100; seed++) {
         expect(roll(seed, family: BossFamily.overlord), isNotNull);
-        expect(roll(seed, winsWithoutLoot: lootPityWins), helmItem);
+        expect(
+          roll(seed, winsWithoutLoot: lootPityWins),
+          laundryBasketHelmItem,
+        );
       }
     });
 
@@ -130,7 +144,7 @@ void main() {
       for (var seed = 0; seed < 100; seed++) {
         final item = roll(
           seed,
-          owned: {helmItem.key},
+          owned: {laundryBasketHelmItem.key},
           winsWithoutLoot: lootPityWins,
         );
         expect(preFightConsumables, contains(item));
@@ -139,7 +153,7 @@ void main() {
           family: BossFamily.overlord,
           owned: {mopOfDoomItem.key},
         );
-        expect(overlord, capeItem);
+        expect(overlord, capeOfCleanSweepItem);
       }
     });
   });

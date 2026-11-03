@@ -26,6 +26,7 @@ import '../world/items_text.dart';
 import 'boss_art.dart';
 import 'fight_controller.dart';
 import 'fight_prep_screen.dart';
+import 'fight_settings.dart';
 import 'fight_sounds.dart';
 import 'lane_field.dart';
 
@@ -107,6 +108,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               loadout: widget.loadout,
               storyMode: person.storyMode,
               slowMode: person.slowMode,
+              difficulty: person.difficulty,
               seed: seed,
             )
           : EchoDuel(
@@ -116,6 +118,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               loadout: widget.loadout,
               storyMode: person.storyMode,
               slowMode: person.slowMode,
+              difficulty: person.difficulty,
               seed: seed,
             ),
       sounds: sounds,
@@ -157,7 +160,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
     if (_reviving || _controller.duel.outcome != DuelOutcome.lost) return;
     _reviving = true;
     try {
-      if (!await _shop.use(_profileId, secondWindItem) || !mounted) return;
+      if (!await _shop.use(_profileId, reviveItem) || !mounted) return;
       _controller.duel.revive();
       _controller.resume();
     } finally {
@@ -327,11 +330,15 @@ class _Duel extends StatelessWidget {
                       style: theme.textTheme.titleMedium,
                     ),
                     Text(
-                      l10n.fightTierPhase(
-                        duel.tier,
-                        duel.phase + 1,
-                        duel.phaseCount,
-                      ),
+                      [
+                        l10n.fightTierPhase(
+                          duel.tier,
+                          duel.phase + 1,
+                          duel.phaseCount,
+                        ),
+                        if (duel.difficulty != Difficulty.balanced)
+                          difficultyName(l10n, duel.difficulty),
+                      ].join(' · '),
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
@@ -585,7 +592,7 @@ class _Result extends ConsumerWidget {
     // The Overlord needs no token: a lost fight can simply be retried.
     final canRetry = overlord ? !won : tokensLeft > 0;
     final secondWinds =
-        ref.watch(inventoryProvider).value?[secondWindItem.key] ?? 0;
+        ref.watch(inventoryProvider).value?[reviveItem.key] ?? 0;
     final boss = bossName(l10n, family);
 
     Widget stat(String value, String label) => Expanded(

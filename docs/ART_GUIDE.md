@@ -37,7 +37,7 @@ variants. A new sprite needs a line there.
 |---|---|---|---|
 | Tab icons | 12×12 | `mask` | `icons/tab_*.png`. One color: draw in black, the app tints them. |
 | Coin, hearts, crown | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png`, `icons/crown.png` (the leaderboard's leader) |
-| Item icons | 16×16 | `items` | `items/<item key>.png`, e.g. `items/turbo_mop.png`: gear and fight consumables |
+| Item icons | 16×16 | `items` | `items/<item key>.png`, e.g. `items/turbo_mop.png`: gear and fight consumables. No `art.json` line needed (the `items/*` rule); the item itself goes in `game/items.toml` |
 | Launcher icon | 16×16 | `app` | `icons/app_shield.png`; run `python tool/generate_icon.py` after changing it |
 | Ground tiles | 16×16 | `map` | `map/grass_0..3`, `map/water_0..3`, `map/sand_0..3`: fill the whole tile |
 | Overlays | 16×16 | `map` | `map/forest_0..1`, `map/hill`, `map/mountain`: transparent background, drawn on grass |

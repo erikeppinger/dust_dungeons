@@ -6,6 +6,12 @@
 - **Color is never the only signal.** Pair it with an icon and/or text, and check light, dark and colorblind modes.
 - **Update `CHANGELOG.md`** under `[Unreleased]` with every change.
 
+## Game data
+Items, bosses, built-in quests and balance numbers are data, not code: see
+[`game/README.md`](game/README.md). After changing them, run `python tool/build_game_data.py`.
+It checks them and regenerates `lib/game/` and the game's texts in the ARB files. Don't edit
+those generated parts by hand.
+
 ## Generated code
 After changing Drift tables or queries, regenerate and commit `*.g.dart`:
 

@@ -8,6 +8,12 @@ import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'calibration_screen.dart';
 
+String difficultyName(AppLocalizations l10n, Difficulty d) => switch (d) {
+  Difficulty.easy => l10n.difficultyEasy,
+  Difficulty.balanced => l10n.difficultyBalanced,
+  Difficulty.hard => l10n.difficultyHard,
+};
+
 /// Settings page content for boss fights.
 class FightSettings extends ConsumerWidget {
   const FightSettings({super.key});
@@ -67,6 +73,30 @@ class FightSettings extends ConsumerWidget {
           onChanged: (v) => profiles.update(
             person.id,
             ProfilesCompanion(storyMode: Value(v)),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.speed),
+          title: Text(l10n.fightSettingDifficulty),
+          subtitle: Text(l10n.fightSettingDifficultySubtitle),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<Difficulty>(
+              key: const ValueKey('difficulty'),
+              showSelectedIcon: false,
+              segments: [
+                for (final d in Difficulty.values)
+                  ButtonSegment(value: d, label: Text(difficultyName(l10n, d))),
+              ],
+              selected: {person.difficulty},
+              onSelectionChanged: (picked) => profiles.update(
+                person.id,
+                ProfilesCompanion(difficulty: Value(picked.single)),
+              ),
+            ),
           ),
         ),
         SwitchListTile(

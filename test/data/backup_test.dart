@@ -360,14 +360,14 @@ void main() {
       final phone = memory();
       final path = '${tmp.path}/b.sqlite';
       await writeSnapshot(phone, path);
-      expect(checkBackup(path, currentSchema: 9), 9);
+      expect(checkBackup(path, currentSchema: 10), 10);
     });
 
     test('a random file is not a backup', () {
       final path = '${tmp.path}/notes.txt';
       File(path).writeAsStringSync('shopping list: milk, eggs');
       expect(
-        () => checkBackup(path, currentSchema: 9),
+        () => checkBackup(path, currentSchema: 10),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -385,7 +385,7 @@ void main() {
         ..userVersion = 3
         ..close();
       expect(
-        () => checkBackup(path, currentSchema: 9),
+        () => checkBackup(path, currentSchema: 10),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -400,10 +400,10 @@ void main() {
       final path = '${tmp.path}/new.sqlite';
       await writeSnapshot(memory(), path);
       sqlite.sqlite3.open(path)
-        ..userVersion = 10
+        ..userVersion = 11
         ..close();
       expect(
-        () => checkBackup(path, currentSchema: 9),
+        () => checkBackup(path, currentSchema: 10),
         throwsA(
           isA<BackupException>().having(
             (e) => e.problem,
@@ -437,7 +437,7 @@ void main() {
       );
       await old.close();
 
-      expect(checkBackup(path, currentSchema: 9), version);
+      expect(checkBackup(path, currentSchema: 10), version);
       final here = memory();
       final report = await mergeBackup(here, fileDb(path));
       expect(report.completions, 1);

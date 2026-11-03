@@ -44,7 +44,24 @@ void main() {
   });
 
   testWidgets('generated sprites match the PNG files', (tester) async {
-    final sprites = manifest['sprites'] as Map<String, dynamic>;
+    // A `folder/*` entry stands for every PNG in that folder, by name.
+    final sprites = <String, dynamic>{
+      for (final MapEntry(:key, :value)
+          in (manifest['sprites'] as Map<String, dynamic>).entries)
+        if (key.endsWith('/*'))
+          for (final png
+              in (Directory('assets/art/${key.substring(0, key.length - 2)}')
+                  .listSync()
+                  .whereType<File>()
+                  .map((f) => f.uri.pathSegments.last)
+                  .where((n) => n.endsWith('.png'))
+                  .toList()
+                ..sort()))
+            '${key.substring(0, key.length - 2)}/${png.substring(0, png.length - 4)}':
+                value
+        else
+          key: value,
+    };
     final groups = manifest['palettes'] as Map<String, dynamic>;
     expect(Sprites.all.keys, sprites.keys);
     for (final MapEntry(key: name, value: spec as Map) in sprites.entries) {

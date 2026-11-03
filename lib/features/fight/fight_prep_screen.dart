@@ -13,6 +13,7 @@ import '../world/gear_screen.dart';
 import '../world/items_text.dart';
 import 'boss_art.dart';
 import 'fight_screen.dart';
+import 'fight_settings.dart';
 
 /// Before a fight: the gear worn, a waiting curse, consumables to pick and
 /// which owned items are good against this boss.
@@ -133,7 +134,9 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.worldTier(widget.tier),
+                      '${l10n.worldTier(widget.tier)} · '
+                      '${difficultyName(l10n, ref.watch(currentProfileProvider).difficulty)}',
+                      key: const ValueKey('prep-tier'),
                       style: theme.textTheme.titleMedium,
                     ),
                     Text(
