@@ -15,7 +15,8 @@ work starts.
 
 | Question | Default |
 |---|---|
-| App ID | `io.github.<github-user>.homework_and_chores`. **Needs your GitHub username.** |
+| Name | **Dust & Dungeons** (decided 2026-11-03), the same in English and German. Clear in the Play Store, DPMA and EUIPO searches and on the web. |
+| App ID | `io.github.<github-user>.dust_dungeons`. **Needs your GitHub username.** |
 | GitHub | Public repository from the beta on (GPL-3.0) |
 | Distribution | Signed APKs on GitHub Releases, plus the IzzyOnDroid repository. The main F-Droid repository comes at 1.0. |
 | Signing key | A key file on your PC (not in Dropbox) with an offline backup, plus encrypted GitHub secrets so CI signs tagged releases |
@@ -43,9 +44,28 @@ work starts.
 - **No migration needed:** nobody but us has installed the placeholder ID.
 - **Test:** a new test fails if the string `changeme` turns up anywhere in `lib/`, `android/` or `test/`.
 
+### 1b. The name: Dust & Dungeons
+- **What changes:**
+  - the launcher label (`android:label` in the manifest)
+  - `appTitle` and the backup error text in both ARB files
+  - the home screen widgets' names and descriptions
+  - the README, CONTRIBUTING, the art credits and the docs' titles
+  - new backup file names: `dust-dungeons-backup-…` and `dust-dungeons-auto-…`
+  - the key file name in the signing step (`dust-dungeons.jks`)
+  - the store listings (fastlane, Play)
+- **What stays, on purpose:**
+  - the Dart package name `homework_and_chores`, which is internal and used by every import
+  - the backup format: old backups still import
+  - reading the old backup prefixes, so auto-backup rotation and the import list still find
+    `homework-chores-…` files
+- **The D&D rule:** "Dust & Dungeons" shortens to D&D, and "Dungeons & Dragons" is Hasbro's
+  trademark. Never write "D&D" in the app, the listing, the keywords or the icon. The logo must
+  not borrow their ampersand or dragon style.
+- **Test:** a test fails if "Homework & Chores" turns up in `lib/l10n/` or the manifest again.
+
 ### 2. Release signing
 - **Your step:** you create the key on your PC with `keytool`. A small script, `tool/new_release_key.ps1`, will prompt for the passwords itself, so they never pass through me.
-  - The file lives outside Dropbox (e.g. `%USERPROFILE%\keys\homework-chores.jks`), with a second copy offline.
+  - The file lives outside Dropbox (e.g. `%USERPROFILE%\keys\dust-dungeons.jks`), with a second copy offline.
 - **Gradle** reads `android/key.properties` (already in `.gitignore`) for local builds. Without it, a release build **fails** instead of quietly using the debug key.
 - **CI** gets the keystore (base64) and its passwords as encrypted repository secrets. Only builds of `v*` tags sign.
 - **Check:** after building, `apksigner verify --print-certs` must show the release certificate. The SHA-256 fingerprint goes into README, so testers can verify downloads.
@@ -147,7 +167,7 @@ Releases and IzzyOnDroid. What that changes:
 | Real phones | Find testers, install | Release notes, triage, fixes |
 
 ## Order
-1. App ID, the `changeme` test, and the license and README updates. Nothing outside the repo is needed.
+1. App ID, the name (Dust & Dungeons), the `changeme` and old-name tests, and the license and README updates. Nothing outside the repo is needed.
 2. F-Droid-friendly build: SQLite from source, the dependency info block, the Flutter pin, the dependency audit.
 3. Signing setup, then you create the key, then a signed local build verified on the emulator.
 4. Fastlane metadata and screenshots.

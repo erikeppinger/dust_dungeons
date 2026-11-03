@@ -274,8 +274,8 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.11.0** ✅ | Loot & gear | Gear slots (two-handed weapons push out shields), new Armory items, boss loot with a bad-luck guard, mild curses after a lost fight that last one fight at most, consumables; items never change points ([design](design/items.md)) |
 | **0.12.0** ✅ | Game data | Items, bosses, built-in quests and balance numbers in TOML files under `game/`, checked and turned into code and texts by `tool/build_game_data.py`; descriptions generated from effects; easy / balanced / hard per person ([design](design/game-data.md)) |
 | **0.13.0** ✅ | Fight feedback | A start button before every round, a timeline with a playhead for the rhythm, a pixel hero that wears its gear, also in fights; from the first testers ([design](design/fight-feedback.md)) |
-| **0.14.0** | Beta | Final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) ([plan](design/beta.md)) |
-| **1.0.0** | Release | Final name, icon, store/F-Droid listing, chosen genre theme |
+| **0.14.0** | Beta | Name **Dust & Dungeons**, final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) ([plan](design/beta.md)) |
+| **1.0.0** | Release | Icon and logo for Dust & Dungeons, store/F-Droid listing, chosen genre theme |
 | later | | macOS/iOS, home screen widget, more themes, device-to-device sync without a server |
 
 ---
