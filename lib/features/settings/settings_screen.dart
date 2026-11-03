@@ -13,6 +13,8 @@ import '../screen_time/screen_time_providers.dart';
 import '../screen_time/screen_time_screen.dart';
 import 'settings_controller.dart';
 import 'settings_pages.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Settings overview: one entry per category, each opening its own page.
 /// Subtitles show the current state so most settings can be checked at a
@@ -54,19 +56,19 @@ class SettingsScreen extends ConsumerWidget {
       ),
       children: [
         _Entry(
-          icon: Icons.checklist,
+          icon: Sprites.uiChecklist,
           title: l10n.manageChores,
           subtitle: l10n.manageChoresSubtitle,
           onTap: () => ManageChoresScreen.open(context),
         ),
         _Entry(
-          icon: Icons.group_outlined,
+          icon: Sprites.uiGroup,
           title: l10n.peopleTitle,
           subtitle: l10n.peopleSubtitle(ref.watch(profilesProvider).length),
           onTap: () => PeopleScreen.open(context),
         ),
         _Entry(
-          icon: Icons.palette_outlined,
+          icon: Sprites.uiPalette,
           title: l10n.settingsAppearance,
           subtitle: settings.colorblindSafe
               ? '$theme · ${l10n.colorblindOn}'
@@ -78,7 +80,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         _Entry(
-          icon: Icons.notifications_outlined,
+          icon: Sprites.uiBell,
           title: l10n.settingsNotifications,
           subtitle: notifications,
           onTap: () => SettingsPage.open(
@@ -88,7 +90,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         _Entry(
-          icon: Icons.sports_martial_arts,
+          icon: Sprites.uiFight,
           title: l10n.settingsFights,
           subtitle: fights.isEmpty ? l10n.stateOff : fights.join(' · '),
           onTap: () => SettingsPage.open(
@@ -98,7 +100,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         _Entry(
-          icon: Icons.phone_android,
+          icon: Sprites.uiPhone,
           title: l10n.settingsScreenTime,
           subtitle: ref.watch(screenTimeActiveProvider)
               ? l10n.screenOnSubtitle(settings.screenBaseMinutes)
@@ -106,7 +108,7 @@ class SettingsScreen extends ConsumerWidget {
           onTap: () => ScreenTimeScreen.open(context),
         ),
         _Entry(
-          icon: Icons.language,
+          icon: Sprites.uiGlobe,
           title: l10n.settingsLanguage,
           subtitle: language,
           onTap: () => SettingsPage.open(
@@ -116,7 +118,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
         _Entry(
-          icon: Icons.save_outlined,
+          icon: Sprites.uiSave,
           title: l10n.settingsBackup,
           subtitle: !backupOn
               ? l10n.backupSubtitleOff
@@ -128,7 +130,7 @@ class SettingsScreen extends ConsumerWidget {
           onTap: () => BackupScreen.open(context),
         ),
         _Entry(
-          icon: Icons.info_outline,
+          icon: Sprites.uiInfo,
           title: l10n.settingsAbout,
           subtitle: l10n.settingsAboutSubtitle,
           onTap: () => SettingsPage.open(
@@ -150,17 +152,17 @@ class _Entry extends StatelessWidget {
     required this.onTap,
   });
 
-  final IconData icon;
+  final Sprite icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => ListTile(
-    leading: Icon(icon),
+    leading: PixelIcon(icon),
     title: Text(title),
     subtitle: Text(subtitle),
-    trailing: const Icon(Icons.chevron_right),
+    trailing: const PixelIcon(Sprites.uiChevronRight),
     onTap: onTap,
   );
 }

@@ -1,6 +1,9 @@
-import 'dart:math';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../../app/art/art.dart';
+import '../../domain/fight/items.dart';
+import '../../domain/fight/shop.dart';
 
 /// Free avatar choices (more come with the shop in 0.5.1).
 const avatarSkins = [
@@ -30,7 +33,10 @@ const avatarCapes = [
 Color _pick(List<Color> colors, int index) =>
     colors[index.clamp(0, colors.length - 1)];
 
-/// The player's hero, drawn from simple shapes.
+/// The player's hero: the pixel sprite `assets/art/hero/hero.png` in the
+/// Wardrobe's colors, wearing [gear] and the [hat] look (worn head gear
+/// covers the hat). Scaled by whole pixels from 32 up; smaller sizes scale
+/// down evenly.
 class HeroArt extends StatelessWidget {
   const HeroArt({
     super.key,
@@ -38,167 +44,89 @@ class HeroArt extends StatelessWidget {
     required this.hair,
     required this.cape,
     this.hat = 0,
+    this.gear = const {},
     this.size = 88,
     this.semanticLabel,
   });
 
   final int skin, hair, cape;
 
-  /// 0 = none, 1 cap, 2 bandana, 3 wizard hat, 4 crown (shop order).
+  /// 0 = none, else the `look` of a hat item.
   final int hat;
+
+  /// The worn gear: slot → item key.
+  final Map<GearSlot, String> gear;
   final double size;
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    label: semanticLabel,
-    image: semanticLabel != null,
-    child: CustomPaint(
-      size: Size(size, size * 96 / 88),
-      painter: _HeroPainter(
-        _pick(avatarSkins, skin),
-        _pick(avatarHair, hair),
-        _pick(avatarCapes, cape),
-        hat,
-      ),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final night = Theme.of(context).brightness == Brightness.dark;
+    final picture = CustomPaint(
+      size: Size.square(size),
+      painter: _HeroPainter(heroColors(skin: skin, hair: hair, cape: cape), [
+        for (final key in wearLayers(gear, hat))
+          ?Sprites.all['hero/wear/$key']?.$1.first,
+      ], (night ? itemsNight : itemsDay).colors),
+    );
+    return semanticLabel == null
+        ? ExcludeSemantics(child: picture)
+        : Semantics(label: semanticLabel, image: true, child: picture);
+  }
+}
+
+/// The hero palette with its key colors swapped for the Wardrobe's: skin,
+/// hair and cape, each with a darker shade.
+List<Color> heroColors({
+  required int skin,
+  required int hair,
+  required int cape,
+}) {
+  Color shade(Color c) => Color.lerp(c, const Color(0xFF000000), 0.25)!;
+  final s = _pick(avatarSkins, skin);
+  final h = _pick(avatarHair, hair);
+  final c = _pick(avatarCapes, cape);
+  return [
+    for (final (i, color) in hero.colors.indexed)
+      switch (i) {
+        1 => s,
+        2 => shade(s),
+        3 => h,
+        4 => shade(h),
+        5 => c,
+        6 => shade(c),
+        _ => color,
+      },
+  ];
 }
 
 class _HeroPainter extends CustomPainter {
-  _HeroPainter(this.skin, this.hair, this.cape, this.hat);
+  _HeroPainter(this.colors, this.wear, this.itemColors);
 
-  final Color skin, hair, cape;
-  final int hat;
+  final List<Color> colors;
+  final List<Sprite> wear;
+  final List<Color> itemColors;
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.scale(size.width / 88);
-    // The mop over the shoulder.
-    canvas.save();
-    canvas.translate(66, 40);
-    canvas.rotate(0.31);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        const Rect.fromLTWH(-2.5, -32, 5, 70),
-        const Radius.circular(2),
-      ),
-      Paint()..color = const Color(0xFF8D6E63),
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        const Rect.fromLTWH(2, 26, 18, 12),
-        const Radius.circular(3),
-      ),
-      Paint()..color = const Color(0xFF90A4AE),
-    );
-    canvas.restore();
-    // Cape, body, head, hair, face.
-    final capePath = Path()
-      ..moveTo(22, 50)
-      ..quadraticBezierTo(44, 40, 66, 50)
-      ..lineTo(72, 92)
-      ..lineTo(16, 92)
-      ..close();
-    canvas.drawPath(capePath, Paint()..color = cape);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        const Rect.fromLTWH(28, 50, 32, 38),
-        const Radius.circular(10),
-      ),
-      Paint()..color = const Color(0xFFFFB74D),
-    );
-    canvas.drawCircle(const Offset(44, 30), 20, Paint()..color = skin);
-    final hairPath = Path()
-      ..moveTo(24, 26)
-      ..quadraticBezierTo(44, 4, 64, 26)
-      ..quadraticBezierTo(54, 18, 44, 20)
-      ..quadraticBezierTo(34, 18, 24, 26)
-      ..close();
-    canvas.drawPath(hairPath, Paint()..color = hair);
-    final ink = Paint()..color = const Color(0xFF1A1C18);
-    canvas.drawCircle(const Offset(37, 31), 2.6, ink);
-    canvas.drawCircle(const Offset(51, 31), 2.6, ink);
-    canvas.drawArc(
-      Rect.fromCenter(center: const Offset(44, 38), width: 12, height: 8),
-      0.2,
-      2.7,
-      false,
-      ink
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round,
-    );
-    _hat(canvas);
-  }
-
-  void _hat(Canvas canvas) {
-    switch (hat) {
-      case 1: // Cap
-        canvas.drawArc(
-          Rect.fromCenter(center: const Offset(44, 20), width: 40, height: 28),
-          pi,
-          pi,
-          true,
-          Paint()..color = const Color(0xFFE53935),
-        );
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            const Rect.fromLTWH(44, 17, 28, 6),
-            const Radius.circular(3),
-          ),
-          Paint()..color = const Color(0xFFB71C1C),
-        );
-      case 2: // Bandana
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            const Rect.fromLTWH(24, 16, 40, 8),
-            const Radius.circular(4),
-          ),
-          Paint()..color = const Color(0xFF1E88E5),
-        );
-        canvas.drawPath(
-          Path()
-            ..moveTo(24, 20)
-            ..lineTo(14, 14)
-            ..lineTo(16, 26)
-            ..close(),
-          Paint()..color = const Color(0xFF1565C0),
-        );
-      case 3: // Wizard hat
-        canvas.drawPath(
-          Path()
-            ..moveTo(44, 0)
-            ..lineTo(64, 20)
-            ..lineTo(24, 20)
-            ..close(),
-          Paint()..color = const Color(0xFF5E35B1),
-        );
-        canvas.drawCircle(
-          const Offset(46, 12),
-          2.5,
-          Paint()..color = const Color(0xFFFFEB3B),
-        );
-      case 4: // Crown
-        canvas.drawPath(
-          Path()
-            ..moveTo(28, 18)
-            ..lineTo(30, 4)
-            ..lineTo(37, 12)
-            ..lineTo(44, 2)
-            ..lineTo(51, 12)
-            ..lineTo(58, 4)
-            ..lineTo(60, 18)
-            ..close(),
-          Paint()..color = const Color(0xFFE6C463),
-        );
+    const base = Sprites.hero;
+    // Whole pixels from 32 up, centered; smaller heroes scale down evenly.
+    final cell = size.width >= base.width
+        ? (size.width / base.width).floorToDouble()
+        : size.width / base.width;
+    final offset = (size.width - cell * base.width) / 2;
+    canvas
+      ..translate(offset.roundToDouble(), offset.roundToDouble())
+      ..scale(cell);
+    base.paint(canvas, colors);
+    for (final layer in wear) {
+      layer.paint(canvas, itemColors);
     }
   }
 
   @override
   bool shouldRepaint(_HeroPainter old) =>
-      old.skin != skin ||
-      old.hair != hair ||
-      old.cape != cape ||
-      old.hat != hat;
+      !listEquals(old.colors, colors) ||
+      !listEquals(old.wear, wear) ||
+      !listEquals(old.itemColors, itemColors);
 }

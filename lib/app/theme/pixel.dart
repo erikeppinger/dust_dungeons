@@ -320,6 +320,112 @@ class PixelCoin extends StatelessWidget {
   }
 }
 
+/// The level coin: a coin with [level] stamped on it in pixel digits (up
+/// to 99; higher levels show the plain coin mark).
+class LevelCoin extends StatelessWidget {
+  const LevelCoin({super.key, required this.level, this.size = 36});
+
+  final int level;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: CustomPaint(
+      size: Size.square(size),
+      painter: _LevelCoinPainter(level, PixelColors.of(context).palette),
+    ),
+  );
+}
+
+/// Digits 0–9, 3×5 pixels each, row by row.
+const _digitRows = [
+  ['111', '101', '101', '101', '111'],
+  ['010', '110', '010', '010', '111'],
+  ['111', '001', '111', '100', '111'],
+  ['111', '001', '111', '001', '111'],
+  ['101', '101', '111', '001', '001'],
+  ['111', '100', '111', '001', '111'],
+  ['111', '100', '111', '101', '111'],
+  ['111', '001', '010', '010', '010'],
+  ['111', '101', '111', '101', '111'],
+  ['111', '101', '111', '001', '111'],
+];
+
+class _LevelCoinPainter extends CustomPainter {
+  _LevelCoinPainter(this.level, this.palette);
+
+  final int level;
+  final UiPalette palette;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final plain = level < 1 || level > 99;
+    final sprite = plain ? Sprites.coin : Sprites.coinBlank;
+    final cell = max(1, (size.width / sprite.width).floorToDouble()).toDouble();
+    final offset = ((size.width - cell * sprite.width) / 2).roundToDouble();
+    canvas
+      ..translate(offset, offset)
+      ..scale(cell);
+    sprite.paint(canvas, palette.colors);
+    if (plain) return;
+    final digits = '$level'.split('').map(int.parse).toList();
+    // One digit in the middle, two side by side with a pixel between.
+    var x = digits.length == 1 ? 4 : 2;
+    final ink = Paint()
+      ..color = palette.coinShade
+      ..isAntiAlias = false;
+    for (final d in digits) {
+      for (final (y, row) in _digitRows[d].indexed) {
+        for (var i = 0; i < 3; i++) {
+          if (row[i] == '1') {
+            canvas.drawRect(
+              Rect.fromLTWH((x + i).toDouble(), (3 + y).toDouble(), 1, 1),
+              ink,
+            );
+          }
+        }
+      }
+      x += 4;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_LevelCoinPainter old) =>
+      old.level != level || old.palette != palette;
+}
+
+/// The streak flame, in its own red and gold.
+class PixelFlame extends StatelessWidget {
+  const PixelFlame({super.key, this.size = 24});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => PixelIcon(
+    Sprites.flame,
+    size: size,
+    palette: PixelColors.of(context).palette.colors,
+  );
+}
+
+/// A trophy cup in the theme's gold.
+class PixelTrophy extends StatelessWidget {
+  const PixelTrophy({super.key, this.size = 24, this.semanticLabel});
+
+  final double size;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return PixelIcon(
+      Sprites.trophy,
+      size: size,
+      palette: PixelColors.of(context).palette.colors,
+      semanticLabel: semanticLabel,
+    );
+  }
+}
+
 /// A full or empty heart.
 class PixelHeart extends StatelessWidget {
   const PixelHeart({super.key, required this.full, this.size = 24});

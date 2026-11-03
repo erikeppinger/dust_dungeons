@@ -50,12 +50,15 @@ void main() {
   ) async {
     final outcomes = <DuelOutcome>[];
     final c = controller(outcomes.add)..start();
-    expect(c.stage, FightStage.intro);
+    expect(c.stage, FightStage.ready);
+    c.go();
     await tester.pump(ms(FightController.introMs));
     while (c.stage != FightStage.finished) {
       await playRound(tester, c);
       expect(c.lastHits, everyElement(Hit.perfect));
       await tester.pump(ms(FightController.judgedMs));
+      c.go();
+      await tester.pump(ms(FightController.introMs));
     }
     expect(outcomes, [DuelOutcome.won]);
     expect(c.duel.miss, 0);
@@ -64,6 +67,7 @@ void main() {
 
   testWidgets('late taps are judged as good, not perfect', (tester) async {
     final c = controller((_) {})..start();
+    c.go();
     await tester.pump(ms(FightController.introMs));
     await playRound(tester, c, offsetMs: 90);
     expect(c.lastHits, everyElement(Hit.good));
@@ -75,11 +79,15 @@ void main() {
   ) async {
     final outcomes = <DuelOutcome>[];
     final c = controller(outcomes.add)..start();
+    c.tap(); // before the first round
+    c.go();
+    c.go(); // a double tap starts one round
     c.tap(); // during the intro
     await tester.pump(ms(FightController.introMs));
     c.tap(); // during the call
     expect(c.tapCount, 0);
     while (c.stage != FightStage.finished) {
+      c.go();
       await tester.pump(ms(200));
     }
     expect(outcomes, [DuelOutcome.lost]);
@@ -90,12 +98,15 @@ void main() {
     tester,
   ) async {
     final c = controller((_) {})..start();
+    c.go();
     await tester.pump(ms(FightController.introMs));
     c.pause();
     await tester.pump(const Duration(seconds: 30));
     expect(c.duel.heroHp, c.duel.hero.maxHp, reason: 'nothing was judged');
     c.resume();
-    expect(c.stage, FightStage.intro);
+    expect(c.stage, FightStage.ready);
+    expect(c.pattern, isNull, reason: 'the dropped round is off the timeline');
+    c.go();
     await tester.pump(ms(FightController.introMs));
     expect(c.stage, FightStage.call);
     c.dispose();
@@ -106,7 +117,7 @@ void main() {
     final c = controller(outcomes.add)..start();
     c.stop();
     await tester.pump(const Duration(minutes: 1));
-    expect(c.stage, FightStage.intro);
+    expect(c.stage, FightStage.ready);
     expect(outcomes, isEmpty);
     c.dispose();
   });
@@ -124,13 +135,53 @@ void main() {
       latencyMs: 250,
       onFinished: (_) {},
     )..start();
+    c.go();
     await tester.pump(ms(FightController.introMs));
     await playRound(tester, c, offsetMs: 250);
     expect(c.lastHits, everyElement(Hit.perfect));
     await tester.pump(ms(FightController.judgedMs));
+    c.go();
+    await tester.pump(ms(FightController.introMs));
     // Late on top of the delay: the round waits for the last tap.
     await playRound(tester, c, offsetMs: 340);
     expect(c.lastHits, everyElement(Hit.good));
+    c.dispose();
+  });
+
+  testWidgets('each round waits for the start button', (tester) async {
+    final c = controller((_) {})..start();
+    await tester.pump(const Duration(minutes: 1));
+    expect(c.stage, FightStage.ready, reason: 'no round without the button');
+    c.tap();
+    expect(c.tapCount, 0);
+    c.go();
+    expect(c.stage, FightStage.intro);
+    await tester.pump(ms(FightController.introMs));
+    await playRound(tester, c);
+    await tester.pump(ms(FightController.judgedMs));
+    expect(c.stage, FightStage.ready);
+    expect(c.lastHits, isNotEmpty, reason: 'the judgement stays visible');
+    await tester.pump(const Duration(minutes: 1));
+    expect(c.stage, FightStage.ready);
+    c.dispose();
+  });
+
+  testWidgets('the playhead follows the call and the echo', (tester) async {
+    final c = controller((_) {})..start();
+    expect(c.playheadMs, isNull);
+    c.go();
+    await tester.pump(ms(FightController.introMs));
+    expect(c.playheadMs, 0);
+    final p = c.pattern!;
+    await tester.pump(ms(p.beatsMs.last));
+    expect(c.playheadMs, p.beatsMs.last);
+    await tester.pump(ms(p.lengthMs - p.beatsMs.last));
+    expect(c.stage, FightStage.echo);
+    // The count-in: one pulse before the first beat is due.
+    expect(c.playheadMs, -p.beatMs);
+    await tester.pump(ms(p.beatMs + 30));
+    c.tap();
+    expect(c.taps, [30]);
     c.dispose();
   });
 
@@ -154,6 +205,7 @@ void main() {
     testWidgets('hitting every note on time wins', (tester) async {
       final outcomes = <DuelOutcome>[];
       final c = overlord(outcomes.add)..start();
+      c.go();
       await tester.pump(ms(FightController.introMs));
       expect(c.stage, FightStage.lanes);
       while (c.stage == FightStage.lanes) {
@@ -168,6 +220,7 @@ void main() {
       }
       expect(c.duel.miss, 0);
       await tester.pump(ms(FightController.judgedMs));
+      c.go();
       expect(outcomes, [DuelOutcome.won]);
       c.dispose();
     });
@@ -175,6 +228,7 @@ void main() {
     testWidgets('notes that fall past the line cost hearts', (tester) async {
       final outcomes = <DuelOutcome>[];
       final c = overlord(outcomes.add)..start();
+      c.go();
       await tester.pump(ms(FightController.introMs));
       c.tapLane(1); // a stray tap: no damage
       expect(c.duel.heroHp, 5);
@@ -190,11 +244,13 @@ void main() {
       tester,
     ) async {
       final c = overlord((_) {})..start();
+      c.go();
       await tester.pump(ms(FightController.introMs));
       c.pause();
       await tester.pump(const Duration(seconds: 30));
       expect(c.duel.heroHp, 5, reason: 'nothing was judged while paused');
       c.resume();
+      c.go();
       await tester.pump(ms(FightController.introMs));
       expect(c.stage, FightStage.lanes);
       expect(c.laneJudge!.results, everyElement(isNull));

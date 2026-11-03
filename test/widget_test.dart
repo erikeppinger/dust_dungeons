@@ -349,17 +349,17 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Get ready…'), findsOneWidget);
+    expect(find.text('Ready when you are'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Leave'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Leave the fight?'), findsOneWidget);
-    // "Keep fighting" goes back to the fight, which starts a fresh round.
+    // "Keep fighting" goes back to the fight, which waits for a fresh round.
     await tester.tap(find.text('Keep fighting'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Get ready…'), findsOneWidget);
+    expect(find.text('Ready when you are'), findsOneWidget);
     await tester.tap(find.byTooltip('Leave'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
@@ -593,19 +593,22 @@ void main() {
       matching: find.text('Fight'),
     );
     await startFight(tester, fight);
-    // Never tap: the fight is lost after a few rounds.
+    // Never tap the pad: the fight is lost after a few rounds.
     for (
       var i = 0;
       i < 400 && find.textContaining('got away').evaluate().isEmpty;
       i++
     ) {
+      // Only the start button is pressed, never the pad.
+      final start = find.byKey(const ValueKey('fight-start'));
+      if (start.evaluate().isNotEmpty) await tester.tap(start);
       await tester.pump(const Duration(milliseconds: 100));
     }
     expect(find.text('Dust Bunny King got away'), findsOneWidget);
     await tester.tap(find.text('Use Second Wind · 1 left'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Get ready…'), findsOneWidget);
+    expect(find.text('Ready when you are'), findsOneWidget);
     final inventory = await tester.runAsync(
       () => db!.select(db.inventory).get(),
     );
@@ -865,12 +868,15 @@ void main() {
       matching: find.text('Fight'),
     );
     await startFight(tester, fight);
-    // Never tap: the fight is lost after a few rounds.
+    // Never tap the pad: the fight is lost after a few rounds.
     for (
       var i = 0;
       i < 900 && find.textContaining('got away').evaluate().isEmpty;
       i++
     ) {
+      // Only the start button is pressed, never the pad.
+      final start = find.byKey(const ValueKey('fight-start'));
+      if (start.evaluate().isNotEmpty) await tester.tap(start);
       await tester.pump(const Duration(milliseconds: 100));
     }
     // The curse warning pushes the buttons down; the list builds lazily.

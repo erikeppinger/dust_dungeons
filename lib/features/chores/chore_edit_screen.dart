@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme/chore_palette.dart';
+import '../../app/theme/pixel.dart';
 import '../../data/db/app_database.dart';
 import '../../core/day_clock.dart';
 import '../../data/providers.dart';
@@ -16,6 +17,7 @@ import '../settings/settings_controller.dart';
 import '../../domain/fight/boss.dart';
 import '../fight/boss_art.dart';
 import 'repeat_editor.dart';
+import '../../app/art/art.dart';
 
 /// Add a new chore (`chore == null`) or edit/archive an existing one.
 class ChoreEditScreen extends ConsumerStatefulWidget {
@@ -336,7 +338,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                           radius: 21,
                           backgroundColor: palette.colorFor(i),
                           child: i == _colorKey
-                              ? Icon(Icons.check, color: palette.onColorFor(i))
+                              ? PixelIcon(
+                                  Sprites.uiCheck,
+                                  color: palette.onColorFor(i),
+                                )
                               : null,
                         ),
                       ),
@@ -362,7 +367,10 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
                           )
                         : null,
                     onPressed: () => setState(() => _iconKey = entry.key),
-                    icon: Icon(entry.value),
+                    icon: Builder(
+                      // Tinted like an Icon: the button's foreground color.
+                      builder: (context) => PixelIcon(entry.value, size: 24),
+                    ),
                   ),
               ],
             ),
@@ -370,8 +378,8 @@ class _ChoreEditScreenState extends ConsumerState<ChoreEditScreen> {
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: _saving ? null : _toggleArchived,
-                icon: Icon(
-                  chore.isArchived ? Icons.unarchive : Icons.archive_outlined,
+                icon: PixelIcon(
+                  chore.isArchived ? Sprites.uiUnarchive : Sprites.uiArchive,
                 ),
                 label: Text(chore.isArchived ? l10n.restore : l10n.archive),
               ),
@@ -425,7 +433,7 @@ class _ReminderEditor extends ConsumerWidget {
         SwitchListTile(
           key: const ValueKey('reminder-switch'),
           contentPadding: EdgeInsets.zero,
-          secondary: const Icon(Icons.alarm),
+          secondary: const PixelIcon(Sprites.uiAlarm),
           title: Text(l10n.choreReminderOn),
           value: hasSchedule && m != null,
           onChanged: hasSchedule
@@ -438,7 +446,7 @@ class _ReminderEditor extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             leading: const SizedBox(width: 24),
             title: Text(l10n.choreReminderAt(formatMinutes(context, m))),
-            trailing: const Icon(Icons.schedule),
+            trailing: const PixelIcon(Sprites.uiClock),
             onTap: () => _pick(context),
           ),
         if (hint != null) Text(hint, style: theme.textTheme.bodySmall),
@@ -564,7 +572,7 @@ class _TimesEditor extends StatelessWidget {
         SwitchListTile(
           key: const ValueKey('times-switch'),
           contentPadding: EdgeInsets.zero,
-          secondary: const Icon(Icons.schedule),
+          secondary: const PixelIcon(Sprites.uiClock),
           title: Text(l10n.timesOn),
           subtitle: Text(l10n.timesHelp),
           value: t != null,

@@ -36,15 +36,19 @@ variants. A new sprite needs a line there.
 | What | Size | Palette | Files |
 |---|---|---|---|
 | Tab icons | 12×12 | `mask` | `icons/tab_*.png`. One color: draw in black, the app tints them. |
-| Coin, hearts, crown | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png`, `icons/crown.png` (the leaderboard's leader) |
+| Quest icons | 12×12 | `mask` | `quests/<icon key>.png`, tinted like the tab icons. A new one also needs its line in `lib/features/chores/chore_icons.dart` (the key is stored, so never rename one). `task_alt` is the fallback |
+| Coin, hearts, crown | 12×12 | `ui` | `icons/coin.png`, `icons/heart.png`, `icons/heart_empty.png`, `icons/crown.png` (the leaderboard's leader), `icons/coin_blank.png` (the level coin; the app stamps the level on it) |
+| UI icons | 12×12 | `mask` | `ui/<name>.png`, e.g. `ui/check.png`: the app's symbols (settings, buttons, the back arrow), tinted like the tab icons |
+| Trophy | 16×16 | `ui` | `icons/trophy.png`: won fights and the Hall of Fame |
 | Item icons | 16×16 | `items` | `items/<item key>.png`, e.g. `items/turbo_mop.png`: gear and fight consumables. No `art.json` line needed (the `items/*` rule); the item itself goes in `game/items.toml` |
 | Launcher icon | 16×16 | `app` | `icons/app_shield.png`; run `python tool/generate_icon.py` after changing it |
 | Ground tiles | 16×16 | `map` | `map/grass_0..3`, `map/water_0..3`, `map/sand_0..3`: fill the whole tile |
 | Overlays | 16×16 | `map` | `map/forest_0..1`, `map/hill`, `map/mountain`: transparent background, drawn on grass |
 | Bridges | 16×16 | `map` | `map/bridge_across`, `map/bridge_along`: drawn on water |
 | Landmarks | 16×16 | `map` | `map/camp`, `map/lair`, `map/lair_sign` (on unexplored lairs), `map/castle`, `map/castle_won` |
-| Hero *(planned)* | 32×32 | `hero` | layers, recolored with the Wardrobe colors |
-| Boss *(planned)* | 48×48 (Overlord 64×64) | `bosses` | a strip of frames: `idle_0`, `idle_1`, `hit`, `defeated` |
+| Hero | 32×32 | `hero` | `hero/hero.png`. Skin, hair and cape (and their shades) are key colors, replaced by the Wardrobe's |
+| Hero's gear | 32×32 | `items` | `hero/wear/<item key>.png`: what a gear item or hat looks like on the hero, on the hero's canvas and transparent elsewhere. Every gear item and hat needs one (the `hero/wear/*` rule) |
+| Bosses | 48×48 | `bosses` | `bosses/<family>.png`, e.g. `bosses/dust.png`: a strip of four frames, 192×48: idle, bob (idle one pixel lower; the boss bounces on its beats), hit, defeated |
 
 A **strip** is one PNG with the frames side by side, left to right, with no gaps (a boss strip is
 192×48). `art.json` gives the frame count as `"frames": 4`.

@@ -38,7 +38,9 @@ file gives you autocompletion and checks as you type.
    effects = { good_damage = 1, combo_heal = 12 }
    against.kitchen = { good_damage = 2 }          # optional
    ```
-3. Run the tool and the tests.
+3. Draw its look on the hero: `assets/art/hero/wear/<key>.png`, 32×32 on the hero's canvas
+   (`assets/art/hero/hero.png`), transparent where the item isn't, in the items palette.
+4. Run the tool and the tests.
 
 The description in the app is written from the effects ("+1 damage on good hits · heals a heart after
 12 hits in a row · against Sink Kraken: +2 damage on good hits"). So it's always right, and balance
@@ -73,7 +75,7 @@ changes need no new text.
   `effects` (picked on a fight's start screen), or a `use` handled in code (`revive`, `lift_curse`)
   with a written `description`.
 - **Hats:** `kind = "hat"`, `price` and `look`. `look` is the number stored for the hero, so never
-  change it. A new hat also needs its drawing in `lib/features/fight/hero_art.dart`.
+  change it. A new hat also needs its look on the hero in `assets/art/hero/wear/`.
 - **Vouchers:** `kind = "voucher"`, `price` and `minutes`. Their name says the minutes.
 
 ## Keys are forever

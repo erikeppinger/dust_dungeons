@@ -87,7 +87,7 @@ class Chores extends Table {
   IntColumn get reminderMinutes => integer().nullable()();
 
   /// Boss family for fight tokens (schema v4); `null` = the default for the
-  /// built-in chore, or the Clutter Imp for user chores.
+  /// built-in chore, or the Clutter Gremlin for user chores.
   TextColumn get bossFamily => textEnum<BossFamily>().nullable()();
 
   /// Monthly on a weekday (schema v8): 1–4 or -1 for the last; `null` =

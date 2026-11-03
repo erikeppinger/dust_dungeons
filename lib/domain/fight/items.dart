@@ -145,3 +145,26 @@ ShopItem? rollLoot({
   if (missing.isNotEmpty) return missing[random.nextInt(missing.length)];
   return preFightConsumables[random.nextInt(preFightConsumables.length)];
 }
+
+/// The hero's wear layers, back to front, as item keys: body, feet, charm,
+/// shield, then the head (worn head gear covers the [hat] look), and the
+/// weapon in front. Unknown keys are skipped; retired items still show,
+/// since their owners keep them.
+List<String> wearLayers(Map<GearSlot, String> equipped, int hat) {
+  const order = [
+    GearSlot.body,
+    GearSlot.feet,
+    GearSlot.charm,
+    GearSlot.shield,
+    GearSlot.head,
+    GearSlot.weapon,
+  ];
+  final hatKey = hats.where((h) => h.look == hat).firstOrNull?.key;
+  return [
+    for (final slot in order)
+      if (shopItem(equipped[slot] ?? '') case final item?)
+        item.key
+      else if (slot == GearSlot.head && hatKey != null)
+        hatKey,
+  ];
+}

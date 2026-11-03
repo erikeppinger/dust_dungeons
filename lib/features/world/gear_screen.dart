@@ -6,7 +6,10 @@ import '../../data/providers.dart';
 import '../../domain/fight/items.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
+import '../fight/hero_art.dart';
 import 'items_text.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// The six gear slots: what's worn, and what else is in the bag for each.
 class GearScreen extends ConsumerWidget {
@@ -27,6 +30,7 @@ class GearScreen extends ConsumerWidget {
     // Retired items count only for people who have them.
     final total = allGear.where((i) => !i.retired || has(i)).length;
     final curse = ref.watch(curseProvider);
+    final person = ref.watch(currentProfileProvider);
     // The shield slot under a two-handed weapon.
     final twoHanded = shopItem(equipped[GearSlot.weapon] ?? '')?.twoHanded;
     return Scaffold(
@@ -39,6 +43,18 @@ class GearScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
             child: Text(l10n.gearIntro, style: theme.textTheme.bodyMedium),
+          ),
+          // The hero wearing it all: changes as soon as an item does.
+          Center(
+            child: HeroArt(
+              key: const ValueKey('gear-hero'),
+              skin: person.avatarSkin,
+              hair: person.avatarHair,
+              cape: person.avatarCape,
+              hat: person.avatarHat,
+              gear: equipped,
+              size: 128,
+            ),
           ),
           if (curse != null)
             Padding(
@@ -72,7 +88,7 @@ class GearScreen extends ConsumerWidget {
                       if (off && item != null) curseEffect(l10n, curse!),
                     ].join(' · '),
                   ),
-                  trailing: const Icon(Icons.chevron_right),
+                  trailing: const PixelIcon(Sprites.uiChevronRight),
                   onTap: () => _pick(context, slot),
                 );
               },
@@ -141,7 +157,7 @@ class _SlotSheet extends ConsumerWidget {
                 selected: worn == item.key,
                 trailing: worn == item.key
                     ? Chip(
-                        avatar: const Icon(Icons.check, size: 16),
+                        avatar: const PixelIcon(Sprites.uiCheck, size: 16),
                         label: Text(l10n.shopWorn),
                       )
                     : null,
@@ -153,7 +169,7 @@ class _SlotSheet extends ConsumerWidget {
             if (worn != null)
               ListTile(
                 key: const ValueKey('gear-take-off'),
-                leading: const Icon(Icons.remove_circle_outline),
+                leading: const PixelIcon(Sprites.uiRemoveCircle),
                 title: Text(l10n.gearTakeOff),
                 onTap: () async {
                   await shop.takeOff(profile, slot);
@@ -189,8 +205,8 @@ class CurseCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.sentiment_very_dissatisfied,
+                PixelIcon(
+                  Sprites.uiSad,
                   color: theme.colorScheme.onErrorContainer,
                 ),
                 const SizedBox(width: 8),

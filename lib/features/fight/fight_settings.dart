@@ -7,6 +7,8 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'calibration_screen.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 String difficultyName(AppLocalizations l10n, Difficulty d) => switch (d) {
   Difficulty.easy => l10n.difficultyEasy,
@@ -29,13 +31,13 @@ class FightSettings extends ConsumerWidget {
     return Column(
       children: [
         SwitchListTile(
-          secondary: const Icon(Icons.volume_up_outlined),
+          secondary: const PixelIcon(Sprites.uiVolume),
           title: Text(l10n.fightSettingSound),
           value: s.fightSound,
           onChanged: (v) => controller.update((x) => x.copyWith(fightSound: v)),
         ),
         SwitchListTile(
-          secondary: const Icon(Icons.vibration),
+          secondary: const PixelIcon(Sprites.uiVibration),
           title: Text(l10n.fightSettingHaptics),
           value: s.fightHaptics,
           onChanged: (v) =>
@@ -43,7 +45,7 @@ class FightSettings extends ConsumerWidget {
         ),
         SwitchListTile(
           key: const ValueKey('setting-curses'),
-          secondary: const Icon(Icons.sentiment_very_dissatisfied_outlined),
+          secondary: const PixelIcon(Sprites.uiSad),
           title: Text(l10n.fightSettingCurses),
           subtitle: Text(l10n.fightSettingCursesSubtitle),
           value: s.curses,
@@ -66,7 +68,7 @@ class FightSettings extends ConsumerWidget {
             ),
           ),
         SwitchListTile(
-          secondary: const Icon(Icons.auto_stories_outlined),
+          secondary: const PixelIcon(Sprites.uiBook),
           title: Text(l10n.fightSettingStory),
           subtitle: Text(l10n.fightSettingStorySubtitle),
           value: person.storyMode,
@@ -76,7 +78,7 @@ class FightSettings extends ConsumerWidget {
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.speed),
+          leading: const PixelIcon(Sprites.uiSpeed),
           title: Text(l10n.fightSettingDifficulty),
           subtitle: Text(l10n.fightSettingDifficultySubtitle),
         ),
@@ -100,7 +102,7 @@ class FightSettings extends ConsumerWidget {
           ),
         ),
         SwitchListTile(
-          secondary: const Icon(Icons.slow_motion_video),
+          secondary: const PixelIcon(Sprites.uiSlow),
           title: Text(l10n.fightSettingSlow),
           subtitle: Text(l10n.fightSettingSlowSubtitle),
           value: person.slowMode,
@@ -108,10 +110,10 @@ class FightSettings extends ConsumerWidget {
               profiles.update(person.id, ProfilesCompanion(slowMode: Value(v))),
         ),
         ListTile(
-          leading: const Icon(Icons.av_timer),
+          leading: const PixelIcon(Sprites.uiTimer),
           title: Text(l10n.fightSettingCalibrate),
           subtitle: Text(l10n.fightSettingCalibrateSubtitle(s.fightLatencyMs)),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const PixelIcon(Sprites.uiChevronRight),
           onTap: () => CalibrationScreen.open(context),
         ),
       ],

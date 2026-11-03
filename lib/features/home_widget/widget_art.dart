@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -210,29 +211,18 @@ class WidgetArt {
         ..strokeWidth = 2
         ..color = look.pixels.frame,
     );
-    // Laid out in the icon font across the whole tile and centered there:
-    // measuring it in the text font gives the wrong width.
-    final size = r.height * 0.6;
-    final family = q.icon.fontFamily;
-    final icon =
-        (ui.ParagraphBuilder(
-                ui.ParagraphStyle(
-                  fontFamily: family,
-                  fontSize: size,
-                  textAlign: TextAlign.center,
-                ),
-              )
-              ..pushStyle(
-                ui.TextStyle(
-                  color: look.chores.onColorFor(q.colorKey),
-                  fontFamily: family,
-                  fontSize: size,
-                ),
-              )
-              ..addText(String.fromCharCode(q.icon.codePoint)))
-            .build()
-          ..layout(ui.ParagraphConstraints(width: r.width));
-    c.drawParagraph(icon, Offset(r.left, r.top + (r.height - icon.height) / 2));
+    // The pixel icon by whole pixels, centered, in the tile's ink.
+    final sprite = q.icon;
+    final cell = max(1, (r.height * 0.6 / sprite.height).floorToDouble());
+    c
+      ..save()
+      ..translate(
+        (r.center.dx - cell * sprite.width / 2).roundToDouble(),
+        (r.center.dy - cell * sprite.height / 2).roundToDouble(),
+      )
+      ..scale(cell.toDouble());
+    sprite.paint(c, [look.chores.onColorFor(q.colorKey)]);
+    c.restore();
   }
 
   /// A pixel triangle pointing right, [size] tall, with its left edge at

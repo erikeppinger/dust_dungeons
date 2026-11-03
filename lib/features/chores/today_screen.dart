@@ -18,6 +18,7 @@ import '../screen_time/screen_time_screen.dart';
 import 'chore_tile.dart';
 import 'chore_titles.dart';
 import 'schedule_text.dart';
+import '../../app/art/art.dart';
 
 /// Active chores grouped into overdue, due today, done today and later.
 /// Tap to complete (with undo), long-press to edit.
@@ -74,7 +75,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'addChore',
         onPressed: () => ChoreEditScreen.open(context, null),
-        icon: const Icon(Icons.add),
+        icon: const PixelIcon(Sprites.uiAdd),
         label: Text(l10n.addChore),
       ),
     );
@@ -232,7 +233,7 @@ class _BalanceHeader extends ConsumerWidget {
                     label: l10n.levelValue(stats.level),
                   ),
                   Chip(
-                    avatar: const Icon(Icons.local_fire_department, size: 18),
+                    avatar: const PixelFlame(size: 18),
                     label: Text(l10n.streakDays(stats.currentStreak)),
                     visualDensity: VisualDensity.compact,
                   ),

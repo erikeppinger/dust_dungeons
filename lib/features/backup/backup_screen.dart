@@ -9,6 +9,8 @@ import '../../data/backup/backup_file.dart';
 import '../../data/backup/merge.dart';
 import '../../l10n/app_localizations.dart';
 import 'backups.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Settings → Backup: save and import backup files, undo an import, and the
 /// folder for daily automatic backups. See docs/design/data-safety.md.
@@ -132,7 +134,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           ),
           ListTile(
             key: const ValueKey('backup-export'),
-            leading: const Icon(Icons.save_alt),
+            leading: const PixelIcon(Sprites.uiDownload),
             title: Text(l10n.backupExport),
             subtitle: Text(l10n.backupExportSubtitle),
             enabled: enabled,
@@ -140,7 +142,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           ),
           ListTile(
             key: const ValueKey('backup-import'),
-            leading: const Icon(Icons.file_open_outlined),
+            leading: const PixelIcon(Sprites.uiFileOpen),
             title: Text(l10n.backupImport),
             subtitle: Text(l10n.backupImportSubtitle),
             enabled: enabled,
@@ -149,7 +151,7 @@ class _BackupScreenState extends ConsumerState<BackupScreen> {
           if (canUndo)
             ListTile(
               key: const ValueKey('backup-undo'),
-              leading: const Icon(Icons.undo),
+              leading: const PixelIcon(Sprites.uiUndo),
               title: Text(l10n.backupUndo),
               subtitle: Text(l10n.backupUndoSubtitle),
               enabled: enabled,
@@ -200,7 +202,7 @@ class _AutoBackup extends ConsumerWidget {
           child: FilledButton.icon(
             key: const ValueKey('backup-choose-folder'),
             onPressed: enabled ? onChoose : null,
-            icon: const Icon(Icons.folder_open),
+            icon: const PixelIcon(Sprites.uiFolderOpen),
             label: Text(l10n.backupChooseFolder),
           ),
         ),
@@ -215,8 +217,8 @@ class _AutoBackup extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ListTile(
-          leading: Icon(
-            lost || failed ? Icons.warning_amber : Icons.folder_outlined,
+          leading: PixelIcon(
+            lost || failed ? Sprites.uiWarning : Sprites.uiFolder,
             color: lost || failed ? scheme.error : null,
           ),
           title: Text(

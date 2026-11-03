@@ -35,6 +35,11 @@ ThemeData buildAppTheme({
       titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface),
       shape: Border(bottom: frame),
     ),
+    // Flutter's own back arrow as a pixel icon (the segments' check mark is
+    // set below).
+    actionIconTheme: ActionIconThemeData(
+      backButtonIconBuilder: (_) => const PixelIcon(Sprites.uiChevronLeft),
+    ),
     cardTheme: CardThemeData(
       color: scheme.surfaceContainerLow,
       surfaceTintColor: Colors.transparent,
@@ -56,7 +61,7 @@ ThemeData buildAppTheme({
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        shape: const PixelBorder(bevel: false),
+        shape: const PixelBorder(),
         side: frame,
       ),
     ),
@@ -73,7 +78,7 @@ ThemeData buildAppTheme({
       shape: PixelBorder(side: frame, depth: 2),
     ),
     chipTheme: ChipThemeData(
-      shape: const PixelBorder(bevel: false),
+      shape: const PixelBorder(),
       side: frame,
       backgroundColor: scheme.surfaceContainerLow,
     ),
@@ -107,8 +112,9 @@ ThemeData buildAppTheme({
       border: OutlineInputBorder(borderRadius: BorderRadius.zero),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
+      selectedIcon: const PixelIcon(Sprites.uiCheck, size: 18),
       style: SegmentedButton.styleFrom(
-        shape: const RoundedRectangleBorder(),
+        shape: const PixelBorder(),
         side: frame,
       ),
     ),

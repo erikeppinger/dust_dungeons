@@ -8,9 +8,11 @@ import '../../domain/fight/echo_duel.dart';
 import '../../domain/fight/lanes.dart';
 import 'fight_sounds.dart';
 
-/// Where a fight is in its loop: intro → (call → echo → judged)* → finished.
-/// The Overlord's last phase replaces call and echo with [lanes].
-enum FightStage { intro, call, echo, judged, lanes, finished }
+/// Where a fight is in its loop:
+/// (ready → intro → call → echo → judged)* → finished. The Overlord's last
+/// phase replaces call and echo with [lanes]. In [ready] the fight waits for
+/// the player's start button.
+enum FightStage { ready, intro, call, echo, judged, lanes, finished }
 
 /// Drives one echo duel in real time: plays the boss's call, collects the
 /// player's taps and judges them. Uses `clock` so tests can control time.
@@ -35,13 +37,15 @@ class FightController extends ChangeNotifier {
   /// Called once with the final outcome (won or lost).
   final void Function(DuelOutcome) onFinished;
 
-  static const introMs = 1500;
+  /// The short "get ready" between the start button and the boss's call,
+  /// so the finger can come off the screen.
+  static const introMs = 400;
   static const judgedMs = 1000;
 
   /// Bars of lane notes written at a time.
   static const laneBars = 2;
 
-  FightStage stage = FightStage.intro;
+  FightStage stage = FightStage.ready;
   Pattern? pattern;
 
   /// Beat lit during the call (`-1`: none).
@@ -61,11 +65,24 @@ class FightController extends ChangeNotifier {
 
   final _timers = <Timer>[];
   final _taps = <int>[];
+  DateTime? _callStart;
   DateTime? _echoStart;
   DateTime? _laneStart;
   bool _disposed = false;
 
-  void start() => _after(introMs, _next);
+  /// Shows the start button for the first round.
+  void start() => _set(FightStage.ready);
+
+  /// The start button: the next round begins after a short "get ready".
+  /// Ignored outside [FightStage.ready], so a double tap starts one round.
+  void go() {
+    if (stage != FightStage.ready) return;
+    _set(FightStage.intro);
+    _after(introMs, _next);
+  }
+
+  /// Whether the next round is the Overlord's lane phase.
+  bool get lanesNext => duel.lanePhase;
 
   /// The next round: lanes in the Overlord's last phase, else call and echo.
   void _next() => duel.lanePhase ? _lanes() : _call();
@@ -90,6 +107,7 @@ class FightController extends ChangeNotifier {
     final p = pattern = duel.nextPattern();
     litBeat = -1;
     lastHits = const [];
+    _callStart = clock.now();
     _set(FightStage.call);
     for (final (i, beat) in p.beatsMs.indexed) {
       _after(beat, () {
@@ -119,6 +137,22 @@ class FightController extends ChangeNotifier {
     );
   }
 
+  /// The player's taps in the current or last echo, in ms from the first
+  /// beat's due time, with the calibrated delay taken off (as judged).
+  List<int> get taps => List.unmodifiable(_taps);
+
+  /// Where the timeline's playhead is, in ms from the phrase's first beat:
+  /// during the call from its start, during the echo from the first beat's
+  /// due time (negative during the count-in). `null` in other stages.
+  int? get playheadMs {
+    final start = switch (stage) {
+      FightStage.call => _callStart,
+      FightStage.echo => _echoStart,
+      _ => null,
+    };
+    return start == null ? null : clock.now().difference(start).inMilliseconds;
+  }
+
   /// A tap on the pad; ignored outside the echo.
   void tap() {
     final start = _echoStart;
@@ -134,7 +168,8 @@ class FightController extends ChangeNotifier {
     _cue(lastHits.contains(Hit.miss) ? Cue.miss : Cue.perfect);
     _set(FightStage.judged);
     if (duel.outcome == DuelOutcome.ongoing) {
-      _after(judgedMs, _next);
+      // The judgement stays on screen while the start button waits.
+      _after(judgedMs, () => _set(FightStage.ready));
     } else {
       _after(judgedMs, _finish);
     }
@@ -221,15 +256,16 @@ class FightController extends ChangeNotifier {
   /// dropped without judging it, so pausing never costs health.
   void pause() => stop();
 
-  /// Continues after [pause] (or after a Second Wind revived a lost duel)
-  /// with a short "get ready" and a fresh round.
+  /// Continues after [pause] (or after a Second Wind revived a lost duel):
+  /// the start button begins a fresh round.
   void resume() {
     if (duel.outcome != DuelOutcome.ongoing) return;
     stop();
+    // The dropped round's rhythm leaves the timeline too.
+    pattern = null;
     lastHits = const [];
     litBeat = -1;
-    _set(FightStage.intro);
-    _after(introMs, _next);
+    _set(FightStage.ready);
   }
 
   /// Stops all timers (leaving the fight).

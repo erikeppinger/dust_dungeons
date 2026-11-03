@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../../app/art/art.dart';
+
 import '../../data/models/scheduled_chore.dart';
 import '../../domain/dates.dart';
 import '../../domain/points.dart';
@@ -38,7 +40,7 @@ class WidgetQuest {
   });
 
   final String title;
-  final IconData icon;
+  final Sprite icon;
   final int colorKey;
   final WidgetStatus status;
   final int points;

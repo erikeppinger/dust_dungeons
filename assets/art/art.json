@@ -7,7 +7,9 @@
     "ui": { "source": "ui_day", "variants": ["ui_day", "ui_night"] },
     "mask": { "source": "mask", "variants": ["mask"] },
     "app": { "source": "app", "variants": ["app"] },
-    "items": { "source": "items_day", "variants": ["items_day", "items_night"] }
+    "items": { "source": "items_day", "variants": ["items_day", "items_night"] },
+    "hero": { "source": "hero", "variants": ["hero"] },
+    "bosses": { "source": "bosses", "variants": ["bosses"] }
   },
   "sprites": {
     "icons/tab_quests": { "size": [12, 12], "palette": "mask" },
@@ -16,9 +18,12 @@
     "icons/tab_hall_of_fame": { "size": [12, 12], "palette": "mask" },
     "icons/tab_settings": { "size": [12, 12], "palette": "mask" },
     "icons/coin": { "size": [12, 12], "palette": "ui" },
+    "icons/coin_blank": { "size": [12, 12], "palette": "ui" },
     "icons/heart": { "size": [12, 12], "palette": "ui" },
     "icons/heart_empty": { "size": [12, 12], "palette": "ui" },
     "icons/crown": { "size": [12, 12], "palette": "ui" },
+    "icons/trophy": { "size": [16, 16], "palette": "ui" },
+    "icons/flame": { "size": [12, 12], "palette": "ui" },
     "icons/app_shield": { "size": [16, 16], "palette": "app" },
     "map/grass": { "size": [16, 16], "palette": "map", "variants": 4 },
     "map/forest": { "size": [16, 16], "palette": "map", "variants": 2 },
@@ -33,6 +38,11 @@
     "map/lair_sign": { "size": [16, 16], "palette": "map" },
     "map/castle": { "size": [16, 16], "palette": "map" },
     "map/castle_won": { "size": [16, 16], "palette": "map" },
-    "items/*": { "size": [16, 16], "palette": "items" }
+    "items/*": { "size": [16, 16], "palette": "items" },
+    "hero/hero": { "size": [32, 32], "palette": "hero" },
+    "hero/wear/*": { "size": [32, 32], "palette": "items", "prefix": "wear" },
+    "bosses/*": { "size": [48, 48], "palette": "bosses", "frames": 4, "prefix": "boss" },
+    "quests/*": { "size": [12, 12], "palette": "mask", "prefix": "quest" },
+    "ui/*": { "size": [12, 12], "palette": "mask", "prefix": "ui" }
   }
 }

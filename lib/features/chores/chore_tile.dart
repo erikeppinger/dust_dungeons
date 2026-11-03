@@ -4,6 +4,7 @@ import '../../app/theme/pixel.dart';
 import '../../app/theme/chore_palette.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_icons.dart';
+import '../../app/art/art.dart';
 
 /// Colorful card for one chore. Color is never the only signal: every tile
 /// also shows its icon, title, due status and points.
@@ -96,10 +97,10 @@ class ChoreTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        child: Icon(
-                          choreIcon(iconKey),
+                        child: ChoreIcon(
+                          iconKey,
+                          size: 36,
                           color: palette.onColorFor(colorKey),
-                          size: 26,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -127,8 +128,8 @@ class ChoreTile extends StatelessWidget {
                     Row(
                       children: [
                         if (overdue) ...[
-                          Icon(
-                            Icons.error_outline,
+                          PixelIcon(
+                            Sprites.uiError,
                             size: 14,
                             color: theme.colorScheme.error,
                           ),
@@ -193,7 +194,11 @@ class _DoneBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.check, size: 16, color: scheme.onSecondaryContainer),
+            PixelIcon(
+              Sprites.uiCheck,
+              size: 16,
+              color: scheme.onSecondaryContainer,
+            ),
             const SizedBox(width: 2),
             Flexible(
               child: Text(
@@ -229,13 +234,13 @@ class _CurseBadge extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: ShapeDecoration(
           color: theme.colorScheme.errorContainer,
-          shape: const StadiumBorder(),
+          shape: const PixelBorder(),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.auto_fix_high,
+            PixelIcon(
+              Sprites.uiMagic,
               size: 14,
               color: theme.colorScheme.onErrorContainer,
             ),

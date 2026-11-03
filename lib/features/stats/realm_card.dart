@@ -13,6 +13,7 @@ import '../../domain/fight/overworld.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
 import '../world/quest_map.dart';
+import '../../app/art/art.dart';
 
 /// The realm: every week's quest map since the first chore, joined into one
 /// world. Month shows a strip to scroll through; Year shows all weeks small,
@@ -109,12 +110,12 @@ class _RealmCardState extends ConsumerState<RealmCard> {
                 segments: [
                   ButtonSegment(
                     value: false,
-                    icon: const Icon(Icons.view_week_outlined),
+                    icon: const PixelIcon(Sprites.uiWeek),
                     label: Text(l10n.realmMonth),
                   ),
                   ButtonSegment(
                     value: true,
-                    icon: const Icon(Icons.grid_view),
+                    icon: const PixelIcon(Sprites.uiGrid),
                     label: Text(l10n.realmYear),
                   ),
                 ],

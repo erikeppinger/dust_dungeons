@@ -23,12 +23,15 @@ import '../settings/settings_controller.dart';
 import '../../domain/screen_time.dart';
 import '../screen_time/screen_time_providers.dart';
 import '../world/items_text.dart';
+import 'beat_timeline.dart';
 import 'boss_art.dart';
 import 'fight_controller.dart';
 import 'fight_prep_screen.dart';
 import 'fight_settings.dart';
 import 'fight_sounds.dart';
+import 'hero_art.dart';
 import 'lane_field.dart';
+import '../../app/art/art.dart';
 
 /// One boss fight, opened from [FightPrepScreen]. Starting it spends a
 /// token (the Overlord needs none); leaving early or putting the app in the
@@ -227,6 +230,22 @@ class _FightScreenState extends ConsumerState<FightScreen> {
     super.dispose();
   }
 
+  /// The person's hero, in the gear they brought to this fight.
+  Widget _hero() {
+    final person = ref.read(currentProfileProvider);
+    return HeroArt(
+      skin: person.avatarSkin,
+      hair: person.avatarHair,
+      cape: person.avatarCape,
+      hat: person.avatarHat,
+      gear: {
+        for (final MapEntry(:key, :value) in widget.loadout.gear.entries)
+          key: value.key,
+      },
+      size: 64,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Fights always take place at night, in the app's dungeon colors.
@@ -263,7 +282,11 @@ class _FightScreenState extends ConsumerState<FightScreen> {
                         curseWaits: _curses && !_controller.duel.storyMode,
                         onSecondWind: _useSecondWind,
                       )
-                    : _Duel(controller: _controller, onLeave: _confirmLeave),
+                    : _Duel(
+                        controller: _controller,
+                        onLeave: _confirmLeave,
+                        hero: _hero(),
+                      ),
               ),
             ),
           ),
@@ -274,10 +297,15 @@ class _FightScreenState extends ConsumerState<FightScreen> {
 }
 
 class _Duel extends StatelessWidget {
-  const _Duel({required this.controller, required this.onLeave});
+  const _Duel({
+    required this.controller,
+    required this.onLeave,
+    required this.hero,
+  });
 
   final FightController controller;
   final VoidCallback onLeave;
+  final Widget hero;
 
   @override
   Widget build(BuildContext context) {
@@ -291,15 +319,18 @@ class _Duel extends StatelessWidget {
     final hitNow = lanes
         ? c.lastLaneHit != null && c.lastLaneHit != Hit.miss
         : c.stage == FightStage.judged && c.lastHits.any((h) => h != Hit.miss);
+    final judgedText = l10n.fightJudged(
+      c.lastHits.where((h) => h == Hit.perfect).length,
+      c.lastHits.where((h) => h == Hit.good).length,
+      c.lastHits.where((h) => h == Hit.miss).length,
+    );
     final status = switch (c.stage) {
+      // The last judgement stays readable while the start button waits.
+      FightStage.ready => c.lastHits.isEmpty ? l10n.fightReady : judgedText,
       FightStage.intro => l10n.fightGetReady,
       FightStage.call => l10n.fightListen(c.pattern!.beatsMs.length),
       FightStage.echo => l10n.fightYourTurn,
-      FightStage.judged => l10n.fightJudged(
-        c.lastHits.where((h) => h == Hit.perfect).length,
-        c.lastHits.where((h) => h == Hit.good).length,
-        c.lastHits.where((h) => h == Hit.miss).length,
-      ),
+      FightStage.judged => judgedText,
       FightStage.lanes => switch (c.lastLaneHit) {
         null => l10n.fightLanes,
         Hit.perfect => l10n.hitPerfect,
@@ -308,6 +339,15 @@ class _Duel extends StatelessWidget {
       },
       FightStage.finished => '',
     };
+
+    final notes = [
+      if (duel.storyMode)
+        l10n.fightSettingStory
+      else if (duel.freeMissesLeft > 0)
+        l10n.fightFreeMisses(duel.freeMissesLeft),
+      if (duel.loadout.curse case final curse?)
+        l10n.curseTitle(curseName(l10n, curse.family)),
+    ].join(' · ');
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -318,7 +358,7 @@ class _Duel extends StatelessWidget {
               IconButton(
                 tooltip: l10n.fightLeave,
                 onPressed: onLeave,
-                icon: const Icon(Icons.close),
+                icon: const PixelIcon(Sprites.uiClose),
               ),
               const SizedBox(width: 4),
               Expanded(
@@ -351,8 +391,10 @@ class _Duel extends StatelessWidget {
           const SizedBox(height: 8),
           BossArt(
             family: duel.family,
-            size: lanes ? 96 : 170,
+            size: lanes ? 96 : 144,
             mood: hitNow ? BossMood.hit : BossMood.idle,
+            // A bounce on every beat of the boss's call.
+            bob: c.stage == FightStage.call && c.litBeat.isOdd,
           ),
           const SizedBox(height: 8),
           Row(
@@ -396,41 +438,55 @@ class _Duel extends StatelessWidget {
           if (lanes)
             Expanded(child: LaneField(controller: c))
           else ...[
-            _BeatRow(controller: c),
+            BeatTimeline(controller: c),
             Expanded(
               child: Center(
-                child: _Pad(enabled: c.stage == FightStage.echo, onTap: c.tap),
+                child: c.stage == FightStage.ready
+                    ? _StartButton(
+                        label: c.lanesNext
+                            ? l10n.fightStartLanes
+                            : l10n.fightStartRound,
+                        onPressed: c.go,
+                      )
+                    : _Pad(enabled: c.stage == FightStage.echo, onTap: c.tap),
               ),
             ),
           ],
           const SizedBox(height: 8),
           Row(
             children: [
-              Semantics(
-                label: l10n.fightHealth(duel.heroHp, duel.hero.maxHp),
-                child: ExcludeSemantics(
-                  child: Wrap(
-                    spacing: 2,
-                    children: [
-                      for (var i = 0; i < duel.hero.maxHp; i++)
-                        PixelHeart(full: i < duel.heroHp),
-                    ],
-                  ),
-                ),
+              _FightHero(
+                // A new judgement each time one of these counts goes up.
+                judgements: duel.perfect + duel.good + duel.miss,
+                hit: lanes
+                    ? c.lastLaneHit != Hit.miss
+                    : !c.lastHits.contains(Hit.miss),
+                child: hero,
               ),
               const SizedBox(width: 8),
+              // Hearts, and below them what helps or hinders in this fight.
               Expanded(
-                child: Text(
-                  [
-                    if (duel.storyMode)
-                      l10n.fightSettingStory
-                    else if (duel.freeMissesLeft > 0)
-                      l10n.fightFreeMisses(duel.freeMissesLeft),
-                    if (duel.loadout.curse case final curse?)
-                      l10n.curseTitle(curseName(l10n, curse.family)),
-                  ].join(' · '),
-                  textAlign: TextAlign.end,
-                  style: theme.textTheme.bodySmall,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Semantics(
+                      label: l10n.fightHealth(duel.heroHp, duel.hero.maxHp),
+                      child: ExcludeSemantics(
+                        child: Wrap(
+                          spacing: 2,
+                          runSpacing: 2,
+                          children: [
+                            for (var i = 0; i < duel.hero.maxHp; i++)
+                              PixelHeart(full: i < duel.heroHp),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (notes.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(notes, style: theme.textTheme.bodySmall),
+                    ],
+                  ],
                 ),
               ),
             ],
@@ -441,71 +497,80 @@ class _Duel extends StatelessWidget {
   }
 }
 
-/// The pattern's beats: lit during the call, filling up during the echo,
-/// and showing each judgement (shape + text, not color alone) afterwards.
-class _BeatRow extends StatelessWidget {
-  const _BeatRow({required this.controller});
+/// Starts the next round. It sits where the pad is, the same size, so the
+/// thumb is already in place for the echo.
+class _StartButton extends StatelessWidget {
+  const _StartButton({required this.label, required this.onPressed});
 
-  final FightController controller;
+  final String label;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final c = controller;
-    final count = c.pattern?.beatsMs.length ?? 0;
-    if (c.stage == FightStage.judged) {
-      return Wrap(
-        spacing: 12,
-        runSpacing: 8,
-        alignment: WrapAlignment.center,
+    return FilledButton(
+      key: const ValueKey('fight-start'),
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        fixedSize: const Size.square(220),
+        shape: CircleBorder(
+          side: BorderSide(color: scheme.tertiaryContainer, width: 10),
+        ),
+        backgroundColor: scheme.tertiary,
+        foregroundColor: scheme.onTertiary,
+        padding: const EdgeInsets.all(28),
+        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+      ),
+      // One word per line, shrunk to fit at large font sizes, so no word
+      // breaks in the middle.
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          for (final hit in c.lastHits)
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  switch (hit) {
-                    Hit.perfect => Icons.check_circle,
-                    Hit.good => Icons.adjust,
-                    Hit.miss => Icons.cancel,
-                  },
-                  color: hit == Hit.miss ? scheme.error : scheme.primary,
-                  size: 28,
-                ),
-                Text(switch (hit) {
-                  Hit.perfect => l10n.hitPerfect,
-                  Hit.good => l10n.hitGood,
-                  Hit.miss => l10n.hitMiss,
-                }, style: Theme.of(context).textTheme.labelSmall),
-              ],
-            ),
-        ],
-      );
-    }
-    return SizedBox(
-      height: 48,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (var i = 0; i < count; i++)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 9),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 80),
-                width: i == c.litBeat ? 34 : 22,
-                height: i == c.litBeat ? 34 : 22,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: c.stage == FightStage.call
-                      ? (i <= c.litBeat ? scheme.onSurface : null)
-                      : (i < c.tapCount ? scheme.primary : null),
-                  border: Border.all(color: scheme.outline, width: 2),
-                ),
+          const PixelIcon(Sprites.uiPlay, size: 32),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label.replaceAll(' ', '\n'),
+                textAlign: TextAlign.center,
               ),
             ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// The hero beside the hearts: a hop after a clean round, a shake after a
+/// miss. Still with the system's "remove animations" on.
+class _FightHero extends StatelessWidget {
+  const _FightHero({
+    required this.judgements,
+    required this.hit,
+    required this.child,
+  });
+
+  final int judgements;
+  final bool hit;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context) || judgements == 0) {
+      return child;
+    }
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(judgements),
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 360),
+      builder: (context, t, child) => Transform.translate(
+        offset: hit
+            ? Offset(0, -6 * sin(t * pi))
+            : Offset(4 * sin(t * pi * 4) * (1 - t), 0),
+        child: child,
+      ),
+      child: child,
     );
   }
 }
@@ -614,13 +679,8 @@ class _Result extends ConsumerWidget {
       children: [
         Center(
           child: won
-              ? Icon(
-                  Icons.emoji_events,
-                  size: 120,
-                  color: const Color(0xFFE6C463),
-                  semanticLabel: trophyName(l10n, family),
-                )
-              : BossArt(family: family, size: 140),
+              ? PixelTrophy(size: 128, semanticLabel: trophyName(l10n, family))
+              : BossArt(family: family, size: 144),
         ),
         const SizedBox(height: 12),
         Text(
@@ -685,7 +745,7 @@ class _Result extends ConsumerWidget {
         if (!won && secondWinds > 0) ...[
           FilledButton.icon(
             onPressed: onSecondWind,
-            icon: const Icon(Icons.air),
+            icon: const PixelIcon(Sprites.questAir),
             label: Text(l10n.fightSecondWind(secondWinds)),
           ),
           const SizedBox(height: 8),
@@ -751,7 +811,7 @@ class _LootCard extends ConsumerWidget {
                     const SizedBox(height: 6),
                     if (worn)
                       Chip(
-                        avatar: const Icon(Icons.check, size: 16),
+                        avatar: const PixelIcon(Sprites.uiCheck, size: 16),
                         label: Text(l10n.shopWorn),
                       )
                     else

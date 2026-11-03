@@ -1,0 +1,51 @@
+GIMP Palette
+Name: Bosses
+Columns: 8
+#
+ 26  22  30	outline
+250 250 246	white
+230 196  99	gold
+176 140  52	gold_shade
+229  57  53	red
+168  36  34	red_shade
+141 110  99	wood
+206 238 252	bubble
+255 202  40	junk_yellow
+ 84 110 122	crack
+240 140 150	blush
+185 163 196	dust
+133 117 141	dust_shade
+215 196 222	dust_light
+176 161 182	dust_light_shade
+  0 131 143	laundry
+  0  94 103	laundry_shade
+ 77 182 195	laundry_light
+ 63 149 160	laundry_light_shade
+244 162  89	kitchen
+176 117  64	kitchen_shade
+224 138  60	kitchen_light
+184 113  49	kitchen_light_shade
+144 164 174	bath
+104 118 125	bath_shade
+207 216 220	bath_light
+170 177 180	bath_light_shade
+109 127  63	trash
+ 78  91  45	trash_shade
+156 175 106	trash_light
+128 144  87	trash_light_shade
+159 168 218	bedroom
+114 121 157	bedroom_shade
+197 202 233	bedroom_light
+162 166 191	bedroom_light_shade
+129 212 250	outside
+ 93 153 180	outside_shade
+179 229 252	outside_light
+147 188 207	outside_light_shade
+120 144 156	clutter
+ 86 104 112	clutter_shade
+176 190 197	clutter_light
+144 156 162	clutter_light_shade
+ 94  53 177	overlord
+ 68  38 127	overlord_shade
+179 157 219	overlord_light
+147 129 180	overlord_light_shade

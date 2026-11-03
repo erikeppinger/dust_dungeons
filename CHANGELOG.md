@@ -8,6 +8,45 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-03
+From the first testers' feedback ([design](docs/design/fight-feedback.md)).
+
+### Added
+- **Start button before every round:** the fight waits for "Show rhythm" before the boss plays,
+  and for "Start" before the Overlord's lanes. It sits where the pad is, and the last judgement
+  stays readable while it waits.
+- **Rhythm timeline:** the beats sit at their real times on a line, with the beat grid and the
+  count-in, and a playhead sweeps across during the boss's call and during your echo. After a
+  round, each beat shows its judgement by shape, and ticks show where you tapped. With "remove
+  animations" on, the playhead moves pulse by pulse.
+- **Pixel hero that wears its gear:** the hero is now a 32×32 sprite in the Wardrobe's colors, and
+  every gear item and hat has its look on the hero. Worn head gear covers the hat. The hero shows
+  its gear in the Arena, the Wardrobe, People, the top bar and on the Gear screen, and stands
+  beside the hearts in fights, hopping after a clean round and shaking after a miss.
+- `build_game_data.py` checks that every gear item and hat has its look at
+  `assets/art/hero/wear/<key>.png`.
+- **All art is pixel art now:**
+  - **Bosses:** the nine bosses are 48×48 sprites, redrawn from their old shapes. Each has four
+    frames: idle, a bob, hit and defeated. In fights the boss bounces on the beats of its call.
+  - **Quest icons:** the 45 quest icons are 12×12 pixel icons in the quest's color, in the
+    quest list, the editor, the plan, the stats and the home widget.
+  - **Trophy:** the trophy for a won fight and in the Hall of Fame is pixel art.
+  - **Level coin:** the coin beside your level shows the level number.
+  - **UI symbols:** every icon in the app is a 12×12 pixel icon now, from settings and buttons to
+    the fight's ✓/◎/✗ marks, the back arrow and the segmented buttons' check mark.
+  - **Streak flame** in red and gold; quests completed show a plain check.
+- Outlined buttons, chips and segmented buttons have the same light and shaded edge as the
+  other pixel boxes.
+
+### Changed
+- A new hat needs no code any more: its drawing in `assets/art/hero/wear/` is enough.
+- Art: `hero` and `bosses` palette groups, and folder rules can give their sprites a name
+  `prefix`.
+- Bosses and trophies are shown at whole-pixel sizes (the fight's boss is 144 dp, not 170).
+- The clutter boss is now called **Clutter Gremlin** in English: "Imp" read as "lmp" in the app's
+  font. The German name stays Krempel-Kobold.
+- Roadmap: the beta moves to 0.14.0.
+
 ## [0.12.0] - 2026-11-03
 ### Added
 - **Game data catalog** ([design](docs/design/game-data.md), [how to](game/README.md)): items,

@@ -47,7 +47,7 @@ tempo = { bpm = 112, offbeat = 0.1, eighth = 0.5 }
 curse = { kind = "slot_off", slot = "feet", name = { en = "Muddy Boots", de = "Matschstiefel" } }
 
 [bosses.clutter]
-name = { en = "Clutter Imp", de = "Krempel-Kobold" }
+name = { en = "Clutter Gremlin", de = "Krempel-Kobold" }
 fed_by = { en = "your own quests", de = "deine eigenen Quests" }
 trophy = { en = "Tidy Crown", de = "Ordnungskrone" }
 tempo = { bpm = 104, offbeat = 0.25, eighth = 0.35 }

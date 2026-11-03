@@ -152,6 +152,40 @@ Back to front:
   - TalkBack on the start button
   - the hero with full gear and a two-handed weapon on every screen
 
+## As built (changes to the plan)
+- **No "get ready" before the first button:** the fight opens on the start button. After the
+  tap, a 400 ms "get ready" leads into the call (it was 1.5 s without the button).
+- **The button** stacks the icon and one word per line, shrunk to fit, so "Rhythmus zeigen" never
+  breaks mid-word at 200 %.
+- **Dots** go down to 10 dp when beats sit close, not 12.
+- **The judgement's words** stay in the status line ("Perfect 1 · Good 0 · Miss 1"). The timeline
+  shows the icons only, because words under close dots would overlap.
+- **Not done:**
+  - The map's tiny hero stays drawn in code, without gear: 32×32 doesn't fit a 16-pixel tile.
+  - The Armory's gear tiles keep their icons. A hero in each tile would be too small to tell
+    the items apart.
+- **The Arena card's hero** is 96 dp (3×) and the fight's 64 dp (2×). Below 32 dp (the Wardrobe's
+  hat chips) the hero scales down evenly.
+- **The layers' colors** match their icons (the cape and the apron were changed for that).
+
+## Also in 0.13.0: the rest of the art (2026-11-03)
+So that everything looks the same, the last vector and font art was redrawn as pixel art:
+- **Bosses:** 48×48 strips of four frames, ported from the old shapes, so each boss keeps its
+  silhouette. The fight's boss bobs on its beats.
+- **Quest icons:** 45 icons plus a fallback, 12×12 in the mask palette. The keys stay the same, so
+  stored quests keep their icons.
+- **Trophy:** pixel art, in the ui palette.
+- **Level coin:** a blank coin with the level stamped on it in 3×5 pixel digits, up to 99. From
+  100 on, it shows the plain coin.
+- **UI icons:** the remaining Material icons were redrawn too, 12×12 in the mask palette
+  (`assets/art/ui/`), including Flutter's back arrow and the segmented buttons' check mark (set in
+  the theme). Only the platform's own controls (switches, checkboxes, dropdown arrows) stay as
+  they are.
+- **Three quest icons** were redrawn after the testers' look, from options shown first: recycling
+  (a bottle into a bin), the fridge (with a spray bottle) and folding laundry (a T-shirt). All
+  icons are centered automatically.
+- **Clutter Gremlin:** the English name "Clutter Imp" read as "lmp" in the app's font.
+
 ## Version
 **0.13.0**, decided 2026-11-03. The beta moves to 0.14.0.
 

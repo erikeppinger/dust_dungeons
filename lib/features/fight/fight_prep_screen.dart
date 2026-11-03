@@ -14,6 +14,8 @@ import '../world/items_text.dart';
 import 'boss_art.dart';
 import 'fight_screen.dart';
 import 'fight_settings.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Before a fight: the gear worn, a waiting curse, consumables to pick and
 /// which owned items are good against this boss.
@@ -127,7 +129,7 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
         children: [
           Row(
             children: [
-              BossArt(family: family, size: 72),
+              BossArt(family: family, size: 96),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -185,7 +187,7 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
               padding: const EdgeInsets.only(top: 8),
               child: Row(
                 children: [
-                  const Icon(Icons.star_outline, size: 20),
+                  const PixelIcon(Sprites.uiStar, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -201,7 +203,7 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
             alignment: AlignmentDirectional.centerStart,
             child: TextButton.icon(
               onPressed: () => GearScreen.open(context),
-              icon: const Icon(Icons.backpack_outlined),
+              icon: const PixelIcon(Sprites.uiBackpack),
               label: Text(l10n.prepChangeGear),
             ),
           ),

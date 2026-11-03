@@ -56,6 +56,12 @@ class GameDataTest(unittest.TestCase):
                                "effects": {"damage": 1}}
         self.fails(lambda: self.check_items(items), "assets/art/items/golden_mop.png")
 
+    def test_missing_wear_layer(self):
+        items = copy.deepcopy(self.items["items"])
+        items["hat_top"] = {"kind": "hat", "price": 10, "look": 5,
+                            "name": {"en": "Top hat", "de": "Zylinder"}}
+        self.fails(lambda: self.check_items(items), "assets/art/hero/wear/hat_top.png")
+
     def test_missing_german(self):
         items = copy.deepcopy(self.items["items"])
         del items["turbo_mop"]["name"]["de"]

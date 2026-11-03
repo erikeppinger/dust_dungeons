@@ -157,4 +157,43 @@ void main() {
       }
     });
   });
+
+  group('wear layers', () {
+    test('back to front, the weapon in front', () {
+      expect(
+        wearLayers({
+          GearSlot.weapon: 'turbo_mop',
+          GearSlot.head: 'colander_of_clarity',
+          GearSlot.feet: 'rubber_boots',
+          GearSlot.body: 'hi_vis_vest',
+          GearSlot.charm: 'garden_gnome',
+          GearSlot.shield: 'sponge_shield',
+        }, 0),
+        [
+          'hi_vis_vest',
+          'rubber_boots',
+          'garden_gnome',
+          'sponge_shield',
+          'colander_of_clarity',
+          'turbo_mop',
+        ],
+      );
+    });
+
+    test('head gear covers the hat; the hat shows without it', () {
+      expect(wearLayers({GearSlot.head: 'laundry_basket_helm'}, 4), [
+        'laundry_basket_helm',
+      ]);
+      expect(wearLayers({GearSlot.weapon: 'mop_of_doom'}, 4), [
+        'hat_crown',
+        'mop_of_doom',
+      ]);
+      expect(wearLayers(const {}, 0), isEmpty);
+    });
+
+    test('unknown keys and looks are skipped', () {
+      expect(wearLayers({GearSlot.head: 'gone_item'}, 99), isEmpty);
+      expect(wearLayers({GearSlot.head: 'gone_item'}, 1), ['hat_cap']);
+    });
+  });
 }

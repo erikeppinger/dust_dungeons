@@ -18,6 +18,7 @@ import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'screen_time_providers.dart';
 import 'screen_time_service.dart';
+import '../../app/art/art.dart';
 
 /// Apps with a launcher icon, loaded once for names and icons.
 final launcherAppsProvider = FutureProvider<List<LauncherApp>>(
@@ -63,7 +64,7 @@ class ScreenTimeScreen extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.lock_outline, color: theme.colorScheme.primary),
+                PixelIcon(Sprites.uiLock, color: theme.colorScheme.primary),
                 const SizedBox(width: 8),
                 Expanded(child: Text(l10n.screenPrivacy)),
               ],
@@ -234,7 +235,7 @@ class _TodayCard extends ConsumerWidget {
                     OutlinedButton.icon(
                       key: ValueKey('use-${voucher.key}'),
                       onPressed: () => _useVoucher(context, ref, voucher),
-                      icon: const Icon(Icons.hourglass_bottom),
+                      icon: const PixelIcon(Sprites.uiHourglass),
                       label: Text(
                         l10n.screenUseVoucher(
                           voucher.minutes,
@@ -276,7 +277,7 @@ class _PerApp extends ConsumerWidget {
           for (final e in today.perApp)
             ListTile(
               leading: apps[e.key] == null
-                  ? const Icon(Icons.apps)
+                  ? const PixelIcon(Sprites.uiApps)
                   : Image.memory(apps[e.key]!.icon, width: 32, height: 32),
               title: Text(apps[e.key]?.label ?? e.key),
               trailing: Text(l10n.screenMinutes(e.value)),
@@ -342,8 +343,8 @@ class _History extends ConsumerWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   if (over)
-                                    Icon(
-                                      Icons.warning_amber,
+                                    PixelIcon(
+                                      Sprites.uiWarning,
                                       size: 16,
                                       color: scheme.error,
                                     ),
@@ -434,10 +435,10 @@ class _Settings extends ConsumerWidget {
             trailing: Text(l10n.screenMinutes(s.screenEarnCap)),
           ),
           ListTile(
-            leading: const Icon(Icons.apps),
+            leading: const PixelIcon(Sprites.uiApps),
             title: Text(l10n.screenApps),
             subtitle: Text(l10n.screenAppsCount(s.screenApps.length)),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: const PixelIcon(Sprites.uiChevronRight),
             onTap: () => AppPickerScreen.open(context),
           ),
           SwitchListTile(
@@ -557,8 +558,8 @@ class ScreenTimeBar extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      warn ? Icons.warning_amber : Icons.phone_android,
+                    PixelIcon(
+                      warn ? Sprites.uiWarning : Sprites.uiPhone,
                       size: 18,
                       color: foreground,
                     ),

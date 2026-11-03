@@ -16,6 +16,7 @@ import '../chores/chore_titles.dart';
 import '../chores/schedule_text.dart';
 import 'leaderboard_card.dart';
 import 'realm_card.dart';
+import '../../app/art/art.dart';
 
 /// Level, streaks, point totals, the last 7 days and the most done chores.
 class StatsScreen extends ConsumerWidget {
@@ -45,14 +46,17 @@ class StatsScreen extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _StatTile(
-                      icon: Icons.local_fire_department,
+                      icon: const PixelFlame(),
                       value: l10n.streakDays(stats.currentStreak),
                       label: l10n.statsBestStreak(stats.bestStreak),
                     ),
                   ),
                   Expanded(
                     child: _StatTile(
-                      icon: Icons.task_alt,
+                      icon: PixelIcon(
+                        Sprites.uiCheck,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       value: '${stats.completions}',
                       label: l10n.statsChoresDone,
                     ),
@@ -113,7 +117,7 @@ class LevelCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const PixelCoin(size: 36),
+                LevelCoin(level: stats.level, size: 36),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
@@ -150,7 +154,7 @@ class _StatTile extends StatelessWidget {
     required this.label,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String value;
   final String label;
 
@@ -163,7 +167,7 @@ class _StatTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: theme.colorScheme.primary),
+            icon,
             const SizedBox(height: 8),
             Text(value, style: theme.textTheme.titleLarge),
             Text(label, style: theme.textTheme.bodySmall),
@@ -267,9 +271,8 @@ class _TopChores extends ConsumerWidget {
             leading: CircleAvatar(
               radius: 18,
               backgroundColor: palette.colorFor(chore.colorKey),
-              child: Icon(
-                choreIcon(chore.iconKey),
-                size: 20,
+              child: ChoreIcon(
+                chore.iconKey,
                 color: palette.onColorFor(chore.colorKey),
               ),
             ),

@@ -10,6 +10,8 @@ import '../chores/chore_titles.dart';
 import '../notifications/notification_settings.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// First start: welcome and language, which chores apply, then colors and
 /// reminders. Everything can be changed later in the settings.
@@ -139,7 +141,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 class _Page extends StatelessWidget {
   const _Page({required this.title, required this.children, this.icon});
 
-  final IconData? icon;
+  final Sprite? icon;
   final String title;
   final List<Widget> children;
 
@@ -149,8 +151,8 @@ class _Page extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
       children: [
-        if (icon != null) ...[
-          Icon(icon, size: 72, color: theme.colorScheme.primary),
+        if (icon case final icon?) ...[
+          PixelIcon(icon, size: 72, color: theme.colorScheme.primary),
           const SizedBox(height: 16),
         ],
         Semantics(
@@ -174,7 +176,7 @@ class _WelcomePage extends ConsumerWidget {
     final locale = ref.watch(settingsProvider).locale?.languageCode;
     final controller = ref.read(settingsProvider.notifier);
     return _Page(
-      icon: Icons.cleaning_services,
+      icon: Sprites.questCleaningServices,
       title: l10n.onboardingWelcomeTitle,
       children: [
         Text(l10n.onboardingWelcomeBody, style: theme.textTheme.bodyLarge),
@@ -182,7 +184,7 @@ class _WelcomePage extends ConsumerWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.lock_outline, color: theme.colorScheme.primary),
+            PixelIcon(Sprites.uiLock, color: theme.colorScheme.primary),
             const SizedBox(width: 8),
             Expanded(child: Text(l10n.onboardingPrivacy)),
           ],
@@ -234,8 +236,8 @@ class _ChoresPage extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             secondary: CircleAvatar(
               backgroundColor: palette.colorFor(chore.colorKey),
-              child: Icon(
-                choreIcon(chore.iconKey),
+              child: ChoreIcon(
+                chore.iconKey,
                 color: palette.onColorFor(chore.colorKey),
               ),
             ),
@@ -261,7 +263,7 @@ class _SetupPage extends ConsumerWidget {
       children: [
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          secondary: const Icon(Icons.visibility),
+          secondary: const PixelIcon(Sprites.uiEye),
           title: Text(l10n.settingsColorblind),
           subtitle: Text(l10n.settingsColorblindSubtitle),
           value: settings.colorblindSafe,
@@ -269,7 +271,7 @@ class _SetupPage extends ConsumerWidget {
         ),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          secondary: const Icon(Icons.notifications_outlined),
+          secondary: const PixelIcon(Sprites.uiBell),
           title: Text(l10n.onboardingNotifications),
           subtitle: Text(l10n.onboardingNotificationsSubtitle),
           value: settings.notificationsEnabled,

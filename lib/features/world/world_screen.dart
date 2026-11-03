@@ -23,6 +23,7 @@ import 'avatar_editor.dart';
 import 'gear_screen.dart';
 import 'quest_map.dart';
 import 'shop_screen.dart';
+import '../../app/art/art.dart';
 
 /// The hub: your hero, the weekly Overlord, the bosses with their tokens,
 /// and the trophy shelf.
@@ -86,9 +87,9 @@ class WorldScreen extends ConsumerWidget {
         _TrophyShelf(progress: progress),
         const SizedBox(height: 8),
         ListTile(
-          leading: const Icon(Icons.tune),
+          leading: const PixelIcon(Sprites.uiTune),
           title: Text(l10n.settingsFights),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: const PixelIcon(Sprites.uiChevronRight),
           onTap: () => SettingsPage.open(
             context,
             (l) => l.settingsFights,
@@ -126,6 +127,8 @@ class _HeroCard extends ConsumerWidget {
               hair: person.avatarHair,
               cape: person.avatarCape,
               hat: person.avatarHat,
+              gear: ref.watch(equippedProvider).value ?? const {},
+              size: 96,
               semanticLabel: l10n.worldHeroLevel(level),
             ),
             const SizedBox(width: 16),
@@ -156,7 +159,7 @@ class _HeroCard extends ConsumerWidget {
                         triggerMode: TooltipTriggerMode.tap,
                         child: Chip(
                           key: const ValueKey('tired'),
-                          avatar: const Icon(Icons.bedtime_outlined, size: 18),
+                          avatar: const PixelIcon(Sprites.uiMoon, size: 18),
                           label: Text(l10n.screenTired),
                           visualDensity: VisualDensity.compact,
                         ),
@@ -367,7 +370,7 @@ class _TrophyShelf extends StatelessWidget {
         children: [
           for (final family in won)
             ListTile(
-              leading: const Icon(Icons.emoji_events, color: Color(0xFFE6C463)),
+              leading: const PixelTrophy(size: 32),
               title: Text(trophyName(l10n, family)),
               subtitle: Text(
                 l10n.worldTrophyWins(

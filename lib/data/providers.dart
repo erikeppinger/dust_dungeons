@@ -243,6 +243,12 @@ final equippedProvider = StreamProvider<Map<GearSlot, String>>(
       .watchEquipped(ref.watch(currentProfileIdProvider)),
 );
 
+/// The gear [profileId] wears: slot → item key (for heroes of other people).
+final equippedOfProvider = StreamProvider.family<Map<GearSlot, String>, int>(
+  (ref, profileId) =>
+      ref.watch(shopRepositoryProvider).watchEquipped(profileId),
+);
+
 /// The curse waiting for the current person's next fight, or `null`.
 /// Turning curses off lifts every waiting one.
 final curseProvider = Provider<Curse?>((ref) {

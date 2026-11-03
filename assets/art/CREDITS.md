@@ -6,3 +6,5 @@ below says otherwise. When you add art, add a line: files, author, license, sour
 | Files | Author | License | Source |
 |---|---|---|---|
 | `icons/*`, `map/*`, `palettes/*` | Homework & Chores contributors | GPL-3.0 | Drawn for this app (0.6–0.7) |
+| `items/*` | Homework & Chores contributors | GPL-3.0 | Drawn for this app (0.11) |
+| `hero/*`, `bosses/*`, `quests/*`, `ui/*`, `icons/trophy.png`, `icons/flame.png`, `icons/coin_blank.png` | Homework & Chores contributors | GPL-3.0 | Drawn for this app (0.13) |

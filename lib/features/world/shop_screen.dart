@@ -13,6 +13,7 @@ import '../../l10n/app_localizations.dart';
 import '../fight/hero_art.dart';
 import '../screen_time/screen_time_providers.dart';
 import 'items_text.dart';
+import '../../app/art/art.dart';
 
 /// Spend points on gear, consumables and hats. Spending never lowers XP.
 class ShopScreen extends ConsumerWidget {
@@ -83,7 +84,7 @@ class ShopScreen extends ConsumerWidget {
         ),
         trailing: ownedOnce
             ? Chip(
-                avatar: const Icon(Icons.check, size: 16),
+                avatar: const PixelIcon(Sprites.uiCheck, size: 16),
                 label: Text(
                   worn.contains(item.key) ? l10n.shopWorn : l10n.shopOwned,
                 ),

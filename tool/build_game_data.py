@@ -208,6 +208,12 @@ def check_items(items, bosses_all):
             icon = ROOT / "assets" / "art" / "items" / f"{key}.png"
             if not icon.exists():
                 raise DataError(f"{w}: needs an icon at assets/art/items/{key}.png")
+        if kind in ("gear", "hat") and not it.get("retired"):
+            wear = ROOT / "assets" / "art" / "hero" / "wear" / f"{key}.png"
+            if not wear.exists():
+                raise DataError(
+                    f"{w}: needs its look on the hero at assets/art/hero/wear/{key}.png"
+                )
         list(texts_in(it, w))
     if sorted(looks) != list(range(1, len(looks) + 1)):
         raise DataError(f"game/items.toml: hat looks must be 1, 2, 3 … without gaps, not {sorted(looks)}")
@@ -234,7 +240,7 @@ def check_bosses(bosses, all_bosses):
 
 def check_quests(quests):
     icons_src = (ROOT / "lib/features/chores/chore_icons.dart").read_text(encoding="utf-8")
-    icons = set(re.findall(r"^\s*'(\w+)': Icons\.", icons_src, re.M))
+    icons = set(re.findall(r"^\s*'(\w+)': Sprites\.", icons_src, re.M))
     for key, q in quests.items():
         w = f"game/quests.toml: [quests.{key}]"
         if q["points"] % 5:

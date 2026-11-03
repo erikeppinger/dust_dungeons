@@ -7,6 +7,8 @@ import '../../app/art/art_gallery.dart';
 import '../../app/theme/chore_palette.dart';
 import '../../l10n/app_localizations.dart';
 import 'settings_controller.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Language names are shown in their own language, so they are not translated.
 const languageNames = {'de': 'Deutsch', 'en': 'English'};
@@ -62,17 +64,17 @@ class AppearanceSettings extends ConsumerWidget {
               segments: [
                 ButtonSegment(
                   value: ThemeMode.system,
-                  icon: const Icon(Icons.brightness_auto),
+                  icon: const PixelIcon(Sprites.uiAutoBrightness),
                   label: Text(l10n.themeSystem),
                 ),
                 ButtonSegment(
                   value: ThemeMode.light,
-                  icon: const Icon(Icons.light_mode),
+                  icon: const PixelIcon(Sprites.uiSun),
                   label: Text(l10n.themeLight),
                 ),
                 ButtonSegment(
                   value: ThemeMode.dark,
-                  icon: const Icon(Icons.dark_mode),
+                  icon: const PixelIcon(Sprites.uiMoon),
                   label: Text(l10n.themeDark),
                 ),
               ],
@@ -82,7 +84,7 @@ class AppearanceSettings extends ConsumerWidget {
           ),
         ),
         SwitchListTile(
-          secondary: const Icon(Icons.visibility),
+          secondary: const PixelIcon(Sprites.uiEye),
           title: Text(l10n.settingsColorblind),
           subtitle: Text(l10n.settingsColorblindSubtitle),
           value: settings.colorblindSafe,
@@ -146,27 +148,27 @@ class AboutSettings extends ConsumerWidget {
     return Column(
       children: [
         ListTile(
-          leading: const Icon(Icons.lock_outline),
+          leading: const PixelIcon(Sprites.uiLock),
           title: Text(l10n.aboutPrivacy),
         ),
         ListTile(
-          leading: const Icon(Icons.code),
+          leading: const PixelIcon(Sprites.uiCode),
           title: Text(l10n.aboutLicense),
         ),
         if (version != null)
           ListTile(
-            leading: const Icon(Icons.tag),
+            leading: const PixelIcon(Sprites.uiTag),
             title: Text(l10n.aboutVersion(version)),
           ),
         // For checking new pixel art (docs/ART_GUIDE.md).
         if (kDebugMode)
           ListTile(
-            leading: const Icon(Icons.palette_outlined),
+            leading: const PixelIcon(Sprites.uiPalette),
             title: Text(l10n.artGallery),
             onTap: () => ArtGallery.open(context),
           ),
         ListTile(
-          leading: const Icon(Icons.school_outlined),
+          leading: const PixelIcon(Sprites.uiSchool),
           title: Text(l10n.aboutReplayIntro),
           onTap: () {
             ref

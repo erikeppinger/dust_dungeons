@@ -1,59 +1,76 @@
 import 'package:flutter/material.dart';
 
-/// Icons a chore can use, by stable key (stored in the database).
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
+
+/// Icons a chore can use, by stable key (stored in the database): 12×12
+/// pixel icons in `assets/art/quests/`, tinted like the tab icons.
 /// Keys must never change; new icons may be appended.
-const choreIcons = <String, IconData>{
+const choreIcons = <String, Sprite>{
   // Built-in chores
-  'auto_awesome': Icons.auto_awesome,
-  'cleaning_services': Icons.cleaning_services,
-  'air': Icons.air,
-  'water_drop': Icons.water_drop,
-  'soap': Icons.soap,
-  'flatware': Icons.flatware,
-  'local_laundry_service': Icons.local_laundry_service,
-  'checkroom': Icons.checkroom,
-  'layers': Icons.layers,
-  'iron': Icons.iron,
-  'bathtub': Icons.bathtub,
-  'wc': Icons.wc,
-  'countertops': Icons.countertops,
-  'delete': Icons.delete,
-  'recycling': Icons.recycling,
-  'bed': Icons.bed,
-  'window': Icons.window,
-  'kitchen': Icons.kitchen,
-  'shopping_cart': Icons.shopping_cart,
-  'local_florist': Icons.local_florist,
-  'inventory_2': Icons.inventory_2,
+  'auto_awesome': Sprites.questAutoAwesome,
+  'cleaning_services': Sprites.questCleaningServices,
+  'air': Sprites.questAir,
+  'water_drop': Sprites.questWaterDrop,
+  'soap': Sprites.questSoap,
+  'flatware': Sprites.questFlatware,
+  'local_laundry_service': Sprites.questLocalLaundryService,
+  'checkroom': Sprites.questCheckroom,
+  'layers': Sprites.questLayers,
+  'iron': Sprites.questIron,
+  'bathtub': Sprites.questBathtub,
+  'wc': Sprites.questWc,
+  'countertops': Sprites.questCountertops,
+  'delete': Sprites.questDelete,
+  'recycling': Sprites.questRecycling,
+  'bed': Sprites.questBed,
+  'window': Sprites.questWindow,
+  'kitchen': Sprites.questKitchen,
+  'shopping_cart': Sprites.questShoppingCart,
+  'local_florist': Sprites.questLocalFlorist,
+  'inventory_2': Sprites.questInventory2,
   // Extra choices for user chores
-  'restaurant': Icons.restaurant,
-  'dinner_dining': Icons.dinner_dining,
-  'microwave': Icons.microwave,
-  'coffee_maker': Icons.coffee_maker,
-  'shower': Icons.shower,
-  'sanitizer': Icons.sanitizer,
-  'dry_cleaning': Icons.dry_cleaning,
-  'pets': Icons.pets,
-  'child_care': Icons.child_care,
-  'yard': Icons.yard,
-  'grass': Icons.grass,
-  'compost': Icons.compost,
-  'directions_car': Icons.directions_car,
-  'local_car_wash': Icons.local_car_wash,
-  'handyman': Icons.handyman,
-  'lightbulb': Icons.lightbulb,
-  'mail': Icons.mail,
-  'menu_book': Icons.menu_book,
-  'toys': Icons.toys,
-  'chair': Icons.chair,
-  'pest_control': Icons.pest_control,
-  'ac_unit': Icons.ac_unit,
-  'home': Icons.home,
-  'star': Icons.star,
+  'restaurant': Sprites.questRestaurant,
+  'dinner_dining': Sprites.questDinnerDining,
+  'microwave': Sprites.questMicrowave,
+  'coffee_maker': Sprites.questCoffeeMaker,
+  'shower': Sprites.questShower,
+  'sanitizer': Sprites.questSanitizer,
+  'dry_cleaning': Sprites.questDryCleaning,
+  'pets': Sprites.questPets,
+  'child_care': Sprites.questChildCare,
+  'yard': Sprites.questYard,
+  'grass': Sprites.questGrass,
+  'compost': Sprites.questCompost,
+  'directions_car': Sprites.questDirectionsCar,
+  'local_car_wash': Sprites.questLocalCarWash,
+  'handyman': Sprites.questHandyman,
+  'lightbulb': Sprites.questLightbulb,
+  'mail': Sprites.questMail,
+  'menu_book': Sprites.questMenuBook,
+  'toys': Sprites.questToys,
+  'chair': Sprites.questChair,
+  'pest_control': Sprites.questPestControl,
+  'ac_unit': Sprites.questAcUnit,
+  'home': Sprites.questHome,
+  'star': Sprites.questStar,
 };
 
 /// Preselected icon for a new chore.
 const defaultIconKey = 'star';
 
 /// Icon for [key]; unknown keys (e.g. from a newer app version) get a fallback.
-IconData choreIcon(String key) => choreIcons[key] ?? Icons.task_alt;
+Sprite choreIcon(String key) => choreIcons[key] ?? Sprites.questTaskAlt;
+
+/// A quest's icon in one [color], by whole pixels.
+class ChoreIcon extends StatelessWidget {
+  const ChoreIcon(this.iconKey, {super.key, this.size = 24, this.color});
+
+  final String iconKey;
+  final double size;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) =>
+      PixelIcon(choreIcon(iconKey), size: size, color: color);
+}

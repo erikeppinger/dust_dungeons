@@ -78,9 +78,12 @@ decoding PNGs at runtime:
 2. ✅ Icons from files (0.7.2).
 3. ✅ Map tiles and landmarks from files (0.7.2).
 4. ✅ Launcher icon: `generate_icon.py` reads `icons/app_shield.png` (0.7.2).
-5. **Hero and bosses, redrawn as pixel sprites.** This is new art, not a conversion. Until a
-   sprite exists, the current vector painter stays. It needs the `hero_keys` and `bosses` palette
-   groups, strips with frames, and a sprite cache for the Wardrobe colors.
+5. **Hero and bosses, redrawn as pixel sprites.** This is new art, not a conversion.
+   - ✅ The hero, with its gear as layers and the `hero` palette group (0.13.0,
+     [design](fight-feedback.md)).
+   - ✅ The bosses, as strips of four frames in the `bosses` palette group (0.13.0). All are
+     48×48, the Overlord too.
+   - ✅ Also from files since 0.13.0: the trophy, the level coin and the quest icons.
 6. ✅ Docs: the art guide and CONTRIBUTING updated (0.7.2).
 
 ## Open questions

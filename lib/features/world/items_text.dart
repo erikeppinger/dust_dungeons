@@ -121,10 +121,10 @@ class ItemIcon extends StatelessWidget {
       );
     }
     if (sprite == null) {
-      return Icon(
+      return PixelIcon(
         item.use == ItemUse.screenMinutes
-            ? Icons.hourglass_bottom
-            : Icons.checkroom,
+            ? Sprites.uiHourglass
+            : Sprites.questCheckroom,
         size: size,
       );
     }

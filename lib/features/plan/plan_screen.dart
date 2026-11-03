@@ -16,6 +16,8 @@ import '../chores/chore_icons.dart';
 import '../chores/chore_titles.dart';
 import '../chores/schedule_text.dart';
 import 'plan_data.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 enum _PlanView { week, month }
 
@@ -53,12 +55,12 @@ class _PlanScreenState extends ConsumerState<PlanScreen> {
             segments: [
               ButtonSegment(
                 value: _PlanView.week,
-                icon: const Icon(Icons.view_week),
+                icon: const PixelIcon(Sprites.uiWeek),
                 label: Text(l10n.planWeek),
               ),
               ButtonSegment(
                 value: _PlanView.month,
-                icon: const Icon(Icons.calendar_month),
+                icon: const PixelIcon(Sprites.uiCalendar),
                 label: Text(l10n.planMonth),
               ),
             ],
@@ -199,7 +201,7 @@ class _MonthViewState extends ConsumerState<_MonthView> {
             IconButton(
               tooltip: l10n.previousMonth,
               onPressed: () => _shiftMonth(-1),
-              icon: const Icon(Icons.chevron_left),
+              icon: const PixelIcon(Sprites.uiChevronLeft),
             ),
             Expanded(
               child: Text(
@@ -211,7 +213,7 @@ class _MonthViewState extends ConsumerState<_MonthView> {
             IconButton(
               tooltip: l10n.nextMonth,
               onPressed: () => _shiftMonth(1),
-              icon: const Icon(Icons.chevron_right),
+              icon: const PixelIcon(Sprites.uiChevronRight),
             ),
           ],
         ),
@@ -331,12 +333,16 @@ class _DayCell extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (done > 0) ...[
-                    Icon(Icons.check, size: 12, color: scheme.tertiary),
+                    PixelIcon(
+                      Sprites.uiCheck,
+                      size: 12,
+                      color: scheme.tertiary,
+                    ),
                     Text('$done', style: theme.textTheme.labelSmall),
                   ],
                   if (done > 0 && due > 0) const SizedBox(width: 3),
                   if (due > 0) ...[
-                    Icon(Icons.circle, size: 7, color: scheme.secondary),
+                    PixelIcon(Sprites.uiDot, size: 7, color: scheme.secondary),
                     const SizedBox(width: 1),
                     Text('$due', style: theme.textTheme.labelSmall),
                   ],
@@ -448,9 +454,8 @@ class _ChoreRow extends StatelessWidget {
       leading: CircleAvatar(
         radius: 18,
         backgroundColor: palette.colorFor(chore.colorKey),
-        child: Icon(
-          choreIcon(chore.iconKey),
-          size: 20,
+        child: ChoreIcon(
+          chore.iconKey,
           color: palette.onColorFor(chore.colorKey),
         ),
       ),
@@ -466,8 +471,8 @@ class _ChoreRow extends StatelessWidget {
       trailing: done
           ? Tooltip(
               message: l10n.planDone,
-              child: Icon(
-                Icons.check_circle,
+              child: PixelIcon(
+                Sprites.uiCheckCircle,
                 color: theme.colorScheme.tertiary,
               ),
             )

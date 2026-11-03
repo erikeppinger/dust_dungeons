@@ -157,6 +157,12 @@ def load_sprites(manifest, groups):
     return sprites
 
 
+def ident_of(name, spec):
+    """The Dart name: the file name, after the entry's `prefix` if it has one."""
+    stem = name.split("/")[-1]
+    return camel(f"{spec['prefix']}_{stem}" if "prefix" in spec else stem)
+
+
 def hex_color(c):
     return "Color(0xFF%02X%02X%02X)" % c
 
@@ -190,7 +196,7 @@ def generate(groups, sprites):
     out += ["abstract final class Sprites {"]
     names = {}
     for name, (spec, images) in sprites.items():
-        ident = camel(name.split("/")[-1])
+        ident = ident_of(name, spec)
         if ident in names:
             raise ArtError(f"{name} and {names[ident]} would have the same name")
         names[ident] = name
@@ -212,7 +218,7 @@ def generate(groups, sprites):
         "  static const all = <String, (List<Sprite>, String)>{",
     ]
     for name, (spec, _) in sprites.items():
-        ident = camel(name.split("/")[-1])
+        ident = ident_of(name, spec)
         many = spec.get("variants") or spec.get("frames", 1) > 1
         out.append(f"    '{name}': ({ident if many else f'[{ident}]'}, '{spec['palette']}'),")
     out += ["  };", "}", "", "/// Every palette of each group, for the art gallery."]

@@ -13,6 +13,8 @@ import 'chore_edit_screen.dart';
 import 'chore_icons.dart';
 import 'chore_titles.dart';
 import 'schedule_text.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// All chores, active and archived, for editing and archiving.
 class ManageChoresScreen extends ConsumerWidget {
@@ -54,7 +56,7 @@ class ManageChoresScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'addChoreManage',
         onPressed: () => ChoreEditScreen.open(context, null),
-        icon: const Icon(Icons.add),
+        icon: const PixelIcon(Sprites.uiAdd),
         label: Text(l10n.addChore),
       ),
     );
@@ -81,8 +83,8 @@ class _ChoreRow extends ConsumerWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: palette.colorFor(chore.colorKey),
-        child: Icon(
-          choreIcon(chore.iconKey),
+        child: ChoreIcon(
+          chore.iconKey,
           color: palette.onColorFor(chore.colorKey),
         ),
       ),
@@ -100,7 +102,9 @@ class _ChoreRow extends ConsumerWidget {
       onTap: () => ChoreEditScreen.open(context, chore),
       trailing: IconButton(
         tooltip: chore.isArchived ? l10n.restore : l10n.archive,
-        icon: Icon(chore.isArchived ? Icons.unarchive : Icons.archive_outlined),
+        icon: PixelIcon(
+          chore.isArchived ? Sprites.uiUnarchive : Sprites.uiArchive,
+        ),
         onPressed: () => unawaited(
           ref
               .read(choreRepositoryProvider)

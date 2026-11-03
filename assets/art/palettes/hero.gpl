@@ -1,0 +1,20 @@
+GIMP Palette
+Name: Hero (key colors swapped for the Wardrobe)
+Columns: 8
+#
+ 26  20  24	outline
+255 224 189	skin
+226 178 140	skin_shade
+ 93  64  55	hair
+ 62  42  36	hair_shade
+  0 137 123	cape
+  0  94  84	cape_shade
+255 183  77	tunic
+214 136  44	tunic_shade
+110  68  40	belt
+ 64  50  90	pants
+ 44  34  64	pants_shade
+ 90  56  36	shoe
+250 248 240	white
+176  72  72	mouth
+244 150 140	blush

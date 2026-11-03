@@ -7,6 +7,8 @@ import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'notification_planner.dart';
 import 'notification_sync.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Whether Android currently allows notifications; re-checked when the app
 /// resumes (the user may have changed it in the system settings).
@@ -106,7 +108,7 @@ class NotificationSettings extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SwitchListTile(
-          secondary: const Icon(Icons.notifications_outlined),
+          secondary: const PixelIcon(Sprites.uiBell),
           title: Text(l10n.notifEnable),
           subtitle: Text(l10n.notifEnableSubtitle),
           value: on,
@@ -114,7 +116,7 @@ class NotificationSettings extends ConsumerWidget {
         ),
         if (on && !permitted)
           ListTile(
-            leading: Icon(Icons.block, color: theme.colorScheme.error),
+            leading: PixelIcon(Sprites.uiBlock, color: theme.colorScheme.error),
             title: Text(
               l10n.notifBlocked,
               style: TextStyle(color: theme.colorScheme.error),
@@ -122,7 +124,7 @@ class NotificationSettings extends ConsumerWidget {
           ),
         if (on) ...[
           SwitchListTile(
-            secondary: const Icon(Icons.wb_sunny_outlined),
+            secondary: const PixelIcon(Sprites.uiSun),
             title: Text(l10n.notifDailySummary),
             subtitle: Text(l10n.notifDailySummarySubtitle),
             value: settings.dailySummary,
@@ -134,11 +136,11 @@ class NotificationSettings extends ConsumerWidget {
               key: const ValueKey('summary-time'),
               leading: const SizedBox(width: 24),
               title: Text(formatMinutes(context, settings.dailySummaryMinutes)),
-              trailing: const Icon(Icons.schedule),
+              trailing: const PixelIcon(Sprites.uiClock),
               onTap: () => unawaited(_pickSummaryTime(context, ref)),
             ),
           SwitchListTile(
-            secondary: const Icon(Icons.alarm),
+            secondary: const PixelIcon(Sprites.uiAlarm),
             title: Text(l10n.notifChoreReminders),
             subtitle: Text(l10n.notifChoreRemindersSubtitle),
             value: settings.choreReminders,
@@ -146,7 +148,7 @@ class NotificationSettings extends ConsumerWidget {
                 controller.update((s) => s.copyWith(choreReminders: v)),
           ),
           SwitchListTile(
-            secondary: const Icon(Icons.date_range),
+            secondary: const PixelIcon(Sprites.uiCalendar),
             title: Text(l10n.notifWeeklyRecap),
             subtitle: Text(
               l10n.notifWeeklyRecapSubtitle(
@@ -158,7 +160,7 @@ class NotificationSettings extends ConsumerWidget {
                 controller.update((s) => s.copyWith(weeklyRecap: v)),
           ),
           SwitchListTile(
-            secondary: const Icon(Icons.calendar_month),
+            secondary: const PixelIcon(Sprites.uiCalendar),
             title: Text(l10n.notifMonthlyRecap),
             subtitle: Text(
               l10n.notifMonthlyRecapSubtitle(
@@ -170,7 +172,7 @@ class NotificationSettings extends ConsumerWidget {
                 controller.update((s) => s.copyWith(monthlyRecap: v)),
           ),
           ListTile(
-            leading: const Icon(Icons.send_outlined),
+            leading: const PixelIcon(Sprites.uiSend),
             title: Text(l10n.notifSendTest),
             onTap: () => unawaited(_sendTest(context, ref)),
           ),

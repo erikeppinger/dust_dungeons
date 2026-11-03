@@ -9,6 +9,8 @@ import '../../domain/fight/shop.dart';
 import '../fight/hero_art.dart';
 import 'items_text.dart';
 import 'shop_screen.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Choose the hero's look. Changes apply (and are saved) immediately.
 class AvatarEditor extends ConsumerWidget {
@@ -42,6 +44,7 @@ class AvatarEditor extends ConsumerWidget {
               hair: s.avatarHair,
               cape: s.avatarCape,
               hat: s.avatarHat,
+              gear: ref.watch(equippedProvider).value ?? const {},
               size: 160,
             ),
           ),
@@ -99,7 +102,7 @@ class AvatarEditor extends ConsumerWidget {
                 else
                   ActionChip(
                     key: ValueKey('hat-${i + 1}'),
-                    avatar: const Icon(Icons.lock_outline, size: 18),
+                    avatar: const PixelIcon(Sprites.uiLock, size: 18),
                     label: Text(itemName(l10n, hat)),
                     onPressed: () => ShopScreen.open(context),
                   ),
@@ -164,8 +167,8 @@ class _Swatches extends StatelessWidget {
                       backgroundColor: colors[i],
                       // Selection is marked by a check, not only a ring.
                       child: i == selected
-                          ? Icon(
-                              Icons.check,
+                          ? PixelIcon(
+                              Sprites.uiCheck,
                               color:
                                   ThemeData.estimateBrightnessForColor(
                                         colors[i],

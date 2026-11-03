@@ -10,6 +10,8 @@ import '../../domain/progress.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/hero_art.dart';
 import '../settings/settings_controller.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Everyone's level, by profile id (XP is the sum of their completions).
 final peopleLevelsProvider = Provider<Map<int, int>>((ref) {
@@ -26,18 +28,19 @@ final peopleLevelsProvider = Provider<Map<int, int>>((ref) {
 });
 
 /// A person's hero, small.
-class PersonAvatar extends StatelessWidget {
+class PersonAvatar extends ConsumerWidget {
   const PersonAvatar(this.person, {super.key, this.size = 36});
 
   final Profile person;
   final double size;
 
   @override
-  Widget build(BuildContext context) => HeroArt(
+  Widget build(BuildContext context, WidgetRef ref) => HeroArt(
     skin: person.avatarSkin,
     hair: person.avatarHair,
     cape: person.avatarCape,
     hat: person.avatarHat,
+    gear: ref.watch(equippedOfProvider(person.id)).value ?? const {},
     size: size,
   );
 }
@@ -87,7 +90,9 @@ class _Switcher extends ConsumerWidget {
                 title: Text(p.name),
                 subtitle: Text(l10n.levelValue(levels[p.id] ?? 1)),
                 selected: p.id == current,
-                trailing: p.id == current ? const Icon(Icons.check) : null,
+                trailing: p.id == current
+                    ? const PixelIcon(Sprites.uiCheck)
+                    : null,
                 onTap: () {
                   unawaited(
                     ref.read(currentProfileIdProvider.notifier).select(p.id),
@@ -98,7 +103,7 @@ class _Switcher extends ConsumerWidget {
             const Divider(),
             ListTile(
               key: const ValueKey('manage-people'),
-              leading: const Icon(Icons.group_outlined),
+              leading: const PixelIcon(Sprites.uiGroup),
               title: Text(l10n.peopleManage),
               onTap: () {
                 Navigator.of(context).pop();
@@ -220,7 +225,7 @@ class PeopleScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'addPerson',
         onPressed: () => _add(context, ref),
-        icon: const Icon(Icons.person_add_alt),
+        icon: const PixelIcon(Sprites.uiPersonAdd),
         label: Text(l10n.peopleAdd),
       ),
       body: ListView(
@@ -245,7 +250,7 @@ class PeopleScreen extends ConsumerWidget {
                   ? IconButton(
                       key: ValueKey('remove-${p.id}'),
                       tooltip: l10n.peopleRemoveTitle(p.name),
-                      icon: const Icon(Icons.person_remove_outlined),
+                      icon: const PixelIcon(Sprites.uiPersonRemove),
                       onPressed: () => _remove(context, ref, p),
                     )
                   : null,

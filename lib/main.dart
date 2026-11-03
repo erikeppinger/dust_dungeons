@@ -21,6 +21,8 @@ import 'features/notifications/notification_sync.dart';
 import 'features/screen_time/screen_time_providers.dart';
 import 'features/settings/settings_controller.dart';
 import 'l10n/app_localizations.dart';
+import 'app/art/art.dart';
+import 'app/theme/pixel.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,7 +71,7 @@ class StartupErrorApp extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline, size: 64),
+                const PixelIcon(Sprites.uiError, size: 64),
                 const SizedBox(height: 16),
                 Text(
                   AppLocalizations.of(context).startupError,

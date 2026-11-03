@@ -435,6 +435,9 @@
     }
   },
   "fightGetReady": "Get ready…",
+  "fightReady": "Ready when you are",
+  "fightStartRound": "Show rhythm",
+  "fightStartLanes": "Start",
   "fightListen": "{n, plural, =1{Listen · 1 beat} other{Listen · {n} beats}}",
   "@fightListen": {
     "placeholders": {
@@ -1749,7 +1752,7 @@
   "@gameBossOutsideFedBy": {
     "description": "Generated from game/bosses.toml"
   },
-  "gameBossClutter": "Clutter Imp",
+  "gameBossClutter": "Clutter Gremlin",
   "@gameBossClutter": {
     "description": "Generated from game/bosses.toml"
   },

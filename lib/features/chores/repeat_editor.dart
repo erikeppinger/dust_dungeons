@@ -5,6 +5,8 @@ import '../../domain/dates.dart';
 import '../../domain/recurrence.dart';
 import '../../l10n/app_localizations.dart';
 import 'schedule_text.dart';
+import '../../app/art/art.dart';
+import '../../app/theme/pixel.dart';
 
 /// Form section for a chore's schedule.
 class RepeatEditor extends StatelessWidget {
@@ -157,7 +159,7 @@ class RepeatEditor extends StatelessWidget {
         if (value.type != RepeatType.anytime)
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.event),
+            leading: const PixelIcon(Sprites.uiCalendar),
             title: Text(
               value.type == RepeatType.once
                   ? l10n.repeatDate
@@ -364,7 +366,7 @@ class _IntervalRow extends StatelessWidget {
         IconButton(
           tooltip: l10n.decrease,
           onPressed: value > 1 ? () => onChanged(value - 1) : null,
-          icon: const Icon(Icons.remove_circle_outline),
+          icon: const PixelIcon(Sprites.uiRemoveCircle),
         ),
         Text('$value', style: Theme.of(context).textTheme.titleMedium),
         IconButton(
@@ -372,7 +374,7 @@ class _IntervalRow extends StatelessWidget {
           onPressed: value < RepeatEditor.maxInterval
               ? () => onChanged(value + 1)
               : null,
-          icon: const Icon(Icons.add_circle_outline),
+          icon: const PixelIcon(Sprites.uiAddCircle),
         ),
         Expanded(child: Text(label)),
       ],
