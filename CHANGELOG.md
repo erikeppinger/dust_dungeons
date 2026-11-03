@@ -8,6 +8,17 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.13.2] - 2026-11-03
+The app is unchanged.
+
+### Fixed
+- Test APKs from GitHub are signed with the shared test key, so they install over earlier test
+  versions. 0.13.1's APK was signed with GitHub's own key: Gradle on the build machine didn't use the
+  key file it was given. The build now names the key file directly (`TEST_KEYSTORE`) and fails if the
+  APK has any other key.
+- CI uses the current versions of GitHub's actions (checkout, setup-java, setup-python,
+  upload-artifact).
+
 ## [0.13.1] - 2026-11-03
 The app is unchanged from 0.13.0; this is the first test release published on GitHub.
 

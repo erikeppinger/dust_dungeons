@@ -31,6 +31,15 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        getByName("debug") {
+            // CI points this at the shared test key (the DEBUG_KEYSTORE_BASE64
+            // secret), so test APKs from GitHub install over each other and
+            // over local builds. Locally the default debug key is used.
+            System.getenv("TEST_KEYSTORE")?.let { storeFile = file(it) }
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
