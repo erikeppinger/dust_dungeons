@@ -32,6 +32,12 @@ and dress your hero in the gear you win or buy.
 See [CHANGELOG.md](CHANGELOG.md) for what has changed and [docs/DEV_PLAN.md](docs/DEV_PLAN.md) for the
 plan and roadmap.
 
+## Test builds
+Test APKs for Android are on the [releases page](https://github.com/erikeppinger/dust_dungeons/releases)
+(from version tags) and under [Actions](https://github.com/erikeppinger/dust_dungeons/actions)
+(from every push, for 30 days). Download the APK on the phone and open it. There is no iPhone
+version yet.
+
 ## Building
 
 Requires Flutter (stable, 3.47+), the Android SDK, and Python 3.11+ with Pillow (`pip install pillow`).

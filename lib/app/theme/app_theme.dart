@@ -60,10 +60,7 @@ ThemeData buildAppTheme({
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        shape: const PixelBorder(),
-        side: frame,
-      ),
+      style: OutlinedButton.styleFrom(shape: const PixelBorder(), side: frame),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(shape: const PixelBorder(bevel: false)),
@@ -113,10 +110,7 @@ ThemeData buildAppTheme({
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       selectedIcon: const PixelIcon(Sprites.uiCheck, size: 18),
-      style: SegmentedButton.styleFrom(
-        shape: const PixelBorder(),
-        side: frame,
-      ),
+      style: SegmentedButton.styleFrom(shape: const PixelBorder(), side: frame),
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       linearTrackColor: scheme.surfaceContainerHighest,

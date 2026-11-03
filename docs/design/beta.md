@@ -26,7 +26,7 @@ work starts.
 |---|---|---|
 | App ID | `io.github.changeme.homework_and_chores`, in 9 places (Gradle, the Kotlin package and folder, the receiver action, a test, docs) | Placeholder. Changing it after testers install means a new app: their data stays behind unless they back up first. |
 | Release signing | The release build is signed with the **debug key** (Flutter's template TODO) | A debug-signed APK can't be updated by a properly signed one, and F-Droid/IzzyOnDroid need a stable key. |
-| GitHub | The repository exists and is empty; no remote set here yet. `git` is installed, `gh` isn't | The first push needs your sign-in to GitHub (a browser login through Git Credential Manager, or `gh auth login` once `gh` is installed). |
+| GitHub | Pushed 2026-11-03 (history and tags, with the noreply commit email). CI builds test APKs; `gh` isn't installed | Test APKs are debug-signed (one shared key via the `DEBUG_KEYSTORE_BASE64` secret). The release key replaces that in step 2. |
 | CI | None; the checks in CONTRIBUTING run by hand | — |
 | SQLite | The `sqlite3` package **downloads a precompiled SQLite** at build time (its default build hook) | F-Droid builds offline and doesn't accept prebuilt binaries. The hook can compile from the SQLite source instead (public domain). |
 | Google's dependency info | Android Gradle adds an encrypted "dependencies info" block to the APK | F-Droid and IzzyOnDroid ask for it to be turned off (`dependenciesInfo { includeInApk = false }`). |

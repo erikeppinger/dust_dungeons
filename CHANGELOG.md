@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+### Added
+- **CI on GitHub** (`.github/workflows/build.yml`): every push is formatted, analyzed and tested,
+  and builds a test APK (an Actions artifact, kept 30 days). It also checks that the APK requests no
+  internet permission. A `v*` tag publishes the APK as a GitHub pre-release. With the
+  `DEBUG_KEYSTORE_BASE64` secret, test APKs share one signing key and install over each other.
+
 ### Changed
+- The history on GitHub uses the GitHub noreply address as the commit email.
 - Docs brought up to date: the README (name, features, Python needed for the tests), the asset
   licenses (the pixel font, all pixel art, the notification icon), CONTRIBUTING, the architecture,
   the art guide and the beta plan (GitHub repository and app ID `io.github.erikeppinger.dust_dungeons`).
