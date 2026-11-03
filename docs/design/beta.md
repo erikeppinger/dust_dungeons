@@ -16,22 +16,22 @@ work starts.
 | Question | Default |
 |---|---|
 | Name | **Dust & Dungeons** (decided 2026-11-03), the same in English and German. Clear in the Play Store, DPMA and EUIPO searches and on the web. |
-| App ID | `io.github.<github-user>.dust_dungeons`. **Needs your GitHub username.** |
-| GitHub | Public repository from the beta on (GPL-3.0) |
+| App ID | `io.github.erikeppinger.dust_dungeons` |
+| GitHub | <https://github.com/erikeppinger/dust_dungeons>, public (GPL-3.0). Created 2026-11-03, still empty |
 | Distribution | Signed APKs on GitHub Releases, plus the IzzyOnDroid repository. The main F-Droid repository comes at 1.0. |
 | Signing key | A key file on your PC (not in Dropbox) with an offline backup, plus encrypted GitHub secrets so CI signs tagged releases |
 
-## Where things stand (0.9.0)
+## Where things stand (0.13.0)
 | Area | State | Problem |
 |---|---|---|
 | App ID | `io.github.changeme.homework_and_chores`, in 9 places (Gradle, the Kotlin package and folder, the receiver action, a test, docs) | Placeholder. Changing it after testers install means a new app: their data stays behind unless they back up first. |
 | Release signing | The release build is signed with the **debug key** (Flutter's template TODO) | A debug-signed APK can't be updated by a properly signed one, and F-Droid/IzzyOnDroid need a stable key. |
-| GitHub | No remote; `gh` isn't installed | — |
+| GitHub | The repository exists and is empty; no remote set here yet. `git` is installed, `gh` isn't | The first push needs your sign-in to GitHub (a browser login through Git Credential Manager, or `gh auth login` once `gh` is installed). |
 | CI | None; the checks in CONTRIBUTING run by hand | — |
 | SQLite | The `sqlite3` package **downloads a precompiled SQLite** at build time (its default build hook) | F-Droid builds offline and doesn't accept prebuilt binaries. The hook can compile from the SQLite source instead (public domain). |
 | Google's dependency info | Android Gradle adds an encrypted "dependencies info" block to the APK | F-Droid and IzzyOnDroid ask for it to be turned off (`dependenciesInfo { includeInApk = false }`). |
 | Store listing | No `fastlane/metadata` | Needed by F-Droid/IzzyOnDroid: title, short and full description (EN/DE), screenshots, a changelog per version code. |
-| Asset licenses | `ASSETS_LICENSES.md` lacks the Press Start 2P font (OFL) and the `assets/art` sprites | Must be complete for a GPL/F-Droid release. |
+| Asset licenses | Complete since 0.13.0: the font (OFL), `assets/art` (GPL-3.0, see its `CREDITS.md`), the sounds and the notification icon | — |
 | Permissions | No `INTERNET`; usage access, notifications, boot completed | Fine; the listing should explain usage access. |
 
 ## Work
@@ -52,7 +52,9 @@ work starts.
   - the README, CONTRIBUTING, the art credits and the docs' titles
   - new backup file names: `dust-dungeons-backup-…` and `dust-dungeons-auto-…`
   - the key file name in the signing step (`dust-dungeons.jks`)
-  - the store listings (fastlane, Play)
+  - the store listings (fastlane, Play). The full description ends with the credit
+    "Idea for the app: Daniele Pasquale Funaro" (German: "Idee zur App: Daniele Pasquale Funaro"),
+    as in the README.
 - **What stays, on purpose:**
   - the Dart package name `homework_and_chores`, which is internal and used by every import
   - the backup format: old backups still import
@@ -159,9 +161,9 @@ Releases and IzzyOnDroid. What that changes:
 ## Who does what
 | Step | You | Me |
 |---|---|---|
-| App ID | Tell me your GitHub username | Rename, test, docs |
+| App ID | ✅ GitHub username given (erikeppinger) | Rename, test, docs |
 | Signing key | Run the key script, keep the passwords and the backup | Script, Gradle config, verification |
-| GitHub | Create the repo, install and log in to `gh`, add the secrets | Workflows, first push (with your OK) |
+| GitHub | ✅ Repo created. Sign in for the first push, add the secrets | Workflows, first push (with your OK) |
 | IzzyOnDroid | Send the inclusion request (it's your project and account) | Prepare the metadata, check the requirements |
 | Google Play | Developer account, Play Console forms, app signing choice (your own key), closed-test testers | AAB build, listing texts and graphics, Data safety answers to copy in |
 | Real phones | Find testers, install | Release notes, triage, fixes |

@@ -3,9 +3,11 @@
 How to draw art for Homework & Chores so it fits the 16-bit look and works in the app.
 For how the art gets into the code, see [design/art-assets.md](design/art-assets.md).
 
-> **Status (0.7.2):** the icons, map tiles and launcher shield are PNG files in `assets/art`.
-> The hero and the bosses are still drawn in Dart code; they are waiting to be redrawn as
-> sprites (step 5 of the plan). That is a good first job for an art contributor.
+> **Status (0.13.0):** all of the app's art is PNG files in `assets/art`: icons, map tiles, the
+> launcher shield, items, the hero and its gear, the bosses, and the quest and UI icons. Only the
+> map's tiny hero and the platform's own controls (switches, checkboxes) are still drawn in code.
+> Good first jobs for an art contributor: more frames for the bosses, or nicer versions of any
+> icon, keeping its file name.
 
 ## The look in one paragraph
 A 16-bit console game, not 8-bit: limited palettes but with shading, a dark one-pixel outline
@@ -67,11 +69,12 @@ open. Every color has a name; the app uses the names, so keep them when you chan
   files at the same position (shared colors like `rock` are simply the same in all four).
 - **`ui_day.gpl`**: draw the coin and hearts with it; `ui_night.gpl` is their night version.
 - **`items_day.gpl`**: the item icons; `items_night.gpl` is their night version.
-- **`mask.gpl`**: one color, for tab icons.
+- **`mask.gpl`**: one color, for the tab, quest and UI icons (the app tints them).
 - **`app.gpl`**: the launcher shield.
-- *(planned)* **`hero_keys.gpl`**: the hero is drawn with key colors (skin, hair, cape, each with a
-  shade) that the app replaces with the player's choices. **`bosses.gpl`**: outline and shading
-  shared by all bosses.
+- **`hero.gpl`**: the hero. Skin, hair and cape, each with a shade, are key colors that the app
+  replaces with the player's Wardrobe choices. The hero's gear layers use the items palettes.
+- **`bosses.gpl`**: all bosses: shared outline, white, gold and red, plus a main and a light color
+  (each with a shade) per boss.
 
 Within the source palette of a group (meadow, day) every color must be different, so each pixel
 maps to exactly one name. Keep a single sprite to **16 colors or fewer**, outline included.
@@ -86,9 +89,9 @@ maps to exactly one name. Keep a single sprite to **16 colors or fewer**, outlin
    stay visible on night; if it vanishes, add a lighter rim inside it.
 5. **Map tiles tile:** ground tiles must join seamlessly with themselves and each other on all
    four sides. Variants of one tile should differ in small details only, so no pattern stands out.
-6. **Leave a gap at the bottom of bosses:** the bottom 2 pixel rows stay empty for the ground shadow.
-7. **Animation is small:** `idle_1` differs from `idle_0` by one or two pixels of bobbing. `hit`
-   leans or flashes and must not change the silhouette much. `defeated` lies flat or turns to dust.
+6. **Bosses fill their square:** keep the whole boss, outline included, inside its 48×48 frame.
+7. **Animation is small:** the bob frame is the idle frame one pixel lower. `hit` leans or
+   squints and must not change the silhouette much. `defeated` sinks and gets crossed-out eyes.
 
 ## Checking your art
 ```bash

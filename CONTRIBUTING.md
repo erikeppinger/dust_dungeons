@@ -1,5 +1,9 @@
 # Contributing
 
+## Requirements
+Flutter (stable, 3.47+), the Android SDK, and Python 3.11+ with Pillow (`pip install pillow`).
+`flutter test` runs the art and game data checks, which are Python.
+
 ## Ground rules
 - **No network, no tracking.** Do not add dependencies that use the internet, collect analytics or need Google Play Services.
 - **Every UI string** goes into both `lib/l10n/app_en.arb` and `lib/l10n/app_de.arb`.

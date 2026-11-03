@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
+### Changed
+- Docs brought up to date: the README (name, features, Python needed for the tests), the asset
+  licenses (the pixel font, all pixel art, the notification icon), CONTRIBUTING, the architecture,
+  the art guide and the beta plan (GitHub repository and app ID `io.github.erikeppinger.dust_dungeons`).
+- README credits Daniele Pasquale Funaro for the idea for the app; the store listings will too.
 
 ## [0.13.0] - 2026-11-03
 From the first testers' feedback ([design](docs/design/fight-feedback.md)).

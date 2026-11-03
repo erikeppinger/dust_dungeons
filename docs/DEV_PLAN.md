@@ -1,7 +1,7 @@
 # Development Plan: Household Chores Gamification App
 
-> Working title: **"Homework & Chores"** (placeholder, final name TBD)
-> Status: Planning · Plan version 0.2 · 2026-10-28 (core decisions recorded, see §16)
+> Name: **Dust & Dungeons** (decided 2026-11-03; the working title "Homework & Chores" goes with the beta, 0.14.0)
+> Status: 0.13.0 released 2026-11-03; next is the beta. This plan dates from 2026-10-28 (core decisions in §16); the roadmap below is kept current.
 > Target: Android APK first, then macOS/iOS later. Built with Flutter 3.47 / Dart 3.13.
 
 ---

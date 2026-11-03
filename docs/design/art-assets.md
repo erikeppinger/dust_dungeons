@@ -86,7 +86,7 @@ decoding PNGs at runtime:
    - ✅ Also from files since 0.13.0: the trophy, the level coin and the quest icons.
 6. ✅ Docs: the art guide and CONTRIBUTING updated (0.7.2).
 
-## Open questions
-- Should step 5 (redrawing hero and bosses) be done by us in 0.7.2, or left for 0.7.3 or for a contributor?
-- An animated `idle` (two frames) costs a timer per boss on screen. Fine for the Arena list?
-  The alternative is to animate only in fights.
+## Open questions (answered)
+- **Who redraws hero and bosses (step 5)?** We did, in 0.13.0.
+- **Animate idle bosses everywhere?** No: bosses only move in fights, where they bob on the beats
+  of their call. Elsewhere they show the idle frame, so no timers run.
