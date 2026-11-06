@@ -85,6 +85,11 @@ class _BeatTimelineState extends State<BeatTimeline>
                   litBeat: c.litBeat,
                   tapCount: c.tapCount,
                   hits: c.lastHits,
+                  // Only an echo round can fail (lanes have no rounds).
+                  failed:
+                      c.lastHits.isNotEmpty &&
+                      !c.duel.lanePhase &&
+                      c.duel.lastRoundLanded == false,
                   taps: c.lastHits.isEmpty ? const [] : c.taps,
                   stepped: MediaQuery.disableAnimationsOf(context),
                   scheme: Theme.of(context).colorScheme,
@@ -103,6 +108,7 @@ class _TimelinePainter extends CustomPainter {
     required this.litBeat,
     required this.tapCount,
     required this.hits,
+    required this.failed,
     required this.taps,
     required this.stepped,
     required this.scheme,
@@ -114,6 +120,10 @@ class _TimelinePainter extends CustomPainter {
   final int litBeat;
   final int tapCount;
   final List<Hit> hits;
+
+  /// The judged round failed: the track is drawn dashed (shape, not only
+  /// color) in the error color.
+  final bool failed;
   final List<int> taps;
 
   /// Reduce motion: the playhead jumps from pulse to pulse.
@@ -134,11 +144,24 @@ class _TimelinePainter extends CustomPainter {
       ..strokeWidth = 2;
 
     // The track, the beat grid and the count-in mark.
-    canvas.drawLine(
-      Offset(x(0), _trackY),
-      Offset(x(pattern.lengthMs), _trackY),
-      line,
-    );
+    if (failed) {
+      final dash = Paint()
+        ..color = scheme.error
+        ..strokeWidth = 2;
+      for (var dx = x(0); dx < x(pattern.lengthMs); dx += 8) {
+        canvas.drawLine(
+          Offset(dx, _trackY),
+          Offset(min(dx + 4, x(pattern.lengthMs)), _trackY),
+          dash,
+        );
+      }
+    } else {
+      canvas.drawLine(
+        Offset(x(0), _trackY),
+        Offset(x(pattern.lengthMs), _trackY),
+        line,
+      );
+    }
     for (var ms = 0; ms <= pattern.lengthMs; ms += pattern.beatMs) {
       canvas.drawLine(
         Offset(x(ms), _trackY - 4),
@@ -188,9 +211,9 @@ class _TimelinePainter extends CustomPainter {
     final tick = Paint()
       ..color = scheme.onSurface
       ..strokeWidth = 2;
-    final min = -pattern.beatMs;
+    final start = -pattern.beatMs;
     for (final t in taps) {
-      final ms = t.clamp(min, pattern.lengthMs);
+      final ms = t.clamp(start, pattern.lengthMs);
       canvas.drawLine(
         Offset(x(ms), _trackY + dot / 2 + 8),
         Offset(x(ms), _trackY + dot / 2 + 18),
@@ -200,7 +223,7 @@ class _TimelinePainter extends CustomPainter {
 
     // The playhead.
     if (playheadMs case final at?) {
-      var ms = at.clamp(min, pattern.lengthMs);
+      var ms = at.clamp(start, pattern.lengthMs);
       if (stepped) {
         ms =
             ((ms + pattern.beatMs) ~/ pattern.beatMs) * pattern.beatMs -

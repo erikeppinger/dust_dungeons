@@ -461,6 +461,30 @@
       }
     }
   },
+  "fightRoundHit": "{percent} % hit",
+  "@fightRoundHit": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "fightRoundFailed": "{percent} % failed",
+  "@fightRoundFailed": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "fightRoundAccuracy": "{percent} %",
+  "@fightRoundAccuracy": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
   "fightTierPhase": "Tier {tier} · phase {phase} of {total}",
   "@fightTierPhase": {
     "placeholders": {
@@ -1438,8 +1462,8 @@
     }
   },
   "prepFight": "Fight!",
-  "fightFreeMisses": "{n, plural, =1{1 free miss} other{{n} free misses}}",
-  "@fightFreeMisses": {
+  "fightFreeRounds": "{n, plural, =1{1 free round} other{{n} free rounds}}",
+  "@fightFreeRounds": {
     "placeholders": {
       "n": {
         "type": "int"
@@ -1494,7 +1518,7 @@
       }
     }
   },
-  "effectFreeMisses": "{n, plural, =1{forgives your first miss in every fight} other{forgives your first {n} misses in every fight}}",
+  "effectFreeMisses": "{n, plural, =1{forgives your first failed round in every fight} other{forgives your first {n} failed rounds in every fight}}",
   "@effectFreeMisses": {
     "placeholders": {
       "n": {
@@ -1511,9 +1535,9 @@
       }
     }
   },
-  "effectSneakAttack": "sneak attack: your first round cleans 50% more",
+  "effectSneakAttack": "sneak attack: your first round that lands cleans 50% more",
   "effectSlowerBoss": "bosses play 10% slower",
-  "effectThirdMissFree": "every third miss costs no heart",
+  "effectThirdMissFree": "every third failed round costs no heart",
   "effectFullRevive": "Second Wind brings back all hearts",
   "effectLootBonus": "+{n}% loot chance",
   "@effectLootBonus": {

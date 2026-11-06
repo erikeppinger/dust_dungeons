@@ -459,6 +459,7 @@ const bossesOverlordHealthTimes = 2;
 const bossesOverlordWinsNeeded = 5;
 const lootChanceByTier = [20, 30, 40];
 const lootSureAfterDryWins = 4;
+const roundsHitPercent = 50;
 const cursesMinHearts = 3;
 const pointsMinBase = 5;
 const pointsMaxBase = 100;

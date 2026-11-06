@@ -44,6 +44,11 @@ chance_by_tier = [20, 30, 40]
 # After this many wins without loot, the next win always drops.
 sure_after_dry_wins = 4
 
+[rounds]
+# A round (one echo) lands at this accuracy or more (Perfect 1, Good 1/2,
+# Miss 0): it damages the boss. Below it, it fails: no damage, one heart.
+hit_percent = 50
+
 [curses]
 # A curse never leaves fewer hearts than this.
 min_hearts = 3

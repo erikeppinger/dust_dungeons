@@ -153,6 +153,75 @@ void main() {
       expect(d.heroHp, d.hero.maxHp);
     });
 
+    group('rounds', () {
+      // pattern: four beats.
+      List<int> taps(String hits) => [
+        for (final (i, h) in hits.split('').indexed)
+          if (h == 'p')
+            pattern.beatsMs[i]
+          else if (h == 'g')
+            pattern.beatsMs[i] + 100,
+      ];
+
+      test('accuracy: Perfect 1, Good 1/2, Miss 0, stray taps miss', () {
+        expect(EchoDuel.roundAccuracy(const [Hit.perfect, Hit.good]), 0.75);
+        expect(
+          EchoDuel.roundAccuracy(const [Hit.perfect, Hit.miss, Hit.miss]),
+          closeTo(1 / 3, 1e-9),
+        );
+        expect(EchoDuel.roundAccuracy(const []), 0);
+      });
+
+      test('a round at 50 % lands: damage, no heart, even with misses', () {
+        final d = duel()..applyEcho(pattern, taps('pp--'));
+        expect(d.lastRoundAccuracy, 0.5);
+        expect(d.lastRoundLanded, isTrue);
+        expect(d.bossMaxHp - d.bossHp, 4); // two perfect hits
+        expect(d.heroHp, 5);
+        expect(d.miss, 2);
+      });
+
+      test('all Goods is exactly 50 % and lands', () {
+        final d = duel()..applyEcho(pattern, taps('gggg'));
+        expect(d.lastRoundLanded, isTrue);
+        expect(d.bossMaxHp - d.bossHp, 4);
+      });
+
+      test('under 50 %: no damage, and one heart however many misses', () {
+        final d = duel()..applyEcho(pattern, taps('pg--'));
+        expect(d.lastRoundAccuracy, 0.375);
+        expect(d.lastRoundLanded, isFalse);
+        expect(d.bossHp, d.bossMaxHp);
+        expect(d.heroHp, 4);
+        d.applyEcho(pattern, const []);
+        expect(d.heroHp, 3, reason: 'four misses still cost one heart');
+      });
+
+      test('stray taps count against the round', () {
+        final d = duel()
+          ..applyEcho(pattern, [...pattern.beatsMs, 1300, 1400, 1500, 1600]);
+        expect(d.lastRoundAccuracy, 0.5); // four hits, four stray taps
+        expect(d.lastRoundLanded, isTrue);
+        final mashed = duel()
+          ..applyEcho(pattern, [
+            ...pattern.beatsMs,
+            1300,
+            1400,
+            1500,
+            1600,
+            1700,
+          ]);
+        expect(mashed.lastRoundLanded, isFalse);
+      });
+
+      test('story mode: every hit counts and no heart is lost', () {
+        final d = duel(story: true)..applyEcho(pattern, taps('p---'));
+        expect(d.lastRoundLanded, isTrue);
+        expect(d.bossMaxHp - d.bossHp, 2);
+        expect(d.heroHp, 5);
+      });
+    });
+
     test('phase 2 starts at half health', () {
       final d = duel();
       expect(d.phase, 0);
@@ -185,24 +254,25 @@ void main() {
       return d.bossMaxHp - d.bossHp;
     }
 
-    const oneMiss = [0, 500, 750];
+    /// One beat of four hit: 25 %, a failed round.
+    const failing = [0];
 
-    test('Sponge Shield forgives the first miss of the fight only', () {
+    test('Sponge Shield forgives the first failed round of the fight only', () {
       final d = geared(wearing([spongeShieldItem]));
-      expect(d.freeMissesLeft, 1);
-      d.applyEcho(pattern, oneMiss);
+      expect(d.freeRoundsLeft, 1);
+      d.applyEcho(pattern, failing);
       expect(d.heroHp, 5);
-      expect(d.freeMissesLeft, 0);
-      d.applyEcho(pattern, oneMiss);
+      expect(d.freeRoundsLeft, 0);
+      d.applyEcho(pattern, failing);
       expect(d.heroHp, 4);
     });
 
-    test('Trash-Can Lid forgives two misses', () {
+    test('Trash-Can Lid forgives two failed rounds', () {
       final d = geared(wearing([trashCanLidItem]));
       d
-        ..applyEcho(pattern, oneMiss)
-        ..applyEcho(pattern, oneMiss)
-        ..applyEcho(pattern, oneMiss);
+        ..applyEcho(pattern, failing)
+        ..applyEcho(pattern, failing)
+        ..applyEcho(pattern, failing);
       expect(d.heroHp, 4);
     });
 
@@ -245,6 +315,14 @@ void main() {
         perfectEcho(wearing([featherDusterItem]), family: BossFamily.kitchen),
         8,
       );
+    });
+
+    test('Fuzzy Slippers: wait for a round that lands', () {
+      final d = geared(wearing([fuzzySlippersItem]))
+        ..applyEcho(pattern, failing);
+      expect(d.bossHp, d.bossMaxHp, reason: 'a failed round deals nothing');
+      d.applyEcho(pattern, pattern.beatsMs);
+      expect(d.bossMaxHp - d.bossHp, 12);
     });
 
     test('Fuzzy Slippers: the first echo deals half as much again', () {
@@ -311,10 +389,10 @@ void main() {
       );
     });
 
-    test('Garden Gnome: every third miss costs no heart', () {
+    test('Garden Gnome: every third failed round costs no heart', () {
       final d = geared(wearing([gardenGnomeItem]));
       for (var i = 0; i < 3; i++) {
-        d.applyEcho(pattern, oneMiss);
+        d.applyEcho(pattern, failing);
       }
       expect(d.heroHp, 3);
     });
@@ -327,7 +405,7 @@ void main() {
         loadout: wearing([capeOfCleanSweepItem]),
       );
       expect(d.heroHp, 7);
-      d.applyEcho(pattern, oneMiss); // 3 hits, 1 miss
+      d.applyEcho(pattern, failing); // a failed round: one heart
       expect(d.heroHp, 6);
       d
         ..applyEcho(pattern, pattern.beatsMs)

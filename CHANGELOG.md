@@ -8,6 +8,25 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-06
+From the testers ([design](docs/design/round-rules.md)).
+
+### Changed
+- **Rounds instead of single misses:** a round (one echo) has an accuracy (Perfect 1, Good ½,
+  Miss 0; stray taps count as misses).
+  - At 50 % or more it lands: its hits damage the boss, and no heart is lost, even with misses.
+  - Under 50 % it fails: no damage, and exactly one heart is lost, however many misses.
+  - This applies to the eight bosses and the Overlord's echo phases. The lane phase stays note
+    by note.
+  - Story mode: every hit still counts, and no hearts are lost.
+- The judgement line adds the round's accuracy and the outcome ("62 % hit" / "25 % failed").
+  A failed round's track is dashed, and the boss and hero react to the round's outcome.
+- **Sponge Shield, Trash-Can Lid and Garden Gnome** protect failed rounds instead of misses (in
+  the lane phase, missed notes). Their descriptions say so.
+- **Fuzzy Slippers:** the sneak attack waits for the first round that lands.
+- The 50 % line is `rounds.hit_percent` in `game/balance.toml`.
+- Roadmap: the beta moves to 0.15.0.
+
 ## [0.13.2] - 2026-11-03
 The app is unchanged.
 

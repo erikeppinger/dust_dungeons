@@ -405,7 +405,7 @@ def generate_data(items, bosses, quests, balance):
     out += ["};", ""]
 
     out += ["// ---- Balance (game/balance.toml) ----", ""]
-    for section in ("hero", "bosses", "loot", "curses", "points"):
+    for section in ("hero", "bosses", "loot", "rounds", "curses", "points"):
         for name, value in balance[section].items():
             if isinstance(value, dict):
                 for sub, v in value.items():

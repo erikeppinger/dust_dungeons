@@ -84,5 +84,15 @@ Examples (4 beats):
 - **Emulator:** fights on all three difficulties, a shield and the Gnome, the Overlord, story mode,
   German at 200 %.
 
+## As built (changes to the plan)
+- **The line is `rounds.hit_percent = 50`** in `game/balance.toml`: a whole percent, which keeps
+  the schema simple.
+- **German texts:** "62 % Treffer" / "25 % verpatzt" ("daneben" already means Miss in the same line).
+- **The percent shown is rounded down,** so a round at 49.6 % never shows "50 % failed".
+- **Sneak attack** isn't wasted on a failed first round: it waits for the first round that lands.
+- **The judgement line** keeps the counts in front: "Perfect 2 · Good 1 · Miss 1 · 62 % hit".
+- **Story mode** shows only the accuracy ("0 %"), without "hit": every round lands there,
+  but a round without a hit makes neither the boss flinch nor the hero hop.
+
 ## Version
 **0.14.0**, decided 2026-11-06. The beta moves to 0.15.0.

@@ -9,7 +9,7 @@ edit a file, run one command, test.
 | `items.toml` | Gear, consumables, hats and screen-time vouchers |
 | `bosses.toml` | Boss names, which quests feed them, their tempo and their curse |
 | `quests.toml` | The built-in quests every phone gets |
-| `balance.toml` | Hero growth, boss health, timing, loot chances, points, difficulty presets |
+| `balance.toml` | Hero growth, boss health, timing, the round rule, loot chances, points, difficulty presets |
 | `keys.lock` | Every key ever shipped. Written by the tool; don't edit it |
 | `schema/` | What each file may contain. Editors use it for checks and autocompletion |
 
@@ -53,12 +53,12 @@ changes need no new text.
 | `damage` | 1–5 | Extra damage on every hit |
 | `good_damage` | 1–5 | Extra damage on Good hits |
 | `perfect_times` | 3–6 | A Perfect hit deals this many times the hero's damage (normally 2) |
-| `free_misses` | 1–5 | The first misses of a fight cost no heart |
+| `free_misses` | 1–5 | The first failed rounds of a fight cost no heart (in the lane phase: missed notes) |
 | `wide_timing` | true | Wider timing windows |
 | `combo_heal` | 3–50 | Heals a heart after this many hits in a row |
-| `sneak_attack` | true | The first round deals 50 % more |
+| `sneak_attack` | true | The first round that lands deals 50 % more |
 | `slower_boss` | true | The boss plays 10 % slower |
-| `third_miss_free` | true | Every third miss costs no heart |
+| `third_miss_free` | true | Every third failed round costs no heart (in the lane phase: missed note) |
 | `full_revive` | true | Second Wind brings back all hearts |
 | `loot_bonus` | 1–50 | Percentage points added to the loot chance |
 

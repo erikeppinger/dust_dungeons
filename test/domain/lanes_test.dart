@@ -2,7 +2,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/domain/fight/boss.dart';
 import 'package:homework_and_chores/domain/fight/calibration.dart';
 import 'package:homework_and_chores/domain/fight/echo_duel.dart';
+import 'package:homework_and_chores/domain/fight/items.dart';
 import 'package:homework_and_chores/domain/fight/lanes.dart';
+import 'package:homework_and_chores/domain/fight/shop.dart';
+import 'package:homework_and_chores/game/game_data.dart';
 
 void main() {
   group('lane notes', () {
@@ -94,6 +97,19 @@ void main() {
       d.breakCombo();
       expect(d.combo, 0);
       expect(d.heroHp, 5);
+    });
+
+    test('a missed lane note costs a heart; shields take the first', () {
+      final d = duel();
+      d.applyHits([Hit.miss, Hit.miss]);
+      expect(d.heroHp, 3, reason: 'no rounds in the lane phase');
+      final shielded = OverlordDuel(
+        tier: 1,
+        hero: const HeroStats(maxHp: 5, damage: 1),
+        motifs: const [],
+        loadout: const Loadout(gear: {GearSlot.shield: spongeShieldItem}),
+      )..applyHits([Hit.miss, Hit.miss]);
+      expect(shielded.heroHp, 4);
     });
 
     test('regular bosses keep two phases and no lanes', () {

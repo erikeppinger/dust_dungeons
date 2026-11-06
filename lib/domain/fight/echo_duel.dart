@@ -179,11 +179,20 @@ class EchoDuel {
   int heroHp;
   int perfect = 0, good = 0, miss = 0;
   int combo = 0, bestCombo = 0;
-  int _freeMissesUsed = 0;
-  bool _firstEcho = true;
+  int _freeUsed = 0;
 
-  /// Misses that will still cost no heart (shields).
-  int get freeMissesLeft => effects.freeMisses - _freeMissesUsed;
+  /// Failed rounds (and, in the lane phase, missed notes) so far: every
+  /// time a heart was due, shielded or not.
+  int _failures = 0;
+  bool _sneakUsed = false;
+
+  /// The last round's accuracy (0..1) and whether it landed (`null` before
+  /// the first round).
+  double? lastRoundAccuracy;
+  bool? lastRoundLanded;
+
+  /// Failed rounds that will still cost no heart (shields).
+  int get freeRoundsLeft => effects.freeMisses - _freeUsed;
 
   /// Story mode keeps its own windows; otherwise the difficulty widens or
   /// narrows them.
@@ -235,42 +244,78 @@ class EchoDuel {
 
   Pattern nextPattern() => _generatorFor(family).next(phase: phase);
 
-  /// Applies one judged echo and returns the hits (for display).
+  /// A round's accuracy, 0..1: Perfect counts 1, Good 1/2, Miss 0 (stray
+  /// taps are misses too).
+  static double roundAccuracy(List<Hit> hits) => hits.isEmpty
+      ? 0
+      : hits.fold<double>(
+              0,
+              (sum, hit) =>
+                  sum +
+                  switch (hit) {
+                    Hit.perfect => 1,
+                    Hit.good => 0.5,
+                    Hit.miss => 0,
+                  },
+            ) /
+            hits.length;
+
+  /// Applies one judged echo (a round) and returns the hits (for display).
+  /// A round of at least [roundsHitPercent] % accuracy lands: its hits
+  /// damage the boss. Below that it fails: no damage, and one heart lost
+  /// however many misses. In story mode every round lands.
   List<Hit> applyEcho(Pattern pattern, List<int> tapsMs) {
+    assert(outcome == DuelOutcome.ongoing);
     final hits = judgeEcho(pattern, tapsMs, windows: windows);
-    applyHits(hits);
+    final accuracy = roundAccuracy(hits);
+    final landed = storyMode || accuracy * 100 >= roundsHitPercent;
+    lastRoundAccuracy = accuracy;
+    lastRoundLanded = landed;
+    _apply(hits, damage: landed);
+    if (!landed) _heartDue();
+    _settle();
     return hits;
   }
 
   /// A tap that hit nothing (lane phase): breaks the combo, costs no heart.
   void breakCombo() => combo = 0;
 
-  /// Applies judged hits to boss and hero.
+  /// Applies notes judged in the lane phase, which has no rounds: every
+  /// hit deals damage, and every missed note costs a heart.
   void applyHits(List<Hit> hits) {
     assert(outcome == DuelOutcome.ongoing);
-    // Sneak attack: the first echo (or lane note) hits half as hard again.
-    final sneak = effects.sneakAttack && _firstEcho;
-    _firstEcho = false;
-    int dealt(int damage) => sneak ? damage + (damage + 1) ~/ 2 : damage;
+    _apply(hits, damage: true);
+    for (final _ in hits.where((h) => h == Hit.miss)) {
+      _heartDue();
+    }
+    _settle();
+  }
+
+  /// Counts [hits] and keeps the combo; with [damage], hurts the boss.
+  void _apply(List<Hit> hits, {required bool damage}) {
+    // Sneak attack: the first hits that land strike half as hard again.
+    final sneak = damage && effects.sneakAttack && !_sneakUsed;
+    if (sneak) _sneakUsed = true;
+    int dealt(int value) => sneak ? value + (value + 1) ~/ 2 : value;
     for (final hit in hits) {
       switch (hit) {
         case Hit.perfect:
           perfect++;
           combo++;
-          bossHp -= dealt(hero.damage * effects.perfectTimes + effects.damage);
+          if (damage) {
+            bossHp -= dealt(
+              hero.damage * effects.perfectTimes + effects.damage,
+            );
+          }
         case Hit.good:
           good++;
           combo++;
-          bossHp -= dealt(hero.damage + effects.damage + effects.goodDamage);
+          if (damage) {
+            bossHp -= dealt(hero.damage + effects.damage + effects.goodDamage);
+          }
         case Hit.miss:
           miss++;
           combo = 0;
-          if (storyMode) break;
-          if (freeMissesLeft > 0) {
-            _freeMissesUsed++;
-          } else if (!(effects.thirdMissFree && miss % 3 == 0)) {
-            heroHp -= 1;
-          }
       }
       final heal = effects.comboHeal;
       if (hit != Hit.miss && heal > 0 && combo % heal == 0) {
@@ -278,8 +323,22 @@ class EchoDuel {
       }
       bestCombo = max(bestCombo, combo);
     }
-    // Story mode cannot be lost (misses never hurt the hero); they only
-    // break the combo and slow the cleaning meter.
+  }
+
+  /// A heart is due (a failed round, or a missed lane note): shields take
+  /// the first ones, the Garden Gnome every third. Story mode never loses
+  /// hearts, so it can't be lost.
+  void _heartDue() {
+    if (storyMode) return;
+    _failures++;
+    if (freeRoundsLeft > 0) {
+      _freeUsed++;
+    } else if (!(effects.thirdMissFree && _failures % 3 == 0)) {
+      heroHp -= 1;
+    }
+  }
+
+  void _settle() {
     bossHp = max(bossHp, 0);
     heroHp = max(heroHp, 0);
   }

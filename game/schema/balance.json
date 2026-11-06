@@ -3,7 +3,7 @@
   "title": "Balance",
   "description": "game/balance.toml: the numbers behind fights and points. See game/README.md.",
   "type": "object",
-  "required": ["hero", "bosses", "timing", "loot", "curses", "points", "difficulty"],
+  "required": ["hero", "bosses", "timing", "loot", "rounds", "curses", "points", "difficulty"],
   "additionalProperties": false,
   "properties": {
     "hero": {
@@ -46,6 +46,12 @@
         "chance_by_tier": { "type": "array", "items": { "type": "integer", "minimum": 0, "maximum": 100 }, "minItems": 3, "maxItems": 3 },
         "sure_after_dry_wins": { "type": "integer", "minimum": 1, "maximum": 20 }
       }
+    },
+    "rounds": {
+      "type": "object",
+      "required": ["hit_percent"],
+      "additionalProperties": false,
+      "properties": { "hit_percent": { "type": "integer", "minimum": 1, "maximum": 100 } }
     },
     "curses": {
       "type": "object",

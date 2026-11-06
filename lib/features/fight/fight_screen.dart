@@ -316,14 +316,29 @@ class _Duel extends StatelessWidget {
     final duel = c.duel;
     final cleaned = 1 - duel.bossHp / duel.bossMaxHp;
     final lanes = c.stage == FightStage.lanes;
+    // A round that landed with at least one hit (in story mode every round
+    // lands, even one without hits).
+    final roundHit =
+        duel.lastRoundLanded == true && c.lastHits.any((h) => h != Hit.miss);
     final hitNow = lanes
         ? c.lastLaneHit != null && c.lastLaneHit != Hit.miss
-        : c.stage == FightStage.judged && c.lastHits.any((h) => h != Hit.miss);
-    final judgedText = l10n.fightJudged(
+        : c.stage == FightStage.judged && roundHit;
+    final counts = l10n.fightJudged(
       c.lastHits.where((h) => h == Hit.perfect).length,
       c.lastHits.where((h) => h == Hit.good).length,
       c.lastHits.where((h) => h == Hit.miss).length,
     );
+    // An echo round also says how accurate it was and whether it landed
+    // (the lane phase has no rounds).
+    final accuracy = duel.lastRoundAccuracy;
+    final percent = ((accuracy ?? 0) * 100).floor();
+    final judgedText = duel.lanePhase || accuracy == null
+        ? counts
+        : '$counts · ${duel.storyMode
+              ? l10n.fightRoundAccuracy(percent)
+              : duel.lastRoundLanded!
+              ? l10n.fightRoundHit(percent)
+              : l10n.fightRoundFailed(percent)}';
     final status = switch (c.stage) {
       // The last judgement stays readable while the start button waits.
       FightStage.ready => c.lastHits.isEmpty ? l10n.fightReady : judgedText,
@@ -343,8 +358,8 @@ class _Duel extends StatelessWidget {
     final notes = [
       if (duel.storyMode)
         l10n.fightSettingStory
-      else if (duel.freeMissesLeft > 0)
-        l10n.fightFreeMisses(duel.freeMissesLeft),
+      else if (duel.freeRoundsLeft > 0)
+        l10n.fightFreeRounds(duel.freeRoundsLeft),
       if (duel.loadout.curse case final curse?)
         l10n.curseTitle(curseName(l10n, curse.family)),
     ].join(' · ');
@@ -460,7 +475,7 @@ class _Duel extends StatelessWidget {
                 judgements: duel.perfect + duel.good + duel.miss,
                 hit: lanes
                     ? c.lastLaneHit != Hit.miss
-                    : !c.lastHits.contains(Hit.miss),
+                    : duel.lastRoundLanded == null || roundHit,
                 child: hero,
               ),
               const SizedBox(width: 8),
