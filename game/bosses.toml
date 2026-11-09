@@ -6,7 +6,7 @@
 [bosses.dust]
 name = { en = "Dust Bunny King", de = "Staubhasen-König" }
 fed_by = { en = "dusting, floors", de = "Staub, Böden" }
-trophy = { en = "Golden Feather Duster", de = "Goldener Staubwedel" }
+trophy = { en = "Grand Feather Duster", de = "Großer Staubwedel" }
 tempo = { bpm = 96, offbeat = 0.0, eighth = 0.3 }
 curse = { kind = "tight_timing", name = { en = "Sneezing Fit", de = "Niesanfall" } }
 
@@ -58,3 +58,187 @@ name = { en = "Chore Overlord", de = "Haushalts-Overlord" }
 trophy = { en = "Crown of the Week", de = "Wochenkrone" }
 tempo = { bpm = 100, offbeat = 0.2, eighth = 0.3 }
 curse = { kind = "heart", name = { en = "Overlord's Grudge", de = "Groll des Overlords" } }
+
+[bosses.homework]
+name = { en = "Paper Pile Lich", de = "Papierstapel-Lich" }
+fed_by = { en = "homework, reading", de = "Hausaufgaben, Lesen" }
+tempo = { bpm = 88, offbeat = 0.05, eighth = 0.15 }
+curse = { kind = "tight_timing", name = { en = "Smudged Notes", de = "Verschmierte Notizen" } }
+
+[bosses.pets]
+name = { en = "Fur Ball Beast", de = "Fellknäuel-Biest" }
+fed_by = { en = "pets", de = "Haustiere" }
+tempo = { bpm = 104, offbeat = 0.3, eighth = 0.3 }
+curse = { kind = "heart", name = { en = "Fur Everywhere", de = "Überall Haare" } }
+
+[bosses.garden]
+name = { en = "Weed Wyrm", de = "Unkraut-Lindwurm" }
+fed_by = { en = "garden, lawn", de = "Garten, Rasen" }
+tempo = { bpm = 86, offbeat = 0.1, eighth = 0.35 }
+curse = { kind = "slot_off", slot = "weapon", name = { en = "Thorny Hands", de = "Dornige Hände" } }
+
+[bosses.cooking]
+name = { en = "Pot Gremlin", de = "Topf-Gremlin" }
+fed_by = { en = "cooking, meals", de = "Kochen, Mahlzeiten" }
+tempo = { bpm = 114, offbeat = 0.15, eighth = 0.45 }
+curse = { kind = "slot_off", slot = "shield", name = { en = "Burnt Fingers", de = "Verbrannte Finger" } }
+
+# ---- Forms ----
+# Each chore boss changes form at tier 2 and tier 3: a name (whole pairs, so
+# German needs no adjective endings), its colors (main and light; the app
+# makes the shades) and a small change to how it plays, on top of the tier.
+
+[[bosses.dust.forms]]
+name = { en = "Dust Bunny Emperor", de = "Staubhasen-Kaiser" }
+main = "#8E6FA8"
+light = "#D8C2E6"
+eighth = 0.1
+
+[[bosses.dust.forms]]
+name = { en = "Dust Bunny Tyrant of the Rug", de = "Staubhasen-Tyrann des Teppichs" }
+main = "#5B3F7A"
+light = "#C9A8E0"
+beats = 1
+eighth = 0.1
+
+[[bosses.laundry.forms]]
+name = { en = "Hydra of Many Socks", de = "Hydra der vielen Socken" }
+main = "#006A88"
+light = "#5FC8E0"
+offbeat = 0.1
+
+[[bosses.laundry.forms]]
+name = { en = "Spin-Cycle Hydra", de = "Schleudergang-Hydra" }
+main = "#1B3F8B"
+light = "#7FB2F0"
+beats = 1
+offbeat = 0.1
+
+[[bosses.kitchen.forms]]
+name = { en = "Grease Kraken", de = "Fett-Krake" }
+main = "#E07A2F"
+light = "#F2B66B"
+bpm = 4
+
+[[bosses.kitchen.forms]]
+name = { en = "Kraken of the Deep Drain", de = "Krake des tiefen Abflusses" }
+main = "#B23A1E"
+light = "#F28C4A"
+beats = 1
+bpm = 4
+
+[[bosses.bath.forms]]
+name = { en = "Granite Golem", de = "Granit-Golem" }
+main = "#6F8792"
+light = "#D6E2E8"
+offbeat = 0.1
+
+[[bosses.bath.forms]]
+name = { en = "Golem of the Endless Grout", de = "Golem der endlosen Fugen" }
+main = "#4A5A80"
+light = "#C8D4F0"
+beats = 1
+eighth = 0.1
+
+[[bosses.trash.forms]]
+name = { en = "Trash Titan Rex", de = "Müll-Titan Rex" }
+main = "#56702A"
+light = "#A6C46A"
+eighth = 0.1
+
+[[bosses.trash.forms]]
+name = { en = "Landfill Colossus", de = "Deponie-Koloss" }
+main = "#3E4A1C"
+light = "#C2D86A"
+beats = 1
+offbeat = 0.15
+
+[[bosses.bedroom.forms]]
+name = { en = "Duvet Phantom", de = "Bettdecken-Phantom" }
+main = "#7B86C8"
+light = "#C9CEF2"
+offbeat = 0.1
+
+[[bosses.bedroom.forms]]
+name = { en = "Phantom of the Midnight Snooze", de = "Phantom des Mitternachtsschlummers" }
+main = "#4B3F8E"
+light = "#B4A8E8"
+beats = 1
+eighth = 0.1
+
+[[bosses.outside.forms]]
+name = { en = "Storm Window Wraith", de = "Sturmfenster-Geist" }
+main = "#4FB3E8"
+light = "#BCE8FF"
+bpm = 4
+
+[[bosses.outside.forms]]
+name = { en = "Wraith of the Smudged Panes", de = "Geist der verschmierten Scheiben" }
+main = "#2A6FB8"
+light = "#9ED8FF"
+beats = 1
+eighth = 0.1
+
+[[bosses.clutter.forms]]
+name = { en = "Clutter Goblin King", de = "Krempel-Koboldkönig" }
+main = "#5E7480"
+light = "#BAC8CF"
+offbeat = 0.1
+
+[[bosses.clutter.forms]]
+name = { en = "Hoarder of the Junk Drawer", de = "Horter der Krimskrams-Schublade" }
+main = "#3C4A66"
+light = "#A8B8D8"
+beats = 1
+offbeat = 0.1
+
+[[bosses.homework.forms]]
+name = { en = "Overdue Lich", de = "Überfälliger Lich" }
+main = "#E6D9A8"
+light = "#4A2E7A"
+eighth = 0.1
+
+[[bosses.homework.forms]]
+name = { en = "Lich of the Endless Exam", de = "Lich der endlosen Prüfung" }
+main = "#D9C27A"
+light = "#2A1A4A"
+beats = 1
+
+[[bosses.pets.forms]]
+name = { en = "Shedding Fluff Fiend", de = "Haarende Fusselbestie" }
+main = "#7E5233"
+light = "#E8C89A"
+offbeat = 0.1
+
+[[bosses.pets.forms]]
+name = { en = "Great Furricane", de = "Großer Fell-Orkan" }
+main = "#4A3020"
+light = "#D8A870"
+beats = 1
+offbeat = 0.1
+
+[[bosses.garden.forms]]
+name = { en = "Bramble Wyrm", de = "Dornen-Lindwurm" }
+main = "#2E7A3A"
+light = "#C2E07A"
+eighth = 0.1
+
+[[bosses.garden.forms]]
+name = { en = "Root Wyrm of the Wild Lawn", de = "Wurzel-Lindwurm der wilden Wiese" }
+main = "#5A3A7A"
+light = "#9AD86A"
+beats = 1
+bpm = -4
+
+[[bosses.cooking.forms]]
+name = { en = "Pressure-Cooker Gremlin", de = "Schnellkochtopf-Gremlin" }
+main = "#A0281E"
+light = "#F8C890"
+bpm = 4
+
+[[bosses.cooking.forms]]
+name = { en = "Gremlin of the Burnt Feast", de = "Gremlin des verbrannten Festmahls" }
+main = "#5A1A1A"
+light = "#FF9A6A"
+beats = 1
+eighth = 0.15

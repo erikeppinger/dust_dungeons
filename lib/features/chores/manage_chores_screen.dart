@@ -7,6 +7,7 @@ import '../../app/theme/chore_palette.dart';
 import '../../core/widgets/section_header.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
+import '../../domain/default_chores.dart';
 import '../../domain/points.dart';
 import '../../l10n/app_localizations.dart';
 import 'chore_edit_screen.dart';
@@ -36,7 +37,15 @@ class ManageChoresScreen extends ConsumerWidget {
         error: (_, _) => Center(child: Text(l10n.errorGeneric)),
         data: (list) {
           final active = list.where((c) => !c.isArchived).toList();
-          final archived = list.where((c) => c.isArchived).toList();
+          bool suggestion(Chore c) => suggestedSeeds.contains(c.seedKey);
+          final archived = list
+              .where((c) => c.isArchived && !suggestion(c))
+              .toList();
+          // Suggested built-in quests (homework, pets, garden, cooking)
+          // that nobody brought in yet.
+          final suggested = list
+              .where((c) => c.isArchived && suggestion(c))
+              .toList();
           return ListView(
             // Room for the FAB plus the edge-to-edge navigation bar.
             padding: EdgeInsets.only(
@@ -48,6 +57,10 @@ class ManageChoresScreen extends ConsumerWidget {
               if (archived.isNotEmpty) ...[
                 SectionHeader('${l10n.archivedChores} (${archived.length})'),
                 for (final c in archived) _ChoreRow(c),
+              ],
+              if (suggested.isNotEmpty) ...[
+                SectionHeader('${l10n.suggestedChores} (${suggested.length})'),
+                for (final c in suggested) _ChoreRow(c),
               ],
             ],
           );

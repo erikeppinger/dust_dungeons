@@ -17,6 +17,9 @@ import '../../data/repositories/shop_repository.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/echo_duel.dart';
 import '../../domain/fight/items.dart';
+import '../../domain/fight/overlord.dart';
+import '../../game/game_data.dart' show overlordBoonDays, overlordHolidays;
+import '../../game/game_texts.dart';
 import '../../domain/fight/shop.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
@@ -43,6 +46,7 @@ class FightScreen extends ConsumerStatefulWidget {
     required this.tier,
     this.loadout = Loadout.none,
     this.motifs = const [],
+    this.look,
   });
 
   final BossFamily family;
@@ -53,6 +57,9 @@ class FightScreen extends ConsumerStatefulWidget {
 
   /// For the Overlord: the bosses beaten this week, whose rhythms it plays.
   final List<BossFamily> motifs;
+
+  /// For the Overlord: how it looks and plays this week.
+  final OverlordLook? look;
 
   bool get overlord => family == BossFamily.overlord;
 
@@ -95,6 +102,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
       family: widget.family,
       tier: widget.tier,
       storyMode: person.storyMode,
+      look: widget.overlord ? widget.look?.key : null,
     );
     final base = HeroStats.forLevel(level);
     final hero = HeroStats(
@@ -108,6 +116,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
               tier: widget.tier,
               hero: hero,
               motifs: widget.motifs,
+              trait: widget.look?.trait ?? const BossTrait(),
               loadout: widget.loadout,
               storyMode: person.storyMode,
               slowMode: person.slowMode,
@@ -278,6 +287,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
                         family: widget.family,
                         duel: _controller.duel,
                         motifs: widget.motifs,
+                        look: widget.look,
                         loot: _loot,
                         curseWaits: _curses && !_controller.duel.storyMode,
                         onSecondWind: _useSecondWind,
@@ -286,6 +296,7 @@ class _FightScreenState extends ConsumerState<FightScreen> {
                         controller: _controller,
                         onLeave: _confirmLeave,
                         hero: _hero(),
+                        look: widget.look,
                       ),
               ),
             ),
@@ -301,11 +312,15 @@ class _Duel extends StatelessWidget {
     required this.controller,
     required this.onLeave,
     required this.hero,
+    this.look,
   });
 
   final FightController controller;
   final VoidCallback onLeave;
   final Widget hero;
+
+  /// For the Overlord: how it looks this week.
+  final OverlordLook? look;
 
   @override
   Widget build(BuildContext context) {
@@ -381,7 +396,7 @@ class _Duel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      bossName(l10n, duel.family),
+                      bossName(l10n, duel.family, look, duel.tier),
                       style: theme.textTheme.titleMedium,
                     ),
                     Text(
@@ -406,6 +421,8 @@ class _Duel extends StatelessWidget {
           const SizedBox(height: 8),
           BossArt(
             family: duel.family,
+            look: look,
+            tier: duel.tier,
             size: lanes ? 96 : 144,
             mood: hitNow ? BossMood.hit : BossMood.idle,
             // A bounce on every beat of the boss's call.
@@ -644,6 +661,7 @@ class _Result extends ConsumerWidget {
     required this.family,
     required this.duel,
     required this.motifs,
+    this.look,
     required this.loot,
     required this.curseWaits,
     required this.onSecondWind,
@@ -652,6 +670,7 @@ class _Result extends ConsumerWidget {
   final BossFamily family;
   final EchoDuel duel;
   final List<BossFamily> motifs;
+  final OverlordLook? look;
 
   /// What the win dropped (`null`: nothing, or not recorded yet).
   final ShopItem? loot;
@@ -673,7 +692,10 @@ class _Result extends ConsumerWidget {
     final canRetry = overlord ? !won : tokensLeft > 0;
     final secondWinds =
         ref.watch(inventoryProvider).value?[reviveItem.key] ?? 0;
-    final boss = bossName(l10n, family);
+    final boss = bossName(l10n, family, look, duel.tier);
+    // A win that reached the next tier: the boss returns in a new form.
+    final nextTier = won && !overlord ? tierForWins(wins) : duel.tier;
+    final holiday = won ? look?.holiday : null;
 
     Widget stat(String value, String label) => Expanded(
       child: Card(
@@ -694,8 +716,12 @@ class _Result extends ConsumerWidget {
       children: [
         Center(
           child: won
-              ? PixelTrophy(size: 128, semanticLabel: trophyName(l10n, family))
-              : BossArt(family: family, size: 144),
+              ? PixelTrophy(
+                  size: 128,
+                  tier: overlord ? 3 : duel.tier,
+                  semanticLabel: trophyName(l10n, family),
+                )
+              : BossArt(family: family, look: look, tier: duel.tier, size: 144),
         ),
         const SizedBox(height: 12),
         Text(
@@ -713,6 +739,44 @@ class _Result extends ConsumerWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium,
         ),
+        if (nextTier > duel.tier) ...[
+          const SizedBox(height: 12),
+          Center(
+            child: BossArt(
+              family: family,
+              tier: nextTier,
+              size: 96,
+              semanticLabel: '',
+            ),
+          ),
+          Text(
+            l10n.fightNewForm(bossName(l10n, family, null, nextTier)),
+            key: const ValueKey('new-form'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
+        if (holiday != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            l10n.fightHolidayTrophy(gameHolidayTrophy(l10n, holiday) ?? ''),
+            key: const ValueKey('holiday-trophy'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+          Text(
+            l10n.fightHolidayBoon(
+              overlordBoonDays,
+              effectPhrases(
+                l10n,
+                overlordHolidays[holiday]?.boon ?? Effects.none,
+              ).join(', '),
+            ),
+            key: const ValueKey('holiday-boon'),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+        ],
         if (loot case final loot?) ...[
           const SizedBox(height: 12),
           _LootCard(item: loot),
@@ -778,6 +842,7 @@ class _Result extends ConsumerWidget {
                   family: family,
                   tier: progress.tier(family),
                   motifs: motifs,
+                  look: look,
                 ),
               ),
             ),

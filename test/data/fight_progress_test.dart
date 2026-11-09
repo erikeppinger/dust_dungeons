@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/models/fight_progress.dart';
+import 'package:homework_and_chores/domain/fight/overlord.dart';
+import 'package:homework_and_chores/game/game_data.dart';
+import 'package:homework_and_chores/domain/fight/items.dart';
 
 Chore chore(int id, {String? seedKey, BossFamily? family}) => Chore(
   id: id,
@@ -35,17 +38,20 @@ Fight fight(
   int good = 0,
   int miss = 0,
   DateTime? at,
+  String? look,
+  int tier = 1,
 }) => Fight(
   id: ++_id,
   profileId: 1,
   family: family,
-  tier: 1,
+  tier: tier,
   storyMode: false,
   startedAt: at ?? DateTime(2026, 10, 28),
   result: result,
   perfect: perfect,
   good: good,
   miss: miss,
+  look: look,
 );
 
 void main() {
@@ -253,5 +259,74 @@ void main() {
       DateTime(2026, 10, 26),
       reason: 'without history, just this week',
     );
+  });
+
+  group('weekly Overlords', () {
+    final monday = DateTime(2026, 12, 21);
+    final festive = OverlordLook.forWeek(monday, holidays: {'christmas'});
+
+    test('the beaten Overlord keeps the look it had', () {
+      final progress = FightProgress(
+        completions: const [],
+        chores: const [],
+        fights: [
+          fight(
+            BossFamily.overlord,
+            result: FightResult.lost,
+            at: monday,
+            look: OverlordLook.classic.key,
+          ),
+          fight(
+            BossFamily.overlord,
+            result: FightResult.won,
+            at: monday.add(const Duration(days: 2)),
+            look: festive.key,
+          ),
+        ],
+      );
+      expect(progress.beatenOverlord(monday), festive);
+      expect(
+        progress.beatenOverlord(monday.add(const Duration(days: 7))),
+        isNull,
+      );
+      expect(progress.weekHistory(monday).last.overlord, festive);
+      expect(progress.holidayWins, {'christmas': 1});
+    });
+
+    test('a holiday win gives its boon for 14 days', () {
+      final progress = FightProgress(
+        completions: const [],
+        chores: const [],
+        fights: [
+          fight(
+            BossFamily.overlord,
+            result: FightResult.won,
+            at: DateTime(2026, 12, 23, 18),
+            look: festive.key,
+          ),
+        ],
+      );
+      expect(progress.activeBoons(DateTime(2026, 12, 22)), isEmpty);
+      expect(progress.activeBoons(DateTime(2026, 12, 23)), [('christmas', 14)]);
+      expect(progress.activeBoons(DateTime(2027, 1, 5)), [('christmas', 1)]);
+      expect(progress.activeBoons(DateTime(2027, 1, 6)), isEmpty);
+      final boon = overlordHolidays['christmas']!.boon;
+      expect(const Loadout().against().hearts, 0);
+      expect(Loadout(boon: boon).against().hearts, boon.hearts);
+      expect(boon, isNot(Effects.none));
+    });
+
+    test('wins from before 0.15.0 show the classic Overlord', () {
+      final progress = FightProgress(
+        completions: const [],
+        chores: const [],
+        fights: [fight(BossFamily.overlord, result: FightResult.won)],
+      );
+      expect(
+        progress.beatenOverlord(DateTime(2026, 10, 28)),
+        OverlordLook.classic,
+      );
+      expect(progress.holidayWins, isEmpty);
+    });
   });
 }

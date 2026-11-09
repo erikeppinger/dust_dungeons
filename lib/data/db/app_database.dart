@@ -47,7 +47,7 @@ class AppDatabase extends _$AppDatabase {
   /// (`dart run drift_dev schema dump ... drift_schemas/`) and add a
   /// migration test.
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -156,6 +156,16 @@ class AppDatabase extends _$AppDatabase {
         // v10: fight difficulty per person; everyone starts on balanced.
         await m.addColumn(profiles, profiles.difficulty);
       }
+      if (from < 11) {
+        // v11: the weekly Overlord's look, stored with its fights. Databases
+        // from before v4 got the fights table in its current shape.
+        if (!await _hasColumn('fights', 'look')) {
+          await m.addColumn(fights, fights.look);
+        }
+      }
+      // v12: four more bosses (homework, pets, garden, cooking). Nothing to
+      // migrate: bosses are stored by name. The version tells older app
+      // versions to refuse a backup they couldn't read.
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');
@@ -186,6 +196,8 @@ class AppDatabase extends _$AppDatabase {
           colorKey: seed.colorKey,
           basePoints: seed.basePoints,
           sortOrder: Value(i),
+          // Suggestions wait in the archive until someone brings them in.
+          isArchived: Value(seed.suggested),
         ).withSchedule(seed.defaultRecurrence(_clock(), i), _clock()),
         mode: InsertMode.insertOrIgnore,
       );

@@ -113,7 +113,7 @@ void main() {
     final MapEntry(key: name, value: bytes) = backup.saved.entries.single;
     expect(name, startsWith('homework-chores-backup-'));
     final copy = File('${tmp.path}/saved.sqlite')..writeAsBytesSync(bytes);
-    expect(checkBackup(copy.path, currentSchema: 10), 10);
+    expect(checkBackup(copy.path, currentSchema: 12), 12);
   });
 
   testWidgets('importing shows what it adds, merges, and can be undone', (

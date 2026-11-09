@@ -6,6 +6,7 @@ import '../domain/fight/boss.dart';
 import '../domain/fight/difficulty.dart';
 import '../domain/fight/echo_duel.dart';
 import '../domain/fight/items.dart';
+import '../domain/fight/overlord.dart';
 import '../domain/fight/shop.dart';
 import '../domain/recurrence.dart';
 
@@ -161,6 +162,42 @@ const capeOfCleanSweepItem = ShopItem(
   dropsFrom: BossFamily.overlord,
   effects: Effects(hearts: 2, comboHeal: 10),
 );
+const highlighterWandItem = ShopItem(
+  'highlighter_wand',
+  ItemKind.gear,
+  0,
+  slot: GearSlot.weapon,
+  dropsFrom: BossFamily.homework,
+  effects: Effects(goodDamage: 1),
+  against: {BossFamily.homework: Effects(goodDamage: 2)},
+);
+const squeakyToyItem = ShopItem(
+  'squeaky_toy',
+  ItemKind.gear,
+  0,
+  slot: GearSlot.charm,
+  dropsFrom: BossFamily.pets,
+  effects: Effects(comboHeal: 12),
+  against: {BossFamily.pets: Effects(comboHeal: 8)},
+);
+const hedgeShearsItem = ShopItem(
+  'hedge_shears',
+  ItemKind.gear,
+  0,
+  slot: GearSlot.weapon,
+  twoHanded: true,
+  dropsFrom: BossFamily.garden,
+  effects: Effects(damage: 1, perfectTimes: 3),
+);
+const ovenMittShieldItem = ShopItem(
+  'oven_mitt_shield',
+  ItemKind.gear,
+  0,
+  slot: GearSlot.shield,
+  dropsFrom: BossFamily.cooking,
+  effects: Effects(freeMisses: 1),
+  against: {BossFamily.cooking: Effects(freeMisses: 2)},
+);
 const secondWindItem = ShopItem(
   'second_wind',
   ItemKind.consumable,
@@ -231,6 +268,10 @@ const lootItems = <ShopItem>[
   lostRemoteItem,
   mopOfDoomItem,
   capeOfCleanSweepItem,
+  highlighterWandItem,
+  squeakyToyItem,
+  hedgeShearsItem,
+  ovenMittShieldItem,
 ];
 
 /// All gear, retired too (owners keep it).
@@ -254,6 +295,10 @@ const allGear = <ShopItem>[
   lostRemoteItem,
   mopOfDoomItem,
   capeOfCleanSweepItem,
+  highlighterWandItem,
+  squeakyToyItem,
+  hedgeShearsItem,
+  ovenMittShieldItem,
 ];
 
 /// Consumables for fights, sold in the Armory.
@@ -299,6 +344,10 @@ const shopItems = <ShopItem>[
   lostRemoteItem,
   mopOfDoomItem,
   capeOfCleanSweepItem,
+  highlighterWandItem,
+  squeakyToyItem,
+  hedgeShearsItem,
+  ovenMittShieldItem,
   secondWindItem,
   coffeeOfHasteItem,
   snackBreakItem,
@@ -363,6 +412,158 @@ const bossStyles = <BossFamily, BossStyle>{
     offbeatChance: 0.2,
     eighthChance: 0.3,
   ),
+  BossFamily.homework: BossStyle(
+    baseBpm: 88,
+    offbeatChance: 0.05,
+    eighthChance: 0.15,
+  ),
+  BossFamily.pets: BossStyle(
+    baseBpm: 104,
+    offbeatChance: 0.3,
+    eighthChance: 0.3,
+  ),
+  BossFamily.garden: BossStyle(
+    baseBpm: 86,
+    offbeatChance: 0.1,
+    eighthChance: 0.35,
+  ),
+  BossFamily.cooking: BossStyle(
+    baseBpm: 114,
+    offbeatChance: 0.15,
+    eighthChance: 0.45,
+  ),
+};
+
+/// Forms at tier 2 and 3 (chore bosses).
+const bossForms = <BossFamily, List<BossForm>>{
+  BossFamily.dust: [
+    BossForm(
+      main: 0xFF8E6FA8,
+      light: 0xFFD8C2E6,
+      trait: BossTrait(eighth: 0.1),
+    ),
+    BossForm(
+      main: 0xFF5B3F7A,
+      light: 0xFFC9A8E0,
+      trait: BossTrait(beats: 1, eighth: 0.1),
+    ),
+  ],
+  BossFamily.laundry: [
+    BossForm(
+      main: 0xFF006A88,
+      light: 0xFF5FC8E0,
+      trait: BossTrait(offbeat: 0.1),
+    ),
+    BossForm(
+      main: 0xFF1B3F8B,
+      light: 0xFF7FB2F0,
+      trait: BossTrait(beats: 1, offbeat: 0.1),
+    ),
+  ],
+  BossFamily.kitchen: [
+    BossForm(main: 0xFFE07A2F, light: 0xFFF2B66B, trait: BossTrait(bpm: 4)),
+    BossForm(
+      main: 0xFFB23A1E,
+      light: 0xFFF28C4A,
+      trait: BossTrait(bpm: 4, beats: 1),
+    ),
+  ],
+  BossFamily.bath: [
+    BossForm(
+      main: 0xFF6F8792,
+      light: 0xFFD6E2E8,
+      trait: BossTrait(offbeat: 0.1),
+    ),
+    BossForm(
+      main: 0xFF4A5A80,
+      light: 0xFFC8D4F0,
+      trait: BossTrait(beats: 1, eighth: 0.1),
+    ),
+  ],
+  BossFamily.trash: [
+    BossForm(
+      main: 0xFF56702A,
+      light: 0xFFA6C46A,
+      trait: BossTrait(eighth: 0.1),
+    ),
+    BossForm(
+      main: 0xFF3E4A1C,
+      light: 0xFFC2D86A,
+      trait: BossTrait(beats: 1, offbeat: 0.15),
+    ),
+  ],
+  BossFamily.bedroom: [
+    BossForm(
+      main: 0xFF7B86C8,
+      light: 0xFFC9CEF2,
+      trait: BossTrait(offbeat: 0.1),
+    ),
+    BossForm(
+      main: 0xFF4B3F8E,
+      light: 0xFFB4A8E8,
+      trait: BossTrait(beats: 1, eighth: 0.1),
+    ),
+  ],
+  BossFamily.outside: [
+    BossForm(main: 0xFF4FB3E8, light: 0xFFBCE8FF, trait: BossTrait(bpm: 4)),
+    BossForm(
+      main: 0xFF2A6FB8,
+      light: 0xFF9ED8FF,
+      trait: BossTrait(beats: 1, eighth: 0.1),
+    ),
+  ],
+  BossFamily.clutter: [
+    BossForm(
+      main: 0xFF5E7480,
+      light: 0xFFBAC8CF,
+      trait: BossTrait(offbeat: 0.1),
+    ),
+    BossForm(
+      main: 0xFF3C4A66,
+      light: 0xFFA8B8D8,
+      trait: BossTrait(beats: 1, offbeat: 0.1),
+    ),
+  ],
+  BossFamily.homework: [
+    BossForm(
+      main: 0xFFE6D9A8,
+      light: 0xFF4A2E7A,
+      trait: BossTrait(eighth: 0.1),
+    ),
+    BossForm(main: 0xFFD9C27A, light: 0xFF2A1A4A, trait: BossTrait(beats: 1)),
+  ],
+  BossFamily.pets: [
+    BossForm(
+      main: 0xFF7E5233,
+      light: 0xFFE8C89A,
+      trait: BossTrait(offbeat: 0.1),
+    ),
+    BossForm(
+      main: 0xFF4A3020,
+      light: 0xFFD8A870,
+      trait: BossTrait(beats: 1, offbeat: 0.1),
+    ),
+  ],
+  BossFamily.garden: [
+    BossForm(
+      main: 0xFF2E7A3A,
+      light: 0xFFC2E07A,
+      trait: BossTrait(eighth: 0.1),
+    ),
+    BossForm(
+      main: 0xFF5A3A7A,
+      light: 0xFF9AD86A,
+      trait: BossTrait(bpm: -4, beats: 1),
+    ),
+  ],
+  BossFamily.cooking: [
+    BossForm(main: 0xFFA0281E, light: 0xFFF8C890, trait: BossTrait(bpm: 4)),
+    BossForm(
+      main: 0xFF5A1A1A,
+      light: 0xFFFF9A6A,
+      trait: BossTrait(beats: 1, eighth: 0.15),
+    ),
+  ],
 };
 
 const bossCurses = <BossFamily, Curse>{
@@ -387,6 +588,18 @@ const bossCurses = <BossFamily, Curse>{
   ),
   BossFamily.clutter: Curse(BossFamily.clutter, CurseKind.heart),
   BossFamily.overlord: Curse(BossFamily.overlord, CurseKind.heart),
+  BossFamily.homework: Curse(BossFamily.homework, CurseKind.tightTiming),
+  BossFamily.pets: Curse(BossFamily.pets, CurseKind.heart),
+  BossFamily.garden: Curse(
+    BossFamily.garden,
+    CurseKind.slotOff,
+    GearSlot.weapon,
+  ),
+  BossFamily.cooking: Curse(
+    BossFamily.cooking,
+    CurseKind.slotOff,
+    GearSlot.shield,
+  ),
 };
 
 // ---- Built-in quests (game/quests.toml) ----
@@ -413,6 +626,46 @@ const defaultChores = <SeedChore>[
   SeedChore('groceries', 'shopping_cart', 2, 15, RepeatType.afterDone, 7),
   SeedChore('water_plants', 'local_florist', 3, 5, RepeatType.afterDone, 3),
   SeedChore('tidy_up', 'inventory_2', 0, 10, RepeatType.daily, 1),
+  SeedChore.suggestion('homework', 'menu_book', 1, 20, RepeatType.daily, 1),
+  SeedChore.suggestion(
+    'pack_school_bag',
+    'inventory_2',
+    1,
+    5,
+    RepeatType.daily,
+    1,
+  ),
+  SeedChore.suggestion('reading', 'menu_book', 3, 10, RepeatType.daily, 1),
+  SeedChore.suggestion('feed_pets', 'pets', 4, 5, RepeatType.daily, 1),
+  SeedChore.suggestion('walk_dog', 'pets', 2, 15, RepeatType.daily, 1),
+  SeedChore.suggestion(
+    'clean_pet_home',
+    'sanitizer',
+    6,
+    15,
+    RepeatType.afterDone,
+    3,
+  ),
+  SeedChore.suggestion('weeding', 'yard', 2, 20, RepeatType.afterDone, 7),
+  SeedChore.suggestion('mow_lawn', 'grass', 2, 25, RepeatType.afterDone, 10),
+  SeedChore.suggestion(
+    'water_garden',
+    'water_drop',
+    5,
+    10,
+    RepeatType.afterDone,
+    2,
+  ),
+  SeedChore.suggestion('cook_meal', 'restaurant', 0, 20, RepeatType.daily, 1),
+  SeedChore.suggestion(
+    'plan_meals',
+    'menu_book',
+    7,
+    10,
+    RepeatType.afterDone,
+    7,
+  ),
+  SeedChore.suggestion('bake', 'microwave', 0, 20, RepeatType.anytime, 1),
 ];
 
 /// The boss each built-in quest feeds.
@@ -438,6 +691,18 @@ const seedFamilies = <String, BossFamily>{
   'groceries': BossFamily.outside,
   'water_plants': BossFamily.outside,
   'tidy_up': BossFamily.bedroom,
+  'homework': BossFamily.homework,
+  'pack_school_bag': BossFamily.homework,
+  'reading': BossFamily.homework,
+  'feed_pets': BossFamily.pets,
+  'walk_dog': BossFamily.pets,
+  'clean_pet_home': BossFamily.pets,
+  'weeding': BossFamily.garden,
+  'mow_lawn': BossFamily.garden,
+  'water_garden': BossFamily.garden,
+  'cook_meal': BossFamily.cooking,
+  'plan_meals': BossFamily.cooking,
+  'bake': BossFamily.cooking,
 };
 
 // ---- Balance (game/balance.toml) ----
@@ -484,3 +749,254 @@ const difficultyPresets = <Difficulty, DifficultyPreset>{
     tempo: 1.08,
   ),
 };
+
+// ---- Overlords (game/overlords.toml) ----
+
+const overlordBodies = <String>[
+  'robe',
+  'armor',
+  'blob',
+  'sleeves',
+  'spider',
+  'serpent',
+];
+const overlordFaces = <String>[
+  'grin',
+  'angry',
+  'cyclops',
+  'specs',
+  'sleepy',
+  'three',
+];
+const overlordHats = <String>[
+  'crown',
+  'horns',
+  'wizard',
+  'bucket',
+  'colander',
+  'chef',
+];
+const overlordItems = <String>[
+  'plunger',
+  'fork',
+  'brush',
+  'duster',
+  'spatula',
+  'mop',
+];
+const overlordExtras = <String>[
+  'none',
+  'cape',
+  'flies',
+  'sparkles',
+  'wings',
+  'tentacles',
+];
+const overlordSchemeOrder = <String>[
+  'violet',
+  'crimson',
+  'moss',
+  'midnight',
+  'rust',
+  'teal',
+  'ash',
+  'plum',
+];
+
+const overlordEras = <OverlordEra>[
+  OverlordEra(2024, 1, 1, parts: [6, 6, 6, 6, 6, 8], names: 24, titles: 24),
+];
+
+/// Main and light color by scheme.
+const overlordSchemes = <String, (int, int)>{
+  'violet': (0xFF5E35B1, 0xFFB39DDB),
+  'crimson': (0xFFB0283C, 0xFFF0B4AA),
+  'moss': (0xFF387846, 0xFFBEDC96),
+  'midnight': (0xFF283C82, 0xFFA0BEE6),
+  'rust': (0xFFB85C28, 0xFFF6CEA0),
+  'teal': (0xFF007978, 0xFFB2E6D2),
+  'ash': (0xFF545460, 0xFFC8C4D2),
+  'plum': (0xFF8C2878, 0xFFECBADC),
+  'christmas': (0xFFC62828, 0xFFF8D5C0),
+  'easter': (0xFF6E9E3A, 0xFFF8DCE6),
+  'valentine': (0xFFC8346E, 0xFFFAD6DC),
+  'halloween': (0xFF4A2E6B, 0xFFB5D98A),
+  'new_year': (0xFF1E2A5A, 0xFFE6DCF5),
+  'lunar_new_year': (0xFFB71C1C, 0xFFF8D9B0),
+  'diwali': (0xFFC2185B, 0xFFFFD9A0),
+  'eid_al_fitr': (0xFF00695C, 0xFFE0F2E9),
+  'hanukkah': (0xFF1E4DB7, 0xFFE3ECFF),
+  'nowruz': (0xFF5E8C3A, 0xFFFADADD),
+  'solstice': (0xFFE67E22, 0xFFFFF1B8),
+  'earth_day': (0xFF2E7D32, 0xFFD7CCA8),
+};
+
+/// How each body plays.
+const overlordTraits = <String, BossTrait>{
+  'robe': BossTrait(),
+  'armor': BossTrait(bpm: -8, beats: 1),
+  'blob': BossTrait(offbeat: 0.25),
+  'sleeves': BossTrait(eighth: 0.2),
+  'spider': BossTrait(bpm: 8),
+  'serpent': BossTrait(lanes: 0.1),
+};
+
+const overlordHolidays = <String, OverlordHoliday>{
+  'christmas': OverlordHoliday(
+    month: 12,
+    day: 24,
+    hat: 'santa',
+    item: 'candy_cane',
+    extra: 'snow',
+    scheme: 'christmas',
+    boon: Effects(hearts: 1),
+  ),
+  'easter': OverlordHoliday(
+    easter: true,
+    hat: 'bunny',
+    item: 'egg',
+    extra: 'eggs',
+    scheme: 'easter',
+    boon: Effects(lootBonus: 15),
+  ),
+  'valentine': OverlordHoliday(
+    month: 2,
+    day: 14,
+    hat: 'hearts',
+    item: 'arrow',
+    extra: 'hearts',
+    scheme: 'valentine',
+    boon: Effects(comboHeal: 10),
+  ),
+  'halloween': OverlordHoliday(
+    month: 10,
+    day: 31,
+    hat: 'pumpkin',
+    item: 'broom',
+    extra: 'bats',
+    scheme: 'halloween',
+    boon: Effects(sneakAttack: true),
+  ),
+  'new_year': OverlordHoliday(
+    month: 12,
+    day: 31,
+    hat: 'party',
+    item: 'sparkler',
+    extra: 'confetti',
+    scheme: 'new_year',
+    boon: Effects(wideTiming: true),
+  ),
+  'lunar_new_year': OverlordHoliday(
+    dates: [
+      (2024, 2, 10),
+      (2025, 1, 29),
+      (2026, 2, 17),
+      (2027, 2, 6),
+      (2028, 1, 26),
+      (2029, 2, 13),
+      (2030, 2, 3),
+      (2031, 1, 23),
+      (2032, 2, 11),
+      (2033, 1, 31),
+      (2034, 2, 19),
+      (2035, 2, 8),
+      (2036, 1, 28),
+      (2037, 2, 15),
+      (2038, 2, 4),
+      (2039, 1, 24),
+      (2040, 2, 12),
+    ],
+    hat: 'lion',
+    item: 'lantern',
+    extra: 'firecrackers',
+    scheme: 'lunar_new_year',
+    boon: Effects(lootBonus: 20),
+  ),
+  'diwali': OverlordHoliday(
+    dates: [
+      (2024, 11, 1),
+      (2025, 10, 20),
+      (2026, 11, 8),
+      (2027, 10, 29),
+      (2028, 10, 17),
+      (2029, 11, 5),
+      (2030, 10, 26),
+      (2031, 11, 14),
+      (2032, 11, 2),
+      (2033, 10, 22),
+      (2034, 11, 10),
+      (2035, 10, 30),
+      (2036, 10, 18),
+    ],
+    hat: 'marigold',
+    item: 'rocket',
+    extra: 'lights',
+    scheme: 'diwali',
+    boon: Effects(perfectTimes: 3),
+  ),
+  'eid_al_fitr': OverlordHoliday(
+    dates: [
+      (2024, 4, 10),
+      (2025, 3, 30),
+      (2026, 3, 20),
+      (2027, 3, 10),
+      (2028, 2, 27),
+      (2029, 2, 14),
+      (2030, 2, 5),
+      (2031, 1, 24),
+      (2032, 1, 14),
+      (2033, 1, 2),
+      (2033, 12, 23),
+      (2034, 12, 12),
+      (2035, 12, 1),
+      (2036, 11, 19),
+      (2037, 11, 8),
+      (2038, 10, 29),
+      (2039, 10, 19),
+      (2040, 10, 7),
+    ],
+    hat: 'star_garland',
+    item: 'fanous',
+    extra: 'stars',
+    scheme: 'eid_al_fitr',
+    boon: Effects(freeMisses: 1),
+  ),
+  'hanukkah': OverlordHoliday(
+    hanukkah: true,
+    hat: 'dreidel',
+    item: 'gelt',
+    extra: 'coins',
+    scheme: 'hanukkah',
+    boon: Effects(goodDamage: 1),
+  ),
+  'nowruz': OverlordHoliday(
+    month: 3,
+    day: 20,
+    hat: 'blossom',
+    item: 'branch',
+    extra: 'petals',
+    scheme: 'nowruz',
+    boon: Effects(thirdMissFree: true),
+  ),
+  'earth_day': OverlordHoliday(
+    month: 4,
+    day: 22,
+    hat: 'leaf',
+    item: 'grabber',
+    extra: 'leaves',
+    scheme: 'earth_day',
+    boon: Effects(slowerBoss: true),
+  ),
+  'solstice': OverlordHoliday(
+    month: 6,
+    day: 21,
+    hat: 'sun',
+    item: 'ice_cream',
+    extra: 'sunbeams',
+    scheme: 'solstice',
+    boon: Effects(damage: 1),
+  ),
+};
+
+/// How many days a holiday boon lasts.
+const overlordBoonDays = 14;

@@ -8,6 +8,82 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-09
+([design](docs/design/more-bosses.md))
+
+### Added
+- **Four new bosses**, each with its own rhythm, curse and loot:
+  - **Paper Pile Lich** (homework, reading): Highlighter Wand
+  - **Fur Ball Beast** (pets): Squeaky Toy
+  - **Weed Wyrm** (garden, lawn): Two-Handed Hedge Shears
+  - **Pot Gremlin** (cooking, meals): Oven-Mitt Shield
+- **12 suggested quests** that feed them, such as Do homework, Feed the pets, Mow the lawn and
+  Cook a meal. They start in the archive, under Manage quests → Suggestions.
+  - Onboarding asks "Anything else at home?" (homework, pets, a garden, cooking) and brings in the
+    quests that were ticked.
+  - On phones that already have the app, they arrive as suggestions too.
+- **Stronger forms:** at tier 2 (3 wins) and tier 3 (8 wins) every chore boss changes form, with a
+  new name (Dust Bunny King → Dust Bunny Emperor → Dust Bunny Tyrant of the Rug), new colors,
+  headgear, embers at tier 3, and a small change to its rhythm (more offbeats, more eighths, a
+  little faster, or one more beat). The fight's result says when a boss will return in a new form.
+- **Trophies in bronze, silver and gold:** for the highest form beaten. The Dust Bunny King's
+  trophy is now the Grand Feather Duster (it was Golden), since it isn't always gold.
+- Boss cards in the Arena take the colors of the boss's form, and the Overlord's card the colors
+  of the week's Overlord.
+- **Seven more holiday Overlords** (opt-in, each with its own check box): Lunar New Year, Diwali,
+  Eid al-Fitr, Hanukkah, Nowruz, Earth Day and the summer solstice. Hanukkah is worked out from the
+  Hebrew calendar; Lunar New Year, Diwali and Eid use date tables. Holidays in the same week take
+  turns by year.
+- **Holiday boons:** beating a holiday Overlord gives a small boon for 14 days (an extra heart,
+  more loot, wider timing …), shown with the days left on the fight's start screen.
+- **Each phone has its own Overlords:** a random number made once on the phone shifts its
+  sequence, with the same rules (no repeats, every part changes each week).
+- **Sleeping bosses:** bosses that no active quest feeds sit small in a "Sleeping" row at the end
+  of the Arena. A tap says which quests wake one and offers to bring in its suggested quests.
+  Bosses with tokens come first.
+
+### Changed
+- Database schema 12, so earlier versions refuse a backup with the new bosses instead of failing
+  on it. No data changes.
+- The pixel art build allows up to 81 colors per palette.
+
+### Fixed
+- The welcome icon in the introduction was stretched to the full width and covered the text (since
+  0.13.0).
+- Decorative boss pictures next to a boss's name are no longer read out as an empty image by screen
+  readers.
+- At large font sizes the tab labels no longer wrap or break mid-word: they grow with the font
+  size up to 110 % (the icons stay large), and the German Settings tab is called "Optionen" (the
+  screen keeps the title "Einstellungen").
+- German: "Erst eine Quest schaffen, dann kämpfen" on a boss without tokens, instead of a sentence
+  whose long "Kampfmarke" broke mid-word at large font sizes.
+- Roadmap: the beta moves to 0.17.0.
+
+## [0.15.0] - 2026-11-08
+([design](docs/design/weekly-overlords.md))
+
+### Added
+- **A different Overlord every week,** put together from six parts: body, face, headgear, held
+  item, extra and color scheme. That's 62,208 looks, and from one week to the next every part
+  changes. The week sets it, so it needs no storage, and everyone on the phone meets the same one.
+- **A name for each Overlord,** like "Grimeclaw of the Sticky Floor" / "Schmierklaue vom klebrigen
+  Boden".
+- **Traits:** the body sets how the Overlord plays: Classic, Heavy (slower, longer rhythms),
+  Wobbly (more offbeats), Swift (more eighths), Skittering (faster) or Coiling (more lane notes).
+  The start screen names it.
+- **Holiday Overlords (opt-in):** for Christmas, Easter, Valentine's Day, Halloween and New Year's
+  Eve, each with a check box under Settings → Boss fights, and off by default. In the holiday's
+  week, the Overlord wears holiday parts and has its own name and trophy.
+- The Arena's Overlord card shows the week's Overlord, its trait and its name. The Hall of Fame
+  shows each beaten Overlord at its castle, as it looked, and the trophy shelf shows holiday
+  trophies.
+- The Overlord's parts, schemes, traits, names and holidays are in `game/overlords.toml`.
+
+### Changed
+- Each Overlord fight stores the Overlord's look (database schema 11). Overlords beaten before
+  0.15.0 show the classic one.
+- Roadmap: the beta moves to 0.16.0.
+
 ## [0.14.0] - 2026-11-06
 From the testers ([design](docs/design/round-rules.md)).
 

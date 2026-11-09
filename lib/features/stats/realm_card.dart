@@ -12,6 +12,7 @@ import '../../domain/fight/boss.dart';
 import '../../domain/fight/overworld.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
+import '../fight/overlord_art.dart';
 import '../world/quest_map.dart';
 import '../../app/art/art.dart';
 
@@ -276,9 +277,29 @@ class _RealmWeek extends StatelessWidget {
                       height: tile * 1.1,
                       child: BossArt(
                         family: week.wins[i - 1],
+                        tier: i <= week.tiers.length ? week.tiers[i - 1] : 1,
                         size: tile * 1.1,
                       ),
                     ),
+                // The beaten Overlord stands above its castle, inside the map.
+                if (detailed && week.overlord != null)
+                  Positioned(
+                    left: ((map.route.last.x - 0.15) * tile).clamp(
+                      0,
+                      (mapCols - 1.3) * tile,
+                    ),
+                    top: ((map.route.last.y - 1.3) * tile).clamp(
+                      0,
+                      (mapRows - 1.3) * tile,
+                    ),
+                    width: tile * 1.3,
+                    height: tile * 1.3,
+                    child: OverlordArt(
+                      look: week.overlord!,
+                      size: tile * 1.3,
+                      mood: BossMood.defeated,
+                    ),
+                  ),
                 Positioned(
                   left: 3,
                   top: 3,

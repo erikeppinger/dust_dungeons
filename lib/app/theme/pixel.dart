@@ -410,17 +410,40 @@ class PixelFlame extends StatelessWidget {
 
 /// A trophy cup in the theme's gold.
 class PixelTrophy extends StatelessWidget {
-  const PixelTrophy({super.key, this.size = 24, this.semanticLabel});
+  const PixelTrophy({
+    super.key,
+    this.size = 24,
+    this.tier = 3,
+    this.semanticLabel,
+  });
 
   final double size;
+
+  /// Bronze (1), silver (2) or gold (3): the highest form of the boss beaten.
+  final int tier;
   final String? semanticLabel;
+
+  /// Bronze and silver for the trophy's three coin colors (coin, its shade,
+  /// its shine).
+  static const _metals = {
+    1: [Color(0xFFC77B3A), Color(0xFF8A4F1F), Color(0xFFF2C29A)],
+    2: [Color(0xFFB8C2CC), Color(0xFF7C8794), Color(0xFFF4F6F8)],
+  };
 
   @override
   Widget build(BuildContext context) {
+    final palette = PixelColors.of(context).palette;
+    final metal = _metals[tier];
+    final coin = [palette.coin, palette.coinShade, palette.coinShine];
     return PixelIcon(
       Sprites.trophy,
       size: size,
-      palette: PixelColors.of(context).palette.colors,
+      palette: metal == null
+          ? palette.colors
+          : [
+              for (final c in palette.colors)
+                coin.contains(c) ? metal[coin.indexOf(c)] : c,
+            ],
       semanticLabel: semanticLabel,
     );
   }

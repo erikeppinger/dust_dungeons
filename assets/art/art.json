@@ -42,6 +42,12 @@
     "hero/hero": { "size": [32, 32], "palette": "hero" },
     "hero/wear/*": { "size": [32, 32], "palette": "items", "prefix": "wear" },
     "bosses/*": { "size": [48, 48], "palette": "bosses", "frames": 4, "prefix": "boss" },
+    "bosses/forms/*": { "size": [48, 48], "palette": "bosses", "frames": 4, "prefix": "form" },
+    "bosses/overlord/body/*": { "size": [48, 48], "palette": "bosses", "prefix": "overlord_body" },
+    "bosses/overlord/face/*": { "size": [48, 48], "palette": "bosses", "frames": 3, "prefix": "overlord_face" },
+    "bosses/overlord/hat/*": { "size": [48, 48], "palette": "bosses", "prefix": "overlord_hat" },
+    "bosses/overlord/item/*": { "size": [48, 48], "palette": "bosses", "prefix": "overlord_item" },
+    "bosses/overlord/extra/*": { "size": [48, 48], "palette": "bosses", "frames": 2, "prefix": "overlord_extra" },
     "quests/*": { "size": [12, 12], "palette": "mask", "prefix": "quest" },
     "ui/*": { "size": [12, 12], "palette": "mask", "prefix": "ui" }
   }

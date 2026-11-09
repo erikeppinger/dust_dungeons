@@ -1349,7 +1349,7 @@ class Chore extends DataClass implements Insertable<Chore> {
   final int? reminderMinutes;
 
   /// Boss family for fight tokens (schema v4); `null` = the default for the
-  /// built-in chore, or the Clutter Imp for user chores.
+  /// built-in chore, or the Clutter Gremlin for user chores.
   final BossFamily? bossFamily;
 
   /// Monthly on a weekday (schema v8): 1–4 or -1 for the last; `null` =
@@ -3216,6 +3216,15 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _lookMeta = const VerificationMeta('look');
+  @override
+  late final GeneratedColumn<String> look = GeneratedColumn<String>(
+    'look',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3230,6 +3239,7 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
     good,
     miss,
     loot,
+    look,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3306,6 +3316,12 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
         loot.isAcceptableOrUnknown(data['loot']!, _lootMeta),
       );
     }
+    if (data.containsKey('look')) {
+      context.handle(
+        _lookMeta,
+        look.isAcceptableOrUnknown(data['look']!, _lookMeta),
+      );
+    }
     return context;
   }
 
@@ -3367,6 +3383,10 @@ class $FightsTable extends Fights with TableInfo<$FightsTable, Fight> {
         DriftSqlType.string,
         data['${effectivePrefix}loot'],
       ),
+      look: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}look'],
+      ),
     );
   }
 
@@ -3398,6 +3418,10 @@ class Fight extends DataClass implements Insertable<Fight> {
 
   /// The item a won fight dropped (schema v9).
   final String? loot;
+
+  /// The Overlord's look in this fight, an `OverlordLook.key` (schema v11);
+  /// `null` for other bosses and for Overlord fights from before.
+  final String? look;
   const Fight({
     required this.id,
     required this.profileId,
@@ -3411,6 +3435,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     required this.good,
     required this.miss,
     this.loot,
+    this.look,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3439,6 +3464,9 @@ class Fight extends DataClass implements Insertable<Fight> {
     if (!nullToAbsent || loot != null) {
       map['loot'] = Variable<String>(loot);
     }
+    if (!nullToAbsent || look != null) {
+      map['look'] = Variable<String>(look);
+    }
     return map;
   }
 
@@ -3460,6 +3488,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       good: Value(good),
       miss: Value(miss),
       loot: loot == null && nullToAbsent ? const Value.absent() : Value(loot),
+      look: look == null && nullToAbsent ? const Value.absent() : Value(look),
     );
   }
 
@@ -3485,6 +3514,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       good: serializer.fromJson<int>(json['good']),
       miss: serializer.fromJson<int>(json['miss']),
       loot: serializer.fromJson<String?>(json['loot']),
+      look: serializer.fromJson<String?>(json['look']),
     );
   }
   @override
@@ -3507,6 +3537,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       'good': serializer.toJson<int>(good),
       'miss': serializer.toJson<int>(miss),
       'loot': serializer.toJson<String?>(loot),
+      'look': serializer.toJson<String?>(look),
     };
   }
 
@@ -3523,6 +3554,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     int? good,
     int? miss,
     Value<String?> loot = const Value.absent(),
+    Value<String?> look = const Value.absent(),
   }) => Fight(
     id: id ?? this.id,
     profileId: profileId ?? this.profileId,
@@ -3536,6 +3568,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     good: good ?? this.good,
     miss: miss ?? this.miss,
     loot: loot.present ? loot.value : this.loot,
+    look: look.present ? look.value : this.look,
   );
   Fight copyWithCompanion(FightsCompanion data) {
     return Fight(
@@ -3551,6 +3584,7 @@ class Fight extends DataClass implements Insertable<Fight> {
       good: data.good.present ? data.good.value : this.good,
       miss: data.miss.present ? data.miss.value : this.miss,
       loot: data.loot.present ? data.loot.value : this.loot,
+      look: data.look.present ? data.look.value : this.look,
     );
   }
 
@@ -3568,7 +3602,8 @@ class Fight extends DataClass implements Insertable<Fight> {
           ..write('perfect: $perfect, ')
           ..write('good: $good, ')
           ..write('miss: $miss, ')
-          ..write('loot: $loot')
+          ..write('loot: $loot, ')
+          ..write('look: $look')
           ..write(')'))
         .toString();
   }
@@ -3587,6 +3622,7 @@ class Fight extends DataClass implements Insertable<Fight> {
     good,
     miss,
     loot,
+    look,
   );
   @override
   bool operator ==(Object other) =>
@@ -3603,7 +3639,8 @@ class Fight extends DataClass implements Insertable<Fight> {
           other.perfect == this.perfect &&
           other.good == this.good &&
           other.miss == this.miss &&
-          other.loot == this.loot);
+          other.loot == this.loot &&
+          other.look == this.look);
 }
 
 class FightsCompanion extends UpdateCompanion<Fight> {
@@ -3619,6 +3656,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
   final Value<int> good;
   final Value<int> miss;
   final Value<String?> loot;
+  final Value<String?> look;
   const FightsCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -3632,6 +3670,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     this.good = const Value.absent(),
     this.miss = const Value.absent(),
     this.loot = const Value.absent(),
+    this.look = const Value.absent(),
   });
   FightsCompanion.insert({
     this.id = const Value.absent(),
@@ -3646,6 +3685,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     this.good = const Value.absent(),
     this.miss = const Value.absent(),
     this.loot = const Value.absent(),
+    this.look = const Value.absent(),
   }) : profileId = Value(profileId),
        family = Value(family),
        tier = Value(tier),
@@ -3663,6 +3703,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     Expression<int>? good,
     Expression<int>? miss,
     Expression<String>? loot,
+    Expression<String>? look,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3677,6 +3718,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
       if (good != null) 'good': good,
       if (miss != null) 'miss': miss,
       if (loot != null) 'loot': loot,
+      if (look != null) 'look': look,
     });
   }
 
@@ -3693,6 +3735,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     Value<int>? good,
     Value<int>? miss,
     Value<String?>? loot,
+    Value<String?>? look,
   }) {
     return FightsCompanion(
       id: id ?? this.id,
@@ -3707,6 +3750,7 @@ class FightsCompanion extends UpdateCompanion<Fight> {
       good: good ?? this.good,
       miss: miss ?? this.miss,
       loot: loot ?? this.loot,
+      look: look ?? this.look,
     );
   }
 
@@ -3753,6 +3797,9 @@ class FightsCompanion extends UpdateCompanion<Fight> {
     if (loot.present) {
       map['loot'] = Variable<String>(loot.value);
     }
+    if (look.present) {
+      map['look'] = Variable<String>(look.value);
+    }
     return map;
   }
 
@@ -3770,7 +3817,8 @@ class FightsCompanion extends UpdateCompanion<Fight> {
           ..write('perfect: $perfect, ')
           ..write('good: $good, ')
           ..write('miss: $miss, ')
-          ..write('loot: $loot')
+          ..write('loot: $loot, ')
+          ..write('look: $look')
           ..write(')'))
         .toString();
   }
@@ -7813,6 +7861,7 @@ typedef $$FightsTableCreateCompanionBuilder = FightsCompanion Function({
   Value<int> good,
   Value<int> miss,
   Value<String?> loot,
+  Value<String?> look,
 });
 typedef $$FightsTableUpdateCompanionBuilder = FightsCompanion Function({
   Value<int> id,
@@ -7827,6 +7876,7 @@ typedef $$FightsTableUpdateCompanionBuilder = FightsCompanion Function({
   Value<int> good,
   Value<int> miss,
   Value<String?> loot,
+  Value<String?> look,
 });
 
 final class $$FightsTableReferences
@@ -7914,6 +7964,11 @@ class $$FightsTableFilterComposer
 
   ColumnFilters<String> get loot => $composableBuilder(
     column: $table.loot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get look => $composableBuilder(
+    column: $table.look,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8005,6 +8060,11 @@ class $$FightsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get look => $composableBuilder(
+    column: $table.look,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$ProfilesTableOrderingComposer get profileId {
     final $$ProfilesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -8071,6 +8131,9 @@ class $$FightsTableAnnotationComposer
   GeneratedColumn<String> get loot =>
       $composableBuilder(column: $table.loot, builder: (column) => column);
 
+  GeneratedColumn<String> get look =>
+      $composableBuilder(column: $table.look, builder: (column) => column);
+
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -8135,6 +8198,7 @@ class $$FightsTableTableManager
                 Value<int> good = const Value.absent(),
                 Value<int> miss = const Value.absent(),
                 Value<String?> loot = const Value.absent(),
+                Value<String?> look = const Value.absent(),
               }) => FightsCompanion(
                 id: id,
                 profileId: profileId,
@@ -8148,6 +8212,7 @@ class $$FightsTableTableManager
                 good: good,
                 miss: miss,
                 loot: loot,
+                look: look,
               ),
           createCompanionCallback:
               ({
@@ -8163,6 +8228,7 @@ class $$FightsTableTableManager
                 Value<int> good = const Value.absent(),
                 Value<int> miss = const Value.absent(),
                 Value<String?> loot = const Value.absent(),
+                Value<String?> look = const Value.absent(),
               }) => FightsCompanion.insert(
                 id: id,
                 profileId: profileId,
@@ -8176,6 +8242,7 @@ class $$FightsTableTableManager
                 good: good,
                 miss: miss,
                 loot: loot,
+                look: look,
               ),
           withReferenceMapper: (p0) => p0
               .map(

@@ -2,6 +2,8 @@ import 'dart:math';
 
 import '../../domain/dates.dart';
 import '../../domain/fight/boss.dart';
+import '../../domain/fight/overlord.dart';
+import '../../game/game_data.dart' show overlordBoonDays;
 import '../db/app_database.dart';
 
 /// Tokens, wins and tiers per boss family, derived from history like the
@@ -41,7 +43,8 @@ class FightProgress {
       best,
       [
         for (final f in fights)
-          if (f.result == FightResult.won) (f.family, f.startedAt),
+          if (f.result == FightResult.won)
+            (f.family, f.startedAt, f.look, f.tier),
       ],
       [
         ...completions.map((c) => c.completedAt),
@@ -68,8 +71,9 @@ class FightProgress {
   final Map<BossFamily, int> _wins;
   final Map<BossFamily, double> _bestAccuracy;
 
-  /// Every won fight with its start, oldest first.
-  final List<(BossFamily, DateTime)> _won;
+  /// Every won fight with its start and (for the Overlord) its stored
+  /// look, oldest first.
+  final List<(BossFamily, DateTime, String?, int)> _won;
 
   /// Usable tokens (never negative; a debt shows as 0). The Overlord needs
   /// none and has none.
@@ -90,13 +94,57 @@ class FightProgress {
   /// Whether [family] can be fought with a token (the Overlord needs none).
   bool canFight(BossFamily family) => tokens(family) > 0;
 
-  Iterable<BossFamily> _wonInWeekOf(DateTime today) {
+  Iterable<(BossFamily, DateTime, String?, int)> _wonInWeek(DateTime today) {
     final start = weekStartOf(today);
     final end = addDays(start, 7);
-    return _won
-        .where((w) => !w.$2.isBefore(start) && w.$2.isBefore(end))
-        .map((w) => w.$1);
+    return _won.where((w) => !w.$2.isBefore(start) && w.$2.isBefore(end));
   }
+
+  Iterable<BossFamily> _wonInWeekOf(DateTime today) =>
+      _wonInWeek(today).map((w) => w.$1);
+
+  /// The Overlord beaten in the week of [today] as it looked then, or
+  /// `null` if it wasn't beaten. Wins from before 0.15.0 show the classic
+  /// Overlord.
+  OverlordLook? beatenOverlord(DateTime today) {
+    for (final (family, _, look, _) in _wonInWeek(today)) {
+      if (family == BossFamily.overlord) return OverlordLook.parse(look);
+    }
+    return null;
+  }
+
+  /// Holiday boons still working on [today], from holiday Overlords beaten
+  /// in the last [overlordBoonDays] days: the holiday and its days left
+  /// (today included).
+  List<(String, int)> activeBoons(DateTime today) => [
+    for (final (family, at, look, _) in _won)
+      if (family == BossFamily.overlord)
+        if (OverlordLook.parse(look).holiday case final holiday?)
+          if (overlordBoonDays - daysBetween(dayOf(at), dayOf(today))
+              case final left when left > 0 && left <= overlordBoonDays)
+            (holiday, left),
+  ];
+
+  /// Holiday Overlords beaten, by holiday: their trophies.
+  Map<String, int> get holidayWins {
+    final wins = <String, int>{};
+    for (final (family, _, look, _) in _won) {
+      if (family != BossFamily.overlord) continue;
+      final holiday = OverlordLook.parse(look).holiday;
+      if (holiday != null) wins[holiday] = (wins[holiday] ?? 0) + 1;
+    }
+    return wins;
+  }
+
+  /// The highest tier (form) [family] was beaten at, 0 if never.
+  int bestTier(BossFamily family) =>
+      _won.where((w) => w.$1 == family).fold(0, (best, w) => max(best, w.$4));
+
+  /// The tiers of [weekWinFamilies], in the same order.
+  List<int> weekWinTiers(DateTime today) => [
+    for (final w in _wonInWeek(today))
+      if (w.$1 != BossFamily.overlord) w.$4,
+  ];
 
   /// Wins against chore bosses in the week (Mon–Sun) of [today].
   int weekWins(DateTime today) => weekWinFamilies(today).length;
@@ -131,17 +179,35 @@ class FightProgress {
         !monday.isAfter(last);
         monday = addDays(monday, 7)
       )
-        WeekRecord(monday, weekWinFamilies(monday), overlordBeaten(monday)),
+        WeekRecord(
+          monday,
+          weekWinFamilies(monday),
+          overlordBeaten(monday),
+          beatenOverlord(monday),
+          weekWinTiers(monday),
+        ),
     ];
   }
 }
 
 /// One week of the realm: its Monday, the chore-boss wins in order and
-/// whether the Overlord was beaten.
+/// whether the Overlord was beaten (and how it looked).
 class WeekRecord {
-  const WeekRecord(this.monday, this.wins, this.beaten);
+  const WeekRecord(
+    this.monday,
+    this.wins,
+    this.beaten, [
+    this.overlord,
+    this.tiers = const [],
+  ]);
 
   final DateTime monday;
   final List<BossFamily> wins;
   final bool beaten;
+
+  /// The beaten Overlord's look.
+  final OverlordLook? overlord;
+
+  /// The tier of each of [wins] (its boss's form then).
+  final List<int> tiers;
 }

@@ -3,56 +3,182 @@
   "title": "Bosses",
   "description": "game/bosses.toml: names, tempos and curses. See game/README.md.",
   "type": "object",
-  "required": ["bosses"],
+  "required": [
+    "bosses"
+  ],
   "additionalProperties": false,
   "properties": {
     "bosses": {
       "type": "object",
       "propertyNames": {
-        "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"]
+        "enum": [
+          "dust",
+          "laundry",
+          "kitchen",
+          "bath",
+          "trash",
+          "bedroom",
+          "outside",
+          "clutter",
+          "overlord",
+          "homework",
+          "pets",
+          "garden",
+          "cooking"
+        ]
       },
-      "additionalProperties": { "$ref": "#/$defs/boss" }
+      "additionalProperties": {
+        "$ref": "#/$defs/boss"
+      }
     }
   },
   "$defs": {
     "text": {
       "type": "object",
-      "required": ["en", "de"],
+      "required": [
+        "en",
+        "de"
+      ],
       "additionalProperties": false,
       "properties": {
-        "en": { "type": "string", "minLength": 1 },
-        "de": { "type": "string", "minLength": 1 }
+        "en": {
+          "type": "string",
+          "minLength": 1
+        },
+        "de": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "boss": {
       "type": "object",
-      "required": ["name", "tempo", "curse"],
+      "required": [
+        "name",
+        "tempo",
+        "curse"
+      ],
       "additionalProperties": false,
       "properties": {
-        "name": { "$ref": "#/$defs/text" },
-        "fed_by": { "$ref": "#/$defs/text", "description": "Which quests feed it, in a few words. Not for the Overlord." },
-        "trophy": { "$ref": "#/$defs/text", "description": "Optional; otherwise \"<name> trophy\"." },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "fed_by": {
+          "$ref": "#/$defs/text",
+          "description": "Which quests feed it, in a few words. Not for the Overlord."
+        },
+        "trophy": {
+          "$ref": "#/$defs/text",
+          "description": "Optional; otherwise \"<name> trophy\"."
+        },
         "tempo": {
           "type": "object",
-          "required": ["bpm", "offbeat", "eighth"],
+          "required": [
+            "bpm",
+            "offbeat",
+            "eighth"
+          ],
           "additionalProperties": false,
           "properties": {
-            "bpm": { "type": "integer", "minimum": 60, "maximum": 160, "description": "Beats per minute at tier 1." },
-            "offbeat": { "type": "number", "minimum": 0, "maximum": 1, "description": "Chance of a beat between two pulses." },
-            "eighth": { "type": "number", "minimum": 0, "maximum": 1, "description": "Chance of an eighth instead of a quarter." }
+            "bpm": {
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 160,
+              "description": "Beats per minute at tier 1."
+            },
+            "offbeat": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Chance of a beat between two pulses."
+            },
+            "eighth": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Chance of an eighth instead of a quarter."
+            }
           }
         },
         "curse": {
           "type": "object",
-          "required": ["kind", "name"],
+          "required": [
+            "kind",
+            "name"
+          ],
           "additionalProperties": false,
           "properties": {
-            "kind": { "enum": ["heart", "tight_timing", "slot_off"] },
+            "kind": {
+              "enum": [
+                "heart",
+                "tight_timing",
+                "slot_off"
+              ]
+            },
             "slot": {
-              "enum": ["head", "body", "weapon", "shield", "feet", "charm"],
+              "enum": [
+                "head",
+                "body",
+                "weapon",
+                "shield",
+                "feet",
+                "charm"
+              ],
               "description": "For slot_off: the slot whose item does nothing."
             },
-            "name": { "$ref": "#/$defs/text" }
+            "name": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "forms": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "Chore bosses only: the form at tier 2, then at tier 3.",
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "main",
+              "light"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "$ref": "#/$defs/text"
+              },
+              "main": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              "light": {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              "bpm": {
+                "type": "integer",
+                "minimum": -20,
+                "maximum": 20,
+                "description": "Tempo change."
+              },
+              "beats": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 2,
+                "description": "More beats per rhythm."
+              },
+              "offbeat": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.5
+              },
+              "eighth": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.5
+              }
+            }
           }
         }
       }

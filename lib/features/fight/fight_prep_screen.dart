@@ -5,6 +5,7 @@ import '../../core/widgets/section_header.dart';
 import '../../data/providers.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/items.dart';
+import '../../domain/fight/overlord.dart';
 import '../../domain/fight/shop.dart';
 import '../../domain/screen_time.dart';
 import '../../l10n/app_localizations.dart';
@@ -14,6 +15,9 @@ import '../world/items_text.dart';
 import 'boss_art.dart';
 import 'fight_screen.dart';
 import 'fight_settings.dart';
+import 'overlord_art.dart';
+import '../../game/game_data.dart' show overlordHolidays;
+import '../../game/game_texts.dart';
 import '../../app/art/art.dart';
 import '../../app/theme/pixel.dart';
 
@@ -25,6 +29,7 @@ class FightPrepScreen extends ConsumerStatefulWidget {
     required this.family,
     required this.tier,
     this.motifs = const [],
+    this.look,
   });
 
   final BossFamily family;
@@ -32,6 +37,9 @@ class FightPrepScreen extends ConsumerStatefulWidget {
 
   /// For the Overlord: the bosses beaten this week.
   final List<BossFamily> motifs;
+
+  /// For the Overlord: how it looks and plays this week.
+  final OverlordLook? look;
 
   static bool _opening = false;
 
@@ -42,14 +50,19 @@ class FightPrepScreen extends ConsumerStatefulWidget {
     BossFamily family,
     int tier, {
     List<BossFamily> motifs = const [],
+    OverlordLook? look,
   }) async {
     if (_opening) return;
     _opening = true;
     try {
       await Navigator.of(context).push(
         MaterialPageRoute<void>(
-          builder: (_) =>
-              FightPrepScreen(family: family, tier: tier, motifs: motifs),
+          builder: (_) => FightPrepScreen(
+            family: family,
+            tier: tier,
+            motifs: motifs,
+            look: look,
+          ),
         ),
       );
     } finally {
@@ -86,8 +99,10 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
             gear: gear.gear,
             consumables: used,
             curse: gear.curse,
+            boon: gear.boon,
           ),
           motifs: widget.motifs,
+          look: widget.look,
         ),
       ),
     );
@@ -106,7 +121,9 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
       gear: gear.gear,
       consumables: [..._picked],
       curse: gear.curse,
+      boon: gear.boon,
     ).against(family);
+    final boons = ref.watch(activeBoonsProvider);
     final hearts = heartsWith(
       tiredMaxHp(base.maxHp, tired: ref.watch(tiredProvider)),
       effects,
@@ -118,7 +135,9 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
     final worn = gear.gear.values.toSet();
 
     return Scaffold(
-      appBar: AppBar(title: Text(bossName(l10n, family))),
+      appBar: AppBar(
+        title: Text(bossName(l10n, family, widget.look, widget.tier)),
+      ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(
           12,
@@ -129,7 +148,12 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
         children: [
           Row(
             children: [
-              BossArt(family: family, size: 96),
+              BossArt(
+                family: family,
+                look: widget.look,
+                tier: widget.tier,
+                size: 96,
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -146,6 +170,12 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
                       key: const ValueKey('prep-stats'),
                       style: theme.textTheme.bodyMedium,
                     ),
+                    if (widget.look case final look?)
+                      Text(
+                        overlordTraitLine(l10n, look),
+                        key: const ValueKey('prep-trait'),
+                        style: theme.textTheme.bodySmall,
+                      ),
                   ],
                 ),
               ),
@@ -154,6 +184,24 @@ class _FightPrepScreenState extends ConsumerState<FightPrepScreen> {
           if (gear.curse case final curse?) ...[
             const SizedBox(height: 8),
             CurseCard(curse: curse),
+          ],
+          if (boons.isNotEmpty) ...[
+            SectionHeader(l10n.prepBoons),
+            for (final (holiday, days) in boons)
+              ListTile(
+                key: ValueKey('boon-$holiday'),
+                leading: OverlordArt(look: holidayLook(holiday), size: 40),
+                title: Text(gameHolidayTrophy(l10n, holiday) ?? holiday),
+                subtitle: Text(
+                  l10n.prepBoon(
+                    effectPhrases(
+                      l10n,
+                      overlordHolidays[holiday]?.boon ?? Effects.none,
+                    ).join(', '),
+                    days,
+                  ),
+                ),
+              ),
           ],
           SectionHeader(l10n.prepGear),
           if (gear.gear.isEmpty)

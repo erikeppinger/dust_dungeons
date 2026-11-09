@@ -50,7 +50,9 @@ variants. A new sprite needs a line there.
 | Landmarks | 16×16 | `map` | `map/camp`, `map/lair`, `map/lair_sign` (on unexplored lairs), `map/castle`, `map/castle_won` |
 | Hero | 32×32 | `hero` | `hero/hero.png`. Skin, hair and cape (and their shades) are key colors, replaced by the Wardrobe's |
 | Hero's gear | 32×32 | `items` | `hero/wear/<item key>.png`: what a gear item or hat looks like on the hero, on the hero's canvas and transparent elsewhere. Every gear item and hat needs one (the `hero/wear/*` rule) |
-| Bosses | 48×48 | `bosses` | `bosses/<family>.png`, e.g. `bosses/dust.png`: a strip of four frames, 192×48: idle, bob (idle one pixel lower; the boss bounces on its beats), hit, defeated |
+| Bosses | 48×48 | `bosses` | `bosses/<family>.png`, e.g. `bosses/dust.png`: a strip of four frames, 192×48: idle, bob (idle one pixel lower; the boss bounces on its beats), hit, defeated. Not the Overlord: see below |
+| Boss forms | 48×48 | `bosses` | `bosses/forms/<family>_<tier>.png` for tier 2 and 3: four frames like the boss's strip, drawn on top of it, transparent where the boss shows through (headgear, embers). The form's colors replace the boss's four colors, so draw the boss itself in its palette colors |
+| Overlord parts | 48×48 | `bosses` | `bosses/overlord/<kind>/<key>.png`, stacked on one canvas: `body`, `face` (a strip of three: idle, hit, defeated; it draws the head too), `hat`, `item` (held on the right), `extra` (a strip of two: behind and in front). Use the four `overlord` colors for what the scheme recolors (main, its shade, skin, its shade). The head sits at x 14–33, y 19–38 for every body. Each key also goes in `game/overlords.toml` |
 
 A **strip** is one PNG with the frames side by side, left to right, with no gaps (a boss strip is
 192×48). `art.json` gives the frame count as `"frames": 4`.
@@ -74,7 +76,7 @@ open. Every color has a name; the app uses the names, so keep them when you chan
 - **`hero.gpl`**: the hero. Skin, hair and cape, each with a shade, are key colors that the app
   replaces with the player's Wardrobe choices. The hero's gear layers use the items palettes.
 - **`bosses.gpl`**: all bosses: shared outline, white, gold and red, plus a main and a light color
-  (each with a shade) per boss.
+  (each with a shade) per boss. The Overlord's four colors are key colors: each week's scheme replaces them.
 
 Within the source palette of a group (meadow, day) every color must be different, so each pixel
 maps to exactly one name. Keep a single sprite to **16 colors or fewer**, outline included.

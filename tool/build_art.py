@@ -25,7 +25,7 @@ ART = ROOT / "assets" / "art"
 OUT = ROOT / "lib" / "app" / "art" / "art_data.dart"
 
 # Palette index -> character in the generated rows; '.' is transparent.
-DIGITS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+DIGITS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#%&*+-/:;<=>?@^_~|"
 
 
 class ArtError(Exception):

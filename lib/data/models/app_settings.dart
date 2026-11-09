@@ -26,6 +26,8 @@ class AppSettings {
     this.screenOver = true,
     this.screenSummary = true,
     this.curses = true,
+    this.holidays = const {},
+    this.overlordSeed = 0,
   });
 
   final ThemeMode themeMode;
@@ -78,6 +80,14 @@ class AppSettings {
   /// A lost fight leaves the boss's curse (docs/design/items.md).
   final bool curses;
 
+  /// Holidays with a holiday Overlord (keys of game/overlords.toml); none
+  /// by default (docs/design/weekly-overlords.md).
+  final Set<String> holidays;
+
+  /// This phone's random number for the weekly Overlords, made once on the
+  /// first start (docs/design/weekly-overlords.md).
+  final int overlordSeed;
+
   AppSettings copyWith({
     ThemeMode? themeMode,
     bool? colorblindSafe,
@@ -100,6 +110,8 @@ class AppSettings {
     bool? screenOver,
     bool? screenSummary,
     bool? curses,
+    Set<String>? holidays,
+    int? overlordSeed,
   }) => AppSettings(
     themeMode: themeMode ?? this.themeMode,
     colorblindSafe: colorblindSafe ?? this.colorblindSafe,
@@ -122,6 +134,8 @@ class AppSettings {
     screenOver: screenOver ?? this.screenOver,
     screenSummary: screenSummary ?? this.screenSummary,
     curses: curses ?? this.curses,
+    holidays: holidays ?? this.holidays,
+    overlordSeed: overlordSeed ?? this.overlordSeed,
   );
 
   @override
@@ -147,7 +161,9 @@ class AppSettings {
       other.screenWarn == screenWarn &&
       other.screenOver == screenOver &&
       other.screenSummary == screenSummary &&
-      other.curses == curses;
+      other.curses == curses &&
+      setEquals(other.holidays, holidays) &&
+      other.overlordSeed == overlordSeed;
 
   @override
   int get hashCode => Object.hashAll([
@@ -172,5 +188,7 @@ class AppSettings {
     screenOver,
     screenSummary,
     curses,
+    Object.hashAllUnordered(holidays),
+    overlordSeed,
   ]);
 }

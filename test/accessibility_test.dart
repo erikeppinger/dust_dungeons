@@ -127,7 +127,7 @@ void main() {
       final tab = switch (name) {
         'shop' || 'avatar' || 'gear' => 'Arena',
         'add chore' => 'Quests',
-        _ => 'Einstellungen',
+        _ => 'Optionen',
       };
       await openScreen(tester, tab, stepsDe);
       expect(tester.takeException(), isNull);
@@ -209,10 +209,23 @@ void main() {
         'Quest Log': 'Questbuch',
         'Arena': 'Arena',
         'Hall of Fame': 'Ruhmeshalle',
-        'Settings': 'Einstellungen',
+        'Settings': 'Optionen',
       };
       await openTab(tester, german[tab]!);
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('tab labels grow only up to their cap at 200 %', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pumpWith(tester, const AppSettings(locale: Locale('de')));
+    final label = tester.element(
+      find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.text('Optionen'),
+      ),
+    );
+    expect(MediaQuery.textScalerOf(label).scale(10), closeTo(11, 0.001));
+  });
 }

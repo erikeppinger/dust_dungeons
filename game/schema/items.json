@@ -57,7 +57,7 @@
         "two_handed": { "type": "boolean", "description": "A weapon that also takes the shield slot." },
         "price": { "type": "integer", "minimum": 1, "maximum": 10000, "description": "Points in the Armory." },
         "dropped_by": {
-          "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"],
+          "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord", "homework", "pets", "garden", "cooking"],
           "description": "Loot: the boss that drops it (instead of a price)."
         },
         "name": { "$ref": "#/$defs/text" },
@@ -68,7 +68,7 @@
           "type": "object",
           "description": "Values that replace the general effects in fights against one boss.",
           "propertyNames": {
-            "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord"]
+            "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter", "overlord", "homework", "pets", "garden", "cooking"]
           },
           "additionalProperties": { "$ref": "#/$defs/effects" }
         },

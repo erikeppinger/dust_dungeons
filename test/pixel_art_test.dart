@@ -7,8 +7,8 @@ import 'package:homework_and_chores/domain/fight/boss.dart';
 import 'package:homework_and_chores/features/chores/chore_icons.dart';
 
 void main() {
-  test('every boss has a strip: idle, bob, hit, defeated', () {
-    for (final family in BossFamily.values) {
+  test('every chore boss has a strip: idle, bob, hit, defeated', () {
+    for (final family in choreFamilies) {
       final (frames, palette) = Sprites.all['bosses/${family.name}']!;
       expect(frames, hasLength(4), reason: family.name);
       expect(palette, 'bosses');

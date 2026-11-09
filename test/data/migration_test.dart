@@ -13,17 +13,19 @@ import 'generated_migrations/schema_v6.dart' as v6;
 import 'generated_migrations/schema_v7.dart' as v7;
 import 'generated_migrations/schema_v8.dart' as v8;
 import 'generated_migrations/schema_v9.dart' as v9;
+import 'generated_migrations/schema_v10.dart' as v10;
+import 'generated_migrations/schema_v11.dart' as v11;
 
 void main() {
   late SchemaVerifier verifier;
 
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  for (final from in [1, 2, 3, 4, 5, 6, 7, 8, 9]) {
-    test('v$from -> v10 produces the current schema', () async {
+  for (final from in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
+    test('v$from -> v12 produces the current schema', () async {
       final schema = await verifier.schemaAt(from);
       final db = AppDatabase(schema.newConnection());
-      await verifier.migrateAndValidate(db, 10);
+      await verifier.migrateAndValidate(db, 12);
       await db.close();
     });
   }
@@ -280,5 +282,42 @@ void main() {
       Difficulty.balanced,
     ]);
     expect(people.first.curseFamily, BossFamily.dust);
+  });
+
+  test('v10 -> v11: earlier Overlord fights have no stored look', () async {
+    final schema = await verifier.schemaAt(10);
+    final old = v10.DatabaseAtV10(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO fights (profile_id, family, tier, started_at, result) '
+      "VALUES (1, 'overlord', 1, '2026-11-01T09:00:00.000', 'won')",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final fight = await db.select(db.fights).getSingle();
+    expect(fight.family, BossFamily.overlord);
+    expect(fight.look, isNull);
+  });
+
+  test('v11 -> v12: the new quests arrive as suggestions', () async {
+    final schema = await verifier.schemaAt(11);
+    final old = v11.DatabaseAtV11(schema.newConnection());
+    await old.customStatement("INSERT INTO profiles (name) VALUES ('Me')");
+    await old.customStatement(
+      'INSERT INTO chores (seed_key, icon_key, color_key, base_points, '
+      "sort_order) VALUES ('dusting', 'auto_awesome', 6, 15, 0)",
+    );
+    await old.close();
+
+    final db = AppDatabase(schema.newConnection());
+    addTearDown(db.close);
+    final chores = await db.select(db.chores).get();
+    expect(chores.singleWhere((c) => c.seedKey == 'dusting').isArchived, false);
+    expect(
+      chores.where((c) => c.isArchived).map((c) => c.seedKey).toSet(),
+      suggestedSeeds,
+    );
   });
 }

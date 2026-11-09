@@ -49,3 +49,19 @@ Columns: 8
  68  38 127	overlord_shade
 179 157 219	overlord_light
 147 129 180	overlord_light_shade
+242 235 211	homework
+196 186 152	homework_shade
+ 63  78 140	homework_light
+ 44  55 100	homework_light_shade
+160 112  74	pets
+116  79  51	pets_shade
+226 194 154	pets_light
+184 154 118	pets_light_shade
+ 78 154  58	garden
+ 54 108  40	garden_shade
+168 216 120	garden_light
+130 174  92	garden_light_shade
+192  57  43	cooking
+138  40  30	cooking_shade
+245 183 160	cooking_light
+200 146 126	cooking_light_shade

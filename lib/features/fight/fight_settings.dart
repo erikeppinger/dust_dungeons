@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
+import '../../game/game_data.dart' show overlordHolidays;
+import '../../game/game_texts.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
 import 'calibration_screen.dart';
@@ -55,6 +57,36 @@ class FightSettings extends ConsumerWidget {
             if (!v) await profiles.liftAllCurses();
           },
         ),
+        SwitchListTile(
+          key: const ValueKey('setting-holidays'),
+          secondary: const PixelIcon(Sprites.uiCalendar),
+          title: Text(l10n.fightSettingHolidays),
+          subtitle: Text(l10n.fightSettingHolidaysSubtitle),
+          value: s.holidays.isNotEmpty,
+          onChanged: (v) => controller.update(
+            (x) => x.copyWith(
+              holidays: v ? overlordHolidays.keys.toSet() : const {},
+            ),
+          ),
+        ),
+        if (s.holidays.isNotEmpty)
+          for (final holiday in overlordHolidays.keys)
+            CheckboxListTile(
+              key: ValueKey('setting-holiday-$holiday'),
+              contentPadding: const EdgeInsetsDirectional.only(
+                start: 72,
+                end: 16,
+              ),
+              title: Text(gameHolidaySetting(l10n, holiday) ?? holiday),
+              value: s.holidays.contains(holiday),
+              onChanged: (v) => controller.update(
+                (x) => x.copyWith(
+                  holidays: v == true
+                      ? {...x.holidays, holiday}
+                      : ({...x.holidays}..remove(holiday)),
+                ),
+              ),
+            ),
         // Story and slow mode belong to the person; the rest to the phone.
         if (people.length > 1)
           Padding(

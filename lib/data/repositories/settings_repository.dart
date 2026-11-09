@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../db/app_database.dart';
+import '../../game/game_data.dart' show overlordHolidays;
 import '../models/app_settings.dart';
 
 /// Persists [AppSettings] in the key/value settings table.
@@ -30,6 +33,8 @@ class SettingsRepository {
   static const _screenOver = 'screenOver';
   static const _screenSummary = 'screenSummary';
   static const _curses = 'curses';
+  static const _holidays = 'overlordHolidays';
+  static const _overlordSeed = 'overlordSeed';
 
   Future<AppSettings> load() async {
     final rows = await _db.select(_db.settings).get();
@@ -38,6 +43,12 @@ class SettingsRepository {
     bool flag(String key, bool fallback) =>
         map[key] == null ? fallback : map[key] == 'true';
     final languageCode = map[_locale];
+    // Made once, on the first start, and kept from then on.
+    var seed = int.tryParse(map[_overlordSeed] ?? '');
+    if (seed == null) {
+      seed = Random.secure().nextInt(1 << 30);
+      await _put(_overlordSeed, '$seed');
+    }
     // Installs from before the introduction existed skip it once they have
     // completed a chore.
     final onboardingDone = map[_onboardingDone] == null
@@ -81,6 +92,11 @@ class SettingsRepository {
       screenOver: flag(_screenOver, defaults.screenOver),
       screenSummary: flag(_screenSummary, defaults.screenSummary),
       curses: flag(_curses, defaults.curses),
+      holidays: (map[_holidays] ?? '')
+          .split(',')
+          .where(overlordHolidays.containsKey)
+          .toSet(),
+      overlordSeed: seed,
     );
   }
 
@@ -113,6 +129,8 @@ class SettingsRepository {
     await _put(_screenOver, '${settings.screenOver}');
     await _put(_screenSummary, '${settings.screenSummary}');
     await _put(_curses, '${settings.curses}');
+    await _put(_holidays, (settings.holidays.toList()..sort()).join(','));
+    await _put(_overlordSeed, '${settings.overlordSeed}');
   });
 
   Future<void> _put(String key, String value) => _db

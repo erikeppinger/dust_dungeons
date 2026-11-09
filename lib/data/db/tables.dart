@@ -162,6 +162,10 @@ class Fights extends Table {
 
   /// The item a won fight dropped (schema v9).
   TextColumn get loot => text().nullable()();
+
+  /// The Overlord's look in this fight, an `OverlordLook.key` (schema v11);
+  /// `null` for other bosses and for Overlord fights from before.
+  TextColumn get look => text().nullable()();
 }
 
 /// Items bought in the shop (schema v5): gear and hats have count 1,

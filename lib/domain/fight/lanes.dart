@@ -17,18 +17,27 @@ class LaneNote {
 /// Writes lane notes bar by bar: deterministic for a seed. Every pulse
 /// likely gets a note, higher tiers add notes between the pulses.
 class LaneGenerator {
-  LaneGenerator({required this.beatMs, required this.tier, int seed = 0})
-    : _random = Random(seed);
+  LaneGenerator({
+    required this.beatMs,
+    required this.tier,
+    this.extraChance = 0,
+    int seed = 0,
+  }) : _random = Random(seed);
 
   final int beatMs;
   final int tier;
+
+  /// Added chance of a note between two pulses (an Overlord's trait).
+  final double extraChance;
   final Random _random;
 
   /// Notes for [count] bars of four pulses, starting at [fromMs].
   List<LaneNote> bars(int fromMs, int count) {
     final notes = <LaneNote>[];
     for (var slot = 0; slot < count * 8; slot++) {
-      final chance = slot.isEven ? 0.55 + 0.1 * tier : 0.08 * tier;
+      final chance = slot.isEven
+          ? 0.55 + 0.1 * tier
+          : 0.08 * tier + extraChance;
       if (_random.nextDouble() >= chance) continue;
       notes.add(
         LaneNote(_random.nextInt(laneCount), fromMs + slot * beatMs ~/ 2),

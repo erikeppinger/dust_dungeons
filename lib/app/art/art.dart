@@ -18,8 +18,10 @@ class Sprite {
   int get width => rows.first.length;
   int get height => rows.length;
 
+  // Must match DIGITS in tool/build_art.py.
   static const _digits =
-      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      '!#%&*+-/:;<=>?@^_~|';
 
   /// Paints the sprite with its top left at [offset], one canvas unit per
   /// pixel. Recorded once per palette and replayed after that.

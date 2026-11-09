@@ -48,11 +48,15 @@ class PatternGenerator {
     this.style, {
     required this.tier,
     this.tempo = 1,
+    this.extraBeats = 0,
     int seed = 0,
   }) : _random = Random(seed);
 
   final BossStyle style;
   final int tier;
+
+  /// Beats added to every rhythm (an Overlord's trait).
+  final int extraBeats;
 
   /// Tempo factor: 1 normally, [EchoDuel.slowTempo] in slow mode.
   final double tempo;
@@ -62,7 +66,7 @@ class PatternGenerator {
 
   /// Number of beats grows with tier and the fight's [phase] (0 or 1).
   Pattern next({required int phase}) {
-    final minBeats = 2 + tier - 1 + phase;
+    final minBeats = 2 + tier - 1 + phase + extraBeats;
     final count = minBeats + _random.nextInt(2);
     final eighth = beatMs ~/ 2;
     final beats = <int>[0];
@@ -235,12 +239,23 @@ class EchoDuel {
   PatternGenerator _generatorFor(BossFamily style) => _generators.putIfAbsent(
     style,
     () => PatternGenerator(
-      bossStyles[style]!,
+      styleOf(style),
       tier: tier,
       tempo: tempo,
+      extraBeats: extraBeats,
       seed: seed + style.index,
     ),
   );
+
+  /// How [family]'s rhythms play in this fight: with this boss's form at
+  /// its tier on top (docs/design/more-bosses.md).
+  BossStyle styleOf(BossFamily family) {
+    final style = bossStyles[family]!;
+    return bossForm(family, tier)?.trait.apply(style) ?? style;
+  }
+
+  /// Beats added to every rhythm.
+  int get extraBeats => bossForm(family, tier)?.trait.beats ?? 0;
 
   Pattern nextPattern() => _generatorFor(family).next(phase: phase);
 
@@ -364,10 +379,20 @@ class OverlordDuel extends EchoDuel {
     super.slowMode,
     super.difficulty,
     super.seed,
+    this.trait = const BossTrait(),
   }) : motifs = motifs.isEmpty ? const [BossFamily.clutter] : motifs,
        super(family: BossFamily.overlord, maxHp: overlordHpForTier(tier));
 
   final List<BossFamily> motifs;
+
+  /// How this week's Overlord changes the rhythms it borrows.
+  final BossTrait trait;
+
+  @override
+  BossStyle styleOf(BossFamily family) => trait.apply(bossStyles[family]!);
+
+  @override
+  int get extraBeats => trait.beats;
   int _round = 0;
   LaneGenerator? _lanes;
 
@@ -390,8 +415,9 @@ class OverlordDuel extends EchoDuel {
   /// Writes the lane notes, at the Overlord's own tempo.
   @override
   LaneGenerator get lanes => _lanes ??= LaneGenerator(
-    beatMs: beatMsFor(bossStyles[BossFamily.overlord]!, tier, tempo),
+    beatMs: beatMsFor(styleOf(BossFamily.overlord), tier, tempo),
     tier: tier,
+    extraChance: trait.lanes,
     seed: seed,
   );
 }

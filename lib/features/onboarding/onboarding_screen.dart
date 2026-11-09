@@ -7,6 +7,8 @@ import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../chores/chore_icons.dart';
 import '../chores/chore_titles.dart';
+import '../fight/boss_art.dart';
+import '../world/sleeping_bosses.dart';
 import '../notifications/notification_settings.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
@@ -29,6 +31,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   /// Chores the user unticked; archived when onboarding finishes.
   final _unticked = <int>{};
+
+  /// Groups of suggested quests the user ticked (homework, pets, garden,
+  /// cooking); brought in from the archive when onboarding finishes.
+  final _groups = <BossFamily>{};
   bool _finishing = false;
 
   @override
@@ -52,6 +58,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       final chores = ref.read(choreRepositoryProvider);
       for (final id in _unticked) {
         await chores.setArchived(id, archived: true);
+      }
+      final db = ref.read(databaseProvider);
+      final all = await db.select(db.chores).get();
+      for (final family in _groups) {
+        for (final chore in suggestionsFor(family, all)) {
+          await chores.setArchived(chore.id, archived: false);
+        }
       }
     }
     ref
@@ -77,6 +90,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     unticked: _unticked,
                     onChanged: (id, on) => setState(
                       () => on ? _unticked.remove(id) : _unticked.add(id),
+                    ),
+                    groups: _groups,
+                    onGroup: (family, on) => setState(
+                      () => on ? _groups.add(family) : _groups.remove(family),
                     ),
                   ),
                   const _SetupPage(),
@@ -152,7 +169,11 @@ class _Page extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
       children: [
         if (icon case final icon?) ...[
-          PixelIcon(icon, size: 72, color: theme.colorScheme.primary),
+          // Aligned, so the list doesn't stretch it to its full width.
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: PixelIcon(icon, size: 72, color: theme.colorScheme.primary),
+          ),
           const SizedBox(height: 16),
         ],
         Semantics(
@@ -215,10 +236,25 @@ class _WelcomePage extends ConsumerWidget {
 }
 
 class _ChoresPage extends ConsumerWidget {
-  const _ChoresPage({required this.unticked, required this.onChanged});
+  const _ChoresPage({
+    required this.unticked,
+    required this.onChanged,
+    required this.groups,
+    required this.onGroup,
+  });
 
   final Set<int> unticked;
   final void Function(int id, bool on) onChanged;
+  final Set<BossFamily> groups;
+  final void Function(BossFamily family, bool on) onGroup;
+
+  static String _group(AppLocalizations l10n, BossFamily family) =>
+      switch (family) {
+        BossFamily.homework => l10n.onboardingGroupHomework,
+        BossFamily.pets => l10n.onboardingGroupPets,
+        BossFamily.garden => l10n.onboardingGroupGarden,
+        _ => l10n.onboardingGroupCooking,
+      };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -244,6 +280,27 @@ class _ChoresPage extends ConsumerWidget {
             title: Text(choreTitle(chore, l10n)),
             value: !unticked.contains(chore.id),
             onChanged: (on) => onChanged(chore.id, on ?? false),
+          ),
+        const SizedBox(height: 16),
+        Text(
+          l10n.onboardingGroupsTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 4),
+        Text(l10n.onboardingGroupsBody),
+        for (final family in const [
+          BossFamily.homework,
+          BossFamily.pets,
+          BossFamily.garden,
+          BossFamily.cooking,
+        ])
+          CheckboxListTile(
+            key: ValueKey('onboarding-group-${family.name}'),
+            contentPadding: EdgeInsets.zero,
+            secondary: BossArt(family: family, size: 40, semanticLabel: ''),
+            title: Text(_group(l10n, family)),
+            value: groups.contains(family),
+            onChanged: (on) => onGroup(family, on ?? false),
           ),
       ],
     );

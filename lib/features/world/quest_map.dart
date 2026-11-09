@@ -23,6 +23,7 @@ class QuestMap extends ConsumerWidget {
     super.key,
     required this.map,
     required this.wins,
+    this.tiers = const [],
     required this.beaten,
     required this.semanticLabel,
   });
@@ -31,6 +32,9 @@ class QuestMap extends ConsumerWidget {
 
   /// This week's wins against chore bosses, in order (may exceed the lairs).
   final List<BossFamily> wins;
+
+  /// The tier of each win (the boss's form then).
+  final List<int> tiers;
 
   /// Whether the Overlord was beaten this week.
   final bool beaten;
@@ -74,7 +78,11 @@ class QuestMap extends ConsumerWidget {
                         top: (map.route[i].y - 0.55) * tile,
                         width: tile * 1.1,
                         height: tile * 1.1,
-                        child: BossArt(family: wins[i - 1], size: tile * 1.1),
+                        child: BossArt(
+                          family: wins[i - 1],
+                          tier: i <= tiers.length ? tiers[i - 1] : 1,
+                          size: tile * 1.1,
+                        ),
                       ),
                   ],
                 );

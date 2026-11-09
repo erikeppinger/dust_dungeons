@@ -66,6 +66,7 @@ class Loadout {
     this.gear = const {},
     this.consumables = const [],
     this.curse,
+    this.boon = Effects.none,
   });
 
   /// From the worn items (slot → item key).
@@ -73,6 +74,7 @@ class Loadout {
     Map<GearSlot, String> equipped, {
     List<ShopItem> consumables = const [],
     Curse? curse,
+    Effects boon = Effects.none,
   }) => Loadout(
     gear: {
       for (final MapEntry(:key, :value) in equipped.entries)
@@ -80,11 +82,15 @@ class Loadout {
     },
     consumables: consumables,
     curse: curse,
+    boon: boon,
   );
 
   final Map<GearSlot, ShopItem> gear;
   final List<ShopItem> consumables;
   final Curse? curse;
+
+  /// Holiday boons working now (docs/design/weekly-overlords.md).
+  final Effects boon;
 
   static const none = Loadout();
 
@@ -99,7 +105,7 @@ class Loadout {
     for (final item in [...working, ...consumables]) {
       total += effectsOf(item, family);
     }
-    return total + (curse?.effects ?? Effects.none);
+    return total + boon + (curse?.effects ?? Effects.none);
   }
 }
 

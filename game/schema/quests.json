@@ -3,49 +3,113 @@
   "title": "Built-in quests",
   "description": "game/quests.toml: the quests every phone gets. See game/README.md.",
   "type": "object",
-  "required": ["quests"],
+  "required": [
+    "quests"
+  ],
   "additionalProperties": false,
   "properties": {
     "quests": {
       "type": "object",
-      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
-      "additionalProperties": { "$ref": "#/$defs/quest" }
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/quest"
+      }
     }
   },
   "$defs": {
     "text": {
       "type": "object",
-      "required": ["en", "de"],
+      "required": [
+        "en",
+        "de"
+      ],
       "additionalProperties": false,
       "properties": {
-        "en": { "type": "string", "minLength": 1 },
-        "de": { "type": "string", "minLength": 1 }
+        "en": {
+          "type": "string",
+          "minLength": 1
+        },
+        "de": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "quest": {
       "type": "object",
-      "required": ["title", "icon", "color", "points", "repeat", "boss"],
+      "required": [
+        "title",
+        "icon",
+        "color",
+        "points",
+        "repeat",
+        "boss"
+      ],
       "additionalProperties": false,
       "properties": {
-        "title": { "$ref": "#/$defs/text" },
-        "icon": { "type": "string", "description": "A key from lib/features/chores/chore_icons.dart." },
-        "color": { "type": "integer", "minimum": 0, "maximum": 7, "description": "Index into the quest palette." },
-        "points": { "type": "integer", "minimum": 5, "maximum": 100 },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "icon": {
+          "type": "string",
+          "description": "A key from lib/features/chores/chore_icons.dart."
+        },
+        "color": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7,
+          "description": "Index into the quest palette."
+        },
+        "points": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 100
+        },
         "repeat": {
           "type": "object",
-          "required": ["type"],
+          "required": [
+            "type"
+          ],
           "additionalProperties": false,
           "properties": {
             "type": {
-              "enum": ["anytime", "daily", "after_done"],
+              "enum": [
+                "anytime",
+                "daily",
+                "after_done"
+              ],
               "description": "daily: every N days; after_done: N days after it's done; anytime: no schedule."
             },
-            "every": { "type": "integer", "minimum": 1, "maximum": 365, "description": "N, default 1." }
+            "every": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365,
+              "description": "N, default 1."
+            }
           }
         },
         "boss": {
-          "enum": ["dust", "laundry", "kitchen", "bath", "trash", "bedroom", "outside", "clutter"],
+          "enum": [
+            "dust",
+            "laundry",
+            "kitchen",
+            "bath",
+            "trash",
+            "bedroom",
+            "outside",
+            "clutter",
+            "homework",
+            "pets",
+            "garden",
+            "cooking"
+          ],
           "description": "The boss its fight tokens are for."
+        },
+        "suggested": {
+          "type": "boolean",
+          "description": "Added archived, as a suggestion (onboarding and sleeping bosses offer it)."
         }
       }
     }

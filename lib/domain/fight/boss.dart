@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../game/game_data.dart';
 
 export '../../game/game_data.dart' show bossStyles, seedFamilies;
@@ -17,6 +19,13 @@ enum BossFamily {
   /// The weekly boss: appears after [overlordWinsNeeded] wins in a week and
   /// is fed by no chore.
   overlord,
+
+  // Chore bosses from 0.16.0, after the Overlord so stored indexes of the
+  // older ones stay the same.
+  homework,
+  pets,
+  garden,
+  cooking,
 }
 
 /// The bosses fed by chores (all but the weekly Overlord).
@@ -29,6 +38,10 @@ const choreFamilies = [
   BossFamily.bedroom,
   BossFamily.outside,
   BossFamily.clutter,
+  BossFamily.homework,
+  BossFamily.pets,
+  BossFamily.garden,
+  BossFamily.cooking,
 ];
 
 /// Wins against chore bosses in one week (Mon–Sun) that call the Overlord.
@@ -82,4 +95,56 @@ class HeroStats {
 
   /// Cleaning points per *Good* hit; a *Perfect* deals twice that.
   final int damage;
+}
+
+/// A small change to how a boss plays, on top of its style and tier: an
+/// Overlord's body (docs/design/weekly-overlords.md) or a boss's form
+/// (docs/design/more-bosses.md).
+class BossTrait {
+  const BossTrait({
+    this.bpm = 0,
+    this.beats = 0,
+    this.offbeat = 0.0,
+    this.eighth = 0.0,
+    this.lanes = 0.0,
+  });
+
+  /// Tempo change in beats per minute.
+  final int bpm;
+
+  /// More beats per rhythm.
+  final int beats;
+
+  /// Added chances of an offbeat and of an eighth.
+  final double offbeat, eighth;
+
+  /// Added chance of a lane note between two beats.
+  final double lanes;
+
+  /// [style] with this trait on top.
+  BossStyle apply(BossStyle style) => BossStyle(
+    baseBpm: style.baseBpm + bpm,
+    offbeatChance: min(1, style.offbeatChance + offbeat),
+    eighthChance: min(1, style.eighthChance + eighth),
+  );
+}
+
+/// A chore boss's form at tier 2 or 3 (game/bosses.toml): its colors and
+/// how it plays differently.
+class BossForm {
+  const BossForm({
+    required this.main,
+    required this.light,
+    this.trait = const BossTrait(),
+  });
+
+  /// Main and light color as ARGB; the shades are made darker.
+  final int main, light;
+  final BossTrait trait;
+}
+
+/// [family]'s form at [tier]; `null` at tier 1 and for the Overlord.
+BossForm? bossForm(BossFamily family, int tier) {
+  final forms = bossForms[family];
+  return forms == null || tier < 2 ? null : forms[min(tier, 3) - 2];
 }

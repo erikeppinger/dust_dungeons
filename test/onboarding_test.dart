@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:homework_and_chores/app/theme/pixel.dart';
+import 'package:homework_and_chores/domain/default_chores.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
 import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 
@@ -12,6 +14,8 @@ void main() {
   ) async {
     final db = await pumpApp(tester, onboarding: true);
     expect(find.text('Welcome!'), findsOneWidget);
+    // The welcome icon keeps its size (a list once stretched it).
+    expect(tester.getSize(find.byType(PixelIcon).first), const Size(72, 72));
     expect(find.bySemanticsLabel('Step 1 of 3'), findsOneWidget);
 
     // Switching the language applies at once.
@@ -49,10 +53,35 @@ void main() {
       isTrue,
     );
     expect(
-      chores.where((c) => c.isArchived).length,
-      1,
+      chores.where((c) => c.isArchived && !suggestedSeeds.contains(c.seedKey)),
+      hasLength(1),
       reason: 'only the unticked chore',
     );
+  });
+
+  testWidgets('ticking pets brings in their suggested quests', (tester) async {
+    final db = await pumpApp(tester, onboarding: true);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    final pets = find.byKey(const ValueKey('onboarding-group-pets'));
+    await tester.scrollUntilVisible(
+      pets,
+      300,
+      scrollable: find.byType(Scrollable).at(1),
+    );
+    await tester.tap(pets);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text("Let's go"));
+    await tester.pumpAndSettle();
+    final chores = await tester.runAsync(() => db.select(db.chores).get());
+    final active = {
+      for (final c in chores!)
+        if (!c.isArchived) c.seedKey,
+    };
+    expect(active, containsAll(['feed_pets', 'walk_dog', 'clean_pet_home']));
+    expect(active, isNot(contains('homework')));
   });
 
   testWidgets('skipping keeps every chore', (tester) async {
@@ -65,7 +94,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Quests'), findsWidgets);
     final chores = await tester.runAsync(() => db.select(db.chores).get());
-    expect(chores!.where((c) => c.isArchived), isEmpty);
+    expect(
+      chores!.where((c) => c.isArchived).map((c) => c.seedKey).toSet(),
+      suggestedSeeds,
+      reason: 'only the suggestions, as before',
+    );
   });
 
   testWidgets('the introduction can be shown again from About', (tester) async {

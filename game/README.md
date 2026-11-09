@@ -9,6 +9,7 @@ edit a file, run one command, test.
 | `items.toml` | Gear, consumables, hats and screen-time vouchers |
 | `bosses.toml` | Boss names, which quests feed them, their tempo and their curse |
 | `quests.toml` | The built-in quests every phone gets |
+| `overlords.toml` | The weekly Overlords: parts, color schemes, traits, names, holidays |
 | `balance.toml` | Hero growth, boss health, timing, the round rule, loot chances, points, difficulty presets |
 | `keys.lock` | Every key ever shipped. Written by the tool; don't edit it |
 | `schema/` | What each file may contain. Editors use it for checks and autocompletion |
@@ -79,7 +80,7 @@ changes need no new text.
 - **Vouchers:** `kind = "voucher"`, `price` and `minutes`. Their name says the minutes.
 
 ## Keys are forever
-Item, boss and quest keys are stored in people's databases, so a key can't be renamed or removed.
+Item, boss, quest and Overlord part keys are stored in people's databases, so a key can't be renamed or removed.
 The tool refuses that, using `keys.lock`.
 - **To take an item out:** set `retired = true`. It leaves the Armory and the loot tables, and people
   who own it keep it.
@@ -87,8 +88,38 @@ The tool refuses that, using `keys.lock`.
   version.
 
 ## Bosses
-`bosses.toml` changes names, tempos and curses. Adding a boss still needs code (its drawing and its
-place in `BossFamily`).
+`bosses.toml` changes names, tempos and curses.
+- **Forms:** every chore boss has two `[[bosses.<key>.forms]]`, for tier 2 and tier 3: a name
+  (whole English and German pairs, so German needs no adjective endings), `main` and `light`
+  colors (the app makes the shades) and optional rhythm changes `bpm`, `beats`, `offbeat` and
+  `eighth`. Each form needs its overlay `assets/art/bosses/forms/<key>_<tier>.png`.
+- **Adding a boss** still needs code: its value at the end of `BossFamily` (and in
+  `choreFamilies`), its two colors in `bossColors`, the four colors in `bosses.gpl`, the drawing,
+  and the boss list in `schema/bosses.json`, `schema/items.json` and `schema/quests.json`.
+
+## Suggested quests
+A quest with `suggested = true` in `quests.toml` arrives archived, under Manage quests →
+Suggestions. Onboarding and a sleeping boss in the Arena offer to bring in the suggestions for
+homework, pets, garden and cooking.
+
+## Weekly Overlords
+`overlords.toml` builds a new Overlord every week ([design](../docs/design/weekly-overlords.md)):
+- **Parts:** bodies, faces, headgear, held items, extras and color schemes, listed in `[parts]`.
+  Each part needs its drawing in `assets/art/bosses/overlord/<kind>/<key>.png` (see
+  [the art guide](../docs/ART_GUIDE.md)).
+- **Adding parts:** add the keys at the end of a list and a new `[[eras]]` entry from a future
+  Monday with the bigger counts. The weeks before it stay as they were. Never reorder or remove
+  a key.
+- **Schemes** give the main and the light (skin) color; the app makes the shades.
+- **Traits** belong to the bodies: `bpm`, `beats`, `offbeat`, `eighth` and `lanes` change the
+  rhythms the Overlord borrows.
+- **Names and titles** are whole English and German pairs. Write German titles so they need no
+  gender ("vom …", "der …"), so any title fits any name.
+- **Holidays** name a day (`"MM-DD"`, `"easter"` or `"hanukkah"`) or a table of `dates` (for
+  holidays that follow the moon; extend it before it runs out), and the headgear, item, extra and
+  scheme the Overlord wears that week. Players turn them on in Settings → Boss fights. Holidays in
+  the same week take turns by year, in the file's order.
+- **Boons:** `boon` gives the holiday's effects (as for items) for `[boons] days` after a win.
 
 ## Balance and difficulty
 `balance.toml` holds the numbers. Each person picks a difficulty in Settings → Boss fights:

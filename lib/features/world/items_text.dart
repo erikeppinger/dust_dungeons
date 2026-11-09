@@ -32,11 +32,11 @@ String itemDescription(AppLocalizations l10n, ShopItem item) {
 }
 
 List<String> _effectLines(AppLocalizations l10n, ShopItem item) {
-  final general = _phrases(l10n, item.effects);
+  final general = effectPhrases(l10n, item.effects);
   // Bosses where the item does something else, grouped when it's the same.
   final against = <String, List<String>>{};
   for (final MapEntry(key: boss, value: effects) in item.against.entries) {
-    final changed = _phrases(
+    final changed = effectPhrases(
       l10n,
       effects,
     ).where((p) => !general.contains(p)).join(', ');
@@ -55,7 +55,8 @@ List<String> _effectLines(AppLocalizations l10n, ShopItem item) {
       : all;
 }
 
-List<String> _phrases(AppLocalizations l10n, Effects e) => [
+/// [e] in short phrases ("+1 heart", …).
+List<String> effectPhrases(AppLocalizations l10n, Effects e) => [
   if (e.hearts > 0) l10n.effectHearts(e.hearts),
   if (e.perfectTimes > Effects.none.perfectTimes)
     l10n.effectPerfectTimes(e.perfectTimes),

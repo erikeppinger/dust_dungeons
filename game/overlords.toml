@@ -1,0 +1,294 @@
+#:schema ./schema/overlords.json
+# The weekly Overlords: the parts they're built from, their colors, traits,
+# names and the holiday Overlords. See docs/design/weekly-overlords.md.
+#
+# Part keys are stored with every Overlord fight: never rename or remove one.
+# The lists only grow at the end, and only together with a new [[eras]] entry,
+# so the weeks before stay as they were. Every part needs its drawing in
+# assets/art/bosses/overlord/<kind>/<key>.png.
+
+# Names and titles, written as whole pairs (not word by word). German titles
+# need no gender, so any title fits any name.
+names = [
+  { en = "Grimeclaw", de = "Schmierklaue" },
+  { en = "Moldmaw", de = "Schimmelschlund" },
+  { en = "Crumblebeard", de = "Krümelbart" },
+  { en = "Fluffgrub", de = "Fusselfratz" },
+  { en = "Soggybones", de = "Matschknochen" },
+  { en = "Stinkwhisker", de = "Stinkeschnurr" },
+  { en = "Dribblefang", de = "Sabberzahn" },
+  { en = "Smudgefist", de = "Schmierfaust" },
+  { en = "Gloomsponge", de = "Grummelschwamm" },
+  { en = "Sockmuncher", de = "Sockenmampf" },
+  { en = "Rustgrin", de = "Rostgrinser" },
+  { en = "Clutterhorn", de = "Krempelhorn" },
+  { en = "Mildewmuck", de = "Muffelmief" },
+  { en = "Puddlepaw", de = "Pfützenpfote" },
+  { en = "Lintwick", de = "Flusenwisch" },
+  { en = "Greasegob", de = "Fettbacke" },
+  { en = "Dustdrake", de = "Staubdrache" },
+  { en = "Gunkgut", de = "Glibberbauch" },
+  { en = "Snarlmop", de = "Knurrmopp" },
+  { en = "Sludgesnout", de = "Schlammschnauze" },
+  { en = "Tanglehair", de = "Wirrhaar" },
+  { en = "Crustknuckle", de = "Krustenknöchel" },
+  { en = "Fumblefoot", de = "Stolperfuß" },
+  { en = "Wobblechin", de = "Wackelkinn" },
+]
+titles = [
+  { en = "of the Sticky Floor", de = "vom klebrigen Boden" },
+  { en = "of the Last Sock", de = "der letzten Socke" },
+  { en = "of the Overflowing Bin", de = "vom überquellenden Eimer" },
+  { en = "of the Dusty Shelf", de = "vom staubigen Regal" },
+  { en = "of the Unmade Bed", de = "vom ungemachten Bett" },
+  { en = "of the Greasy Pan", de = "von der fettigen Pfanne" },
+  { en = "of the Endless Laundry", de = "der endlosen Wäsche" },
+  { en = "of the Foggy Mirror", de = "vom beschlagenen Spiegel" },
+  { en = "of the Crumb Mountains", de = "der Krümelberge" },
+  { en = "of the Lost Lid", de = "vom verlorenen Deckel" },
+  { en = "of the Muddy Boots", de = "der Matschstiefel" },
+  { en = "of the Smelly Fridge", de = "vom muffigen Kühlschrank" },
+  { en = "of the Tangled Cables", de = "der verhedderten Kabel" },
+  { en = "of the Dripping Tap", de = "vom tropfenden Hahn" },
+  { en = "of the Forgotten Dishes", de = "vom vergessenen Abwasch" },
+  { en = "of the Mystery Stain", de = "vom rätselhaften Fleck" },
+  { en = "of the Cluttered Hall", de = "vom vollgestellten Flur" },
+  { en = "of the Wilted Plants", de = "der welken Pflanzen" },
+  { en = "of the Soggy Towel", de = "vom nassen Handtuch" },
+  { en = "of the Sock Drawer", de = "von der Sockenschublade" },
+  { en = "of the Sticky Jam Jar", de = "vom klebrigen Marmeladenglas" },
+  { en = "of the Overstuffed Closet", de = "vom vollgestopften Schrank" },
+  { en = "of the Clogged Drain", de = "vom verstopften Abfluss" },
+  { en = "of the Rumbling Washer", de = "der rumpelnden Waschmaschine" },
+]
+
+# The parts every week picks from, in order.
+[parts]
+body = ["robe", "armor", "blob", "sleeves", "spider", "serpent"]
+face = ["grin", "angry", "cyclops", "specs", "sleepy", "three"]
+hat = ["crown", "horns", "wizard", "bucket", "colander", "chef"]
+item = ["plunger", "fork", "brush", "duster", "spatula", "mop"]
+extra = ["none", "cape", "flies", "sparkles", "wings", "tentacles"]
+scheme = ["violet", "crimson", "moss", "midnight", "rust", "teal", "ash", "plum"]
+
+# From which Monday how many of each list are in use. A new era starts the
+# weekly order over with the bigger lists. Every count needs at least 3.
+[[eras]]
+from = "2024-01-01"
+body = 6
+face = 6
+hat = 6
+item = 6
+extra = 6
+scheme = 8
+name = 24
+title = 24
+
+# Main and light (skin) color; the app makes the darker shades.
+[schemes]
+violet = { main = "#5E35B1", light = "#B39DDB" }
+crimson = { main = "#B0283C", light = "#F0B4AA" }
+moss = { main = "#387846", light = "#BEDC96" }
+midnight = { main = "#283C82", light = "#A0BEE6" }
+rust = { main = "#B85C28", light = "#F6CEA0" }
+teal = { main = "#007978", light = "#B2E6D2" }
+ash = { main = "#545460", light = "#C8C4D2" }
+plum = { main = "#8C2878", light = "#ECBADC" }
+christmas = { main = "#C62828", light = "#F8D5C0" }
+easter = { main = "#6E9E3A", light = "#F8DCE6" }
+valentine = { main = "#C8346E", light = "#FAD6DC" }
+halloween = { main = "#4A2E6B", light = "#B5D98A" }
+new_year = { main = "#1E2A5A", light = "#E6DCF5" }
+lunar_new_year = { main = "#B71C1C", light = "#F8D9B0" }
+diwali = { main = "#C2185B", light = "#FFD9A0" }
+eid_al_fitr = { main = "#00695C", light = "#E0F2E9" }
+hanukkah = { main = "#1E4DB7", light = "#E3ECFF" }
+nowruz = { main = "#5E8C3A", light = "#FADADD" }
+solstice = { main = "#E67E22", light = "#FFF1B8" }
+earth_day = { main = "#2E7D32", light = "#D7CCA8" }
+
+# The body sets how the Overlord plays, on top of the rhythms it borrows.
+# bpm: tempo change; beats: more beats per rhythm; offbeat, eighth: added
+# chances; lanes: added chance of notes between beats in the lane phase.
+[traits.robe]
+name = { en = "Classic", de = "Klassisch" }
+description = { en = "Plays the beaten bosses' rhythms as they are.", de = "Spielt die Rhythmen der besiegten Bosse, wie sie sind." }
+
+[traits.armor]
+name = { en = "Heavy", de = "Schwer" }
+description = { en = "Slower, but longer rhythms.", de = "Langsamer, aber längere Rhythmen." }
+bpm = -8
+beats = 1
+
+[traits.blob]
+name = { en = "Wobbly", de = "Wabbelig" }
+description = { en = "More beats between the beats.", de = "Mehr Schläge zwischen den Schlägen." }
+offbeat = 0.25
+
+[traits.sleeves]
+name = { en = "Swift", de = "Flink" }
+description = { en = "More quick eighth notes.", de = "Mehr schnelle Achtelnoten." }
+eighth = 0.2
+
+[traits.spider]
+name = { en = "Skittering", de = "Krabbelig" }
+description = { en = "A faster tempo.", de = "Ein schnelleres Tempo." }
+bpm = 8
+
+[traits.serpent]
+name = { en = "Coiling", de = "Geschlängelt" }
+description = { en = "More notes in the last phase.", de = "Mehr Noten in der letzten Phase." }
+lanes = 0.1
+
+# Beating a holiday Overlord gives its boon (effects like an item's, see
+# game/README.md) for this many days.
+[boons]
+days = 14
+
+# Holiday Overlords (opt-in in the settings): the week (Monday to Sunday)
+# that contains the day. day = "MM-DD", "easter" (Easter Sunday) or
+# "hanukkah" (its first day); or dates = [...] for holidays that follow the
+# moon. When two turned-on holidays share a week, they take turns by year.
+# The holiday parts replace the week's headgear, item, extra and colors;
+# body (and with it the trait) and face stay the week's.
+[holidays.christmas]
+day = "12-24"
+setting = { en = "Christmas", de = "Weihnachten" }
+name = { en = "Tinsel Tyrant", de = "Lametta-Tyrann" }
+trophy = { en = "Christmas Star", de = "Weihnachtsstern" }
+hat = "santa"
+item = "candy_cane"
+extra = "snow"
+scheme = "christmas"
+boon = { hearts = 1 }
+
+[holidays.easter]
+day = "easter"
+setting = { en = "Easter", de = "Ostern" }
+name = { en = "Egg-Hoarding Hare", de = "Eierbunker-Hase" }
+trophy = { en = "Golden Egg", de = "Goldenes Ei" }
+hat = "bunny"
+item = "egg"
+extra = "eggs"
+scheme = "easter"
+boon = { loot_bonus = 15 }
+
+[holidays.valentine]
+day = "02-14"
+setting = { en = "Valentine's Day", de = "Valentinstag" }
+name = { en = "Heartbreak Harpy", de = "Herzensbrecher-Harpyie" }
+trophy = { en = "Heart Locket", de = "Herzmedaillon" }
+hat = "hearts"
+item = "arrow"
+extra = "hearts"
+scheme = "valentine"
+boon = { combo_heal = 10 }
+
+[holidays.halloween]
+day = "10-31"
+setting = { en = "Halloween", de = "Halloween" }
+name = { en = "Pumpkin Poltergeist", de = "Kürbis-Poltergeist" }
+trophy = { en = "Pumpkin Lantern", de = "Kürbislaterne" }
+hat = "pumpkin"
+item = "broom"
+extra = "bats"
+scheme = "halloween"
+boon = { sneak_attack = true }
+
+[holidays.new_year]
+day = "12-31"
+setting = { en = "New Year's Eve", de = "Silvester" }
+name = { en = "Count Down", de = "Graf Countdown" }
+trophy = { en = "Party Popper", de = "Knallbonbon" }
+hat = "party"
+item = "sparkler"
+extra = "confetti"
+scheme = "new_year"
+boon = { wide_timing = true }
+
+[holidays.lunar_new_year]
+# Moves with the moon: a table of dates (extend it before it runs out).
+dates = ["2024-02-10", "2025-01-29", "2026-02-17", "2027-02-06", "2028-01-26", "2029-02-13",
+         "2030-02-03", "2031-01-23", "2032-02-11", "2033-01-31", "2034-02-19", "2035-02-08",
+         "2036-01-28", "2037-02-15", "2038-02-04", "2039-01-24", "2040-02-12"]
+setting = { en = "Lunar New Year", de = "Mondneujahr" }
+name = { en = "Nian Beast", de = "Nian-Ungeheuer" }
+trophy = { en = "Red Envelope", de = "Roter Umschlag" }
+hat = "lion"
+item = "lantern"
+extra = "firecrackers"
+scheme = "lunar_new_year"
+boon = { loot_bonus = 20 }
+
+[holidays.diwali]
+# The main day (Lakshmi Puja) in India; a table, as it follows the moon.
+dates = ["2024-11-01", "2025-10-20", "2026-11-08", "2027-10-29", "2028-10-17", "2029-11-05",
+         "2030-10-26", "2031-11-14", "2032-11-02", "2033-10-22", "2034-11-10", "2035-10-30",
+         "2036-10-18"]
+setting = { en = "Diwali", de = "Diwali" }
+name = { en = "Sweets Snatcher", de = "Süßigkeiten-Stibitzer" }
+trophy = { en = "Box of Sweets", de = "Süßigkeitenschachtel" }
+hat = "marigold"
+item = "rocket"
+extra = "lights"
+scheme = "diwali"
+boon = { perfect_times = 3 }
+
+[holidays.eid_al_fitr]
+# Depends on the moon sighting; can be a day off locally. Twice in 2033.
+dates = ["2024-04-10", "2025-03-30", "2026-03-20", "2027-03-10", "2028-02-27", "2029-02-14",
+         "2030-02-05", "2031-01-24", "2032-01-14", "2033-01-02", "2033-12-23", "2034-12-12",
+         "2035-12-01", "2036-11-19", "2037-11-08", "2038-10-29", "2039-10-19", "2040-10-07"]
+setting = { en = "Eid al-Fitr", de = "Zuckerfest (Eid al-Fitr)" }
+name = { en = "Maamoul Muncher", de = "Maamoul-Mampfer" }
+trophy = { en = "Golden Lantern", de = "Goldene Laterne" }
+hat = "star_garland"
+item = "fanous"
+extra = "stars"
+scheme = "eid_al_fitr"
+boon = { free_misses = 1 }
+
+[holidays.hanukkah]
+# Its first day (25 Kislev), worked out from the Hebrew calendar.
+day = "hanukkah"
+setting = { en = "Hanukkah", de = "Chanukka" }
+name = { en = "Gelt Gobbler", de = "Goldmünzen-Gierschlund" }
+trophy = { en = "Silver Dreidel", de = "Silberner Dreidel" }
+hat = "dreidel"
+item = "gelt"
+extra = "coins"
+scheme = "hanukkah"
+boon = { good_damage = 1 }
+
+[holidays.nowruz]
+day = "03-20"
+setting = { en = "Nowruz (start of spring)", de = "Nouruz (Frühlingsanfang)" }
+name = { en = "Spring-Cleaning Storm", de = "Frühjahrsputz-Sturm" }
+trophy = { en = "Hyacinth", de = "Hyazinthe" }
+hat = "blossom"
+item = "branch"
+extra = "petals"
+scheme = "nowruz"
+boon = { third_miss_free = true }
+
+[holidays.earth_day]
+day = "04-22"
+setting = { en = "Earth Day", de = "Tag der Erde" }
+name = { en = "Litterbug Lord", de = "Müllkäfer-Fürst" }
+trophy = { en = "Green Globe", de = "Grüner Globus" }
+hat = "leaf"
+item = "grabber"
+extra = "leaves"
+scheme = "earth_day"
+boon = { slower_boss = true }
+
+[holidays.solstice]
+day = "06-21"
+setting = { en = "Summer solstice", de = "Sommeranfang" }
+name = { en = "Heatwave Horror", de = "Hitzewellen-Horror" }
+trophy = { en = "Sun Medal", de = "Sonnenmedaille" }
+hat = "sun"
+item = "ice_cream"
+extra = "sunbeams"
+scheme = "solstice"
+boon = { damage = 1 }

@@ -129,6 +129,36 @@ dropped_by = "overlord"
 name = { en = "Cape of the Clean Sweep", de = "Umhang des Großputzes" }
 effects = { hearts = 2, combo_heal = 10 }
 
+# ---- Loot of the bosses from 0.16.0 ----
+
+[items.highlighter_wand]
+slot = "weapon"
+dropped_by = "homework"
+name = { en = "Highlighter Wand", de = "Textmarker-Zauberstab" }
+effects = { good_damage = 1 }
+against.homework = { good_damage = 2 }
+
+[items.squeaky_toy]
+slot = "charm"
+dropped_by = "pets"
+name = { en = "Squeaky Toy", de = "Quietschespielzeug" }
+effects = { combo_heal = 12 }
+against.pets = { combo_heal = 8 }
+
+[items.hedge_shears]
+slot = "weapon"
+two_handed = true
+dropped_by = "garden"
+name = { en = "Two-Handed Hedge Shears", de = "Zweihändige Heckenschere" }
+effects = { perfect_times = 3, damage = 1 }
+
+[items.oven_mitt_shield]
+slot = "shield"
+dropped_by = "cooking"
+name = { en = "Oven-Mitt Shield", de = "Topflappen-Schild" }
+effects = { free_misses = 1 }
+against.cooking = { free_misses = 2 }
+
 # ---- Consumables ----
 
 [items.second_wind]

@@ -55,34 +55,43 @@ class HomeShell extends ConsumerWidget {
             ),
           ),
         ),
-        child: NavigationBar(
-          selectedIndex: index,
-          onDestinationSelected: (i) =>
-              ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
-          destinations: [
-            NavigationDestination(
-              icon: const PixelIcon(Sprites.tabQuests),
-              label: titles[0],
-            ),
-            NavigationDestination(
-              icon: const PixelIcon(Sprites.tabQuestLog),
-              label: titles[1],
-            ),
-            NavigationDestination(
-              icon: const PixelIcon(Sprites.tabArena),
-              label: titles[2],
-            ),
-            NavigationDestination(
-              icon: const PixelIcon(Sprites.tabHallOfFame),
-              label: titles[3],
-            ),
-            NavigationDestination(
-              icon: const PixelIcon(Sprites.tabSettings),
-              label: titles[4],
-            ),
-          ],
+        // Tab labels grow with the font size only up to 110 %: then every
+        // label fits on one line (German too) and the icons stay large.
+        child: MediaQuery.withClampedTextScaling(
+          maxScaleFactor: navLabelMaxScale,
+          child: NavigationBar(
+            selectedIndex: index,
+            onDestinationSelected: (i) =>
+                ref.read(homeTabProvider.notifier).select(HomeTab.values[i]),
+            destinations: [
+              NavigationDestination(
+                icon: const PixelIcon(Sprites.tabQuests),
+                label: titles[0],
+              ),
+              NavigationDestination(
+                icon: const PixelIcon(Sprites.tabQuestLog),
+                label: titles[1],
+              ),
+              NavigationDestination(
+                icon: const PixelIcon(Sprites.tabArena),
+                label: titles[2],
+              ),
+              NavigationDestination(
+                icon: const PixelIcon(Sprites.tabHallOfFame),
+                label: titles[3],
+              ),
+              NavigationDestination(
+                icon: const PixelIcon(Sprites.tabSettings),
+                // Its own, shorter label: "Einstellungen" doesn't fit a tab.
+                label: l10n.navSettingsTab,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+/// The largest text scale for the tab labels.
+const navLabelMaxScale = 1.1;

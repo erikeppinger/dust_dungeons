@@ -171,3 +171,115 @@ color = 0
 points = 10
 repeat = { type = "daily" }
 boss = "bedroom"
+
+# ---- Suggestions (0.16.0) ----
+# suggested = true: added archived. Onboarding and the sleeping bosses in
+# the Arena offer to bring them in, since not every home has pets or a garden.
+
+[quests.homework]
+title = { en = "Do homework", de = "Hausaufgaben machen" }
+icon = "menu_book"
+color = 1
+points = 20
+repeat = { type = "daily" }
+boss = "homework"
+suggested = true
+
+[quests.pack_school_bag]
+title = { en = "Pack the school bag", de = "Schultasche packen" }
+icon = "inventory_2"
+color = 1
+points = 5
+repeat = { type = "daily" }
+boss = "homework"
+suggested = true
+
+[quests.reading]
+title = { en = "Read for 20 minutes", de = "20 Minuten lesen" }
+icon = "menu_book"
+color = 3
+points = 10
+repeat = { type = "daily" }
+boss = "homework"
+suggested = true
+
+[quests.feed_pets]
+title = { en = "Feed the pets", de = "Haustiere füttern" }
+icon = "pets"
+color = 4
+points = 5
+repeat = { type = "daily" }
+boss = "pets"
+suggested = true
+
+[quests.walk_dog]
+title = { en = "Walk the dog", de = "Mit dem Hund rausgehen" }
+icon = "pets"
+color = 2
+points = 15
+repeat = { type = "daily" }
+boss = "pets"
+suggested = true
+
+[quests.clean_pet_home]
+title = { en = "Clean the litter box or cage", de = "Katzenklo oder Käfig sauber machen" }
+icon = "sanitizer"
+color = 6
+points = 15
+repeat = { type = "after_done", every = 3 }
+boss = "pets"
+suggested = true
+
+[quests.weeding]
+title = { en = "Weed the garden", de = "Unkraut jäten" }
+icon = "yard"
+color = 2
+points = 20
+repeat = { type = "after_done", every = 7 }
+boss = "garden"
+suggested = true
+
+[quests.mow_lawn]
+title = { en = "Mow the lawn", de = "Rasen mähen" }
+icon = "grass"
+color = 2
+points = 25
+repeat = { type = "after_done", every = 10 }
+boss = "garden"
+suggested = true
+
+[quests.water_garden]
+title = { en = "Water the garden", de = "Garten gießen" }
+icon = "water_drop"
+color = 5
+points = 10
+repeat = { type = "after_done", every = 2 }
+boss = "garden"
+suggested = true
+
+[quests.cook_meal]
+title = { en = "Cook a meal", de = "Eine Mahlzeit kochen" }
+icon = "restaurant"
+color = 0
+points = 20
+repeat = { type = "daily" }
+boss = "cooking"
+suggested = true
+
+[quests.plan_meals]
+title = { en = "Plan the meals for the week", de = "Mahlzeiten für die Woche planen" }
+icon = "menu_book"
+color = 7
+points = 10
+repeat = { type = "after_done", every = 7 }
+boss = "cooking"
+suggested = true
+
+[quests.bake]
+title = { en = "Bake something", de = "Etwas backen" }
+icon = "microwave"
+color = 0
+points = 20
+repeat = { type = "anytime" }
+boss = "cooking"
+suggested = true

@@ -11,11 +11,16 @@ import '../../data/providers.dart';
 import '../../domain/fight/boss.dart';
 import '../../domain/fight/overworld.dart';
 import '../../domain/fight/items.dart';
+import '../../domain/fight/overlord.dart';
+import '../../game/game_data.dart' show overlordSchemes;
+import '../../game/game_texts.dart';
 import '../../l10n/app_localizations.dart';
 import '../fight/boss_art.dart';
 import '../fight/fight_prep_screen.dart';
 import '../fight/fight_settings.dart';
 import '../fight/hero_art.dart';
+import '../fight/overlord_art.dart';
+import '../settings/settings_controller.dart';
 import '../settings/settings_pages.dart';
 import '../../domain/screen_time.dart';
 import '../screen_time/screen_time_providers.dart';
@@ -23,6 +28,7 @@ import 'avatar_editor.dart';
 import 'gear_screen.dart';
 import 'quest_map.dart';
 import 'shop_screen.dart';
+import 'sleeping_bosses.dart';
 import '../../app/art/art.dart';
 
 /// The hub: your hero, the weekly Overlord, the bosses with their tokens,
@@ -38,12 +44,23 @@ class WorldScreen extends ConsumerWidget {
     ref.watch(equippedProvider);
     final curse = ref.watch(curseProvider);
     final today = ref.watch(todayProvider);
+    final holidays = ref.watch(settingsProvider.select((s) => s.holidays));
+    final seed = ref.watch(settingsProvider.select((s) => s.overlordSeed));
+    // Until the quests are loaded, no boss counts as sleeping.
+    final chores = ref.watch(allChoresProvider).value;
     return ref
         .watch(fightProgressProvider)
         .when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, _) => Center(child: Text(l10n.errorGeneric)),
-          data: (progress) => _list(context, progress, curse, today),
+          data: (progress) => _list(
+            context,
+            progress,
+            curse,
+            today,
+            weekOverlord(progress, today, holidays, seed: seed),
+            chores == null ? const {} : sleepingBosses(progress, chores),
+          ),
         );
   }
 
@@ -52,8 +69,14 @@ class WorldScreen extends ConsumerWidget {
     FightProgress progress,
     Curse? curse,
     DateTime today,
+    OverlordLook look,
+    Set<BossFamily> sleeping,
   ) {
     final l10n = AppLocalizations.of(context);
+    final awake = [
+      for (final f in choreFamilies)
+        if (!sleeping.contains(f)) f,
+    ];
     return ListView(
       padding: EdgeInsets.fromLTRB(
         12,
@@ -65,24 +88,38 @@ class WorldScreen extends ConsumerWidget {
         const _HeroCard(),
         if (curse != null) CurseCard(curse: curse),
         SectionHeader(l10n.worldWeeklyBoss),
-        _OverlordCard(progress: progress, today: today),
+        _OverlordCard(progress: progress, today: today, look: look),
         SectionHeader(
           '${l10n.worldBosses} · ${l10n.worldTokens(progress.totalTokens)}',
         ),
         // Two cards per row, each row as tall as its fuller card: names and
         // buttons wrap differently by language and font size.
-        for (var i = 0; i < choreFamilies.length; i += 2)
+        // Bosses with tokens first, in the usual order.
+        for (final row in _pairs([
+          ...awake.where((f) => progress.tokens(f) > 0),
+          ...awake.where((f) => progress.tokens(f) == 0),
+        ]))
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final family in choreFamilies.skip(i).take(2))
+                for (final family in row)
                   Expanded(
                     child: _BossCard(family: family, progress: progress),
                   ),
+                if (row.length == 1) const Expanded(child: SizedBox()),
               ],
             ),
           ),
+        if (sleeping.isNotEmpty) ...[
+          SectionHeader(l10n.worldSleeping),
+          SleepingBosses(
+            sleeping: [
+              for (final f in choreFamilies)
+                if (sleeping.contains(f)) f,
+            ],
+          ),
+        ],
         SectionHeader(l10n.worldTrophies),
         _TrophyShelf(progress: progress),
         const SizedBox(height: 8),
@@ -100,6 +137,11 @@ class WorldScreen extends ConsumerWidget {
     );
   }
 }
+
+/// [items] two by two.
+List<List<T>> _pairs<T>(List<T> items) => [
+  for (var i = 0; i < items.length; i += 2) items.skip(i).take(2).toList(),
+];
 
 class _HeroCard extends ConsumerWidget {
   const _HeroCard();
@@ -205,7 +247,7 @@ class _BossCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final (_, light) = bossColors(family);
+    final (_, light) = bossFormColorPair(family, progress.tier(family));
     final tokens = progress.tokens(family);
     final background = Color.alphaBlend(
       light.withValues(alpha: 0.28),
@@ -222,7 +264,7 @@ class _BossCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BossArt(family: family, size: 60),
+                BossArt(family: family, tier: progress.tier(family), size: 60),
                 const Spacer(),
                 Chip(
                   label: Text(l10n.worldTokenCount(tokens)),
@@ -234,7 +276,7 @@ class _BossCard extends StatelessWidget {
             const SizedBox(height: 8),
             const Spacer(),
             Text(
-              bossName(l10n, family),
+              bossName(l10n, family, null, progress.tier(family)),
               style: theme.textTheme.titleSmall,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -274,10 +316,17 @@ class _BossCard extends StatelessWidget {
 
 /// The weekly Chore Overlord: how close it is, ready to fight, or beaten.
 class _OverlordCard extends StatelessWidget {
-  const _OverlordCard({required this.progress, required this.today});
+  const _OverlordCard({
+    required this.progress,
+    required this.today,
+    required this.look,
+  });
 
   final FightProgress progress;
   final DateTime today;
+
+  /// This week's Overlord.
+  final OverlordLook look;
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +336,8 @@ class _OverlordCard extends StatelessWidget {
     final wins = progress.weekWinFamilies(today);
     final ready = progress.overlordReady(today);
     final beaten = progress.overlordBeaten(today);
-    final (_, light) = bossColors(family);
+    // The week's Overlord's own light color.
+    final light = Color(overlordSchemes[look.scheme]?.$2 ?? 0xFFB39DDB);
     return Card(
       key: const ValueKey('boss-overlord'),
       color: ready
@@ -301,15 +351,43 @@ class _OverlordCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(bossName(l10n, family), style: theme.textTheme.titleMedium),
-            Text(
-              l10n.worldTier(progress.tier(family)),
-              style: theme.textTheme.bodySmall,
+            Row(
+              children: [
+                OverlordArt(
+                  look: look,
+                  size: 72,
+                  mood: beaten ? BossMood.defeated : BossMood.idle,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        overlordName(l10n, look),
+                        key: const ValueKey('overlord-name'),
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      Text(
+                        '${l10n.gameBossOverlord} · '
+                        '${l10n.worldTier(progress.tier(family))}',
+                        style: theme.textTheme.bodySmall,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        overlordTraitLine(l10n, look),
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
             QuestMap(
               map: WeekMap.forWeek(today),
               wins: wins,
+              tiers: progress.weekWinTiers(today),
               beaten: beaten,
               semanticLabel: l10n.worldOverlordProgress(
                 wins.length.clamp(0, overlordWinsNeeded),
@@ -339,6 +417,7 @@ class _OverlordCard extends StatelessWidget {
                   family,
                   progress.tier(family),
                   motifs: progress.weekBeaten(today),
+                  look: look,
                 ),
                 child: Text(l10n.worldFight),
               ),
@@ -370,7 +449,12 @@ class _TrophyShelf extends StatelessWidget {
         children: [
           for (final family in won)
             ListTile(
-              leading: const PixelTrophy(size: 32),
+              leading: PixelTrophy(
+                size: 32,
+                tier: family == BossFamily.overlord
+                    ? 3
+                    : progress.bestTier(family),
+              ),
               title: Text(trophyName(l10n, family)),
               subtitle: Text(
                 l10n.worldTrophyWins(
@@ -378,7 +462,20 @@ class _TrophyShelf extends StatelessWidget {
                   ((progress.bestAccuracy(family) ?? 0) * 100).round(),
                 ),
               ),
-              trailing: BossArt(family: family, size: 36),
+              trailing: BossArt(
+                family: family,
+                tier: progress.bestTier(family),
+                size: 36,
+              ),
+            ),
+          for (final MapEntry(key: holiday, value: wins)
+              in progress.holidayWins.entries)
+            ListTile(
+              key: ValueKey('holiday-trophy-$holiday'),
+              leading: const PixelTrophy(size: 32),
+              title: Text(gameHolidayTrophy(l10n, holiday) ?? holiday),
+              subtitle: Text(l10n.worldHolidayTrophyWins(wins)),
+              trailing: OverlordArt(look: holidayLook(holiday), size: 36),
             ),
         ],
       ),

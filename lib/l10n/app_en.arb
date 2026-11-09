@@ -9,6 +9,10 @@
   "navWorld": "Arena",
   "navStats": "Hall of Fame",
   "navSettings": "Settings",
+  "navSettingsTab": "Settings",
+  "@navSettingsTab": {
+    "description": "The Settings tab's label: short, it must fit one line under the icon."
+  },
   "settingsAppearance": "Appearance",
   "settingsTheme": "Theme",
   "themeSystem": "System",
@@ -58,6 +62,7 @@
   "manageChoresSubtitle": "Add, edit, archive",
   "activeChores": "Active",
   "archivedChores": "Archived",
+  "suggestedChores": "Suggestions",
   "choreName": "Name",
   "choreNameRequired": "Please enter a name",
   "chorePoints": "Points",
@@ -1430,6 +1435,89 @@
   },
   "fightSettingCurses": "Curses after a lost fight",
   "fightSettingCursesSubtitle": "A lost fight makes the next one a bit harder, unless a quest lifts the curse first",
+  "fightSettingHolidays": "Holiday Overlords",
+  "fightSettingHolidaysSubtitle": "In a holiday's week the Overlord dresses up and has its own trophy",
+  "fightNewForm": "Next time it returns stronger: {name}!",
+  "prepBoons": "Holiday boons",
+  "prepBoon": "{effects} · {days, plural, =1{last day} other{{days} more days}}",
+  "@prepBoon": {
+    "placeholders": {
+      "effects": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "fightHolidayBoon": "Holiday boon for {days} days: {effects}.",
+  "@fightHolidayBoon": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "effects": {
+        "type": "String"
+      }
+    }
+  },
+  "worldSleeping": "Sleeping",
+  "worldSleepingBoss": "{name} is sleeping",
+  "@worldSleepingBoss": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worldSleepingBody": "No active quest feeds this boss. It wakes up with: {source}.",
+  "@worldSleepingBody": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "worldSleepingSuggestions": "{n, plural, =1{One suggested quest is waiting in the archive.} other{{n} suggested quests are waiting in the archive.}}",
+  "@worldSleepingSuggestions": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "worldSleepingWake": "Add the quests",
+  "worldSleepingLater": "Not now",
+  "worldSleepingOk": "OK",
+  "onboardingGroupsTitle": "Anything else at home?",
+  "onboardingGroupsBody": "Each brings its own quests and a boss of its own. You can add them later from the Arena.",
+  "onboardingGroupHomework": "Homework and reading",
+  "onboardingGroupPets": "Pets",
+  "onboardingGroupGarden": "A garden",
+  "onboardingGroupCooking": "Cooking",
+  "@fightNewForm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fightHolidayTrophy": "Holiday trophy: {name}",
+  "@fightHolidayTrophy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worldHolidayTrophyWins": "Won {n}×",
+  "@worldHolidayTrophyWins": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
   "prepGear": "Your gear",
   "prepChangeGear": "Change gear",
   "prepNoGear": "No gear yet",
@@ -1648,6 +1736,22 @@
   "@gameItemCapeOfCleanSweep": {
     "description": "Generated from game/items.toml"
   },
+  "gameItemHighlighterWand": "Highlighter Wand",
+  "@gameItemHighlighterWand": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemSqueakyToy": "Squeaky Toy",
+  "@gameItemSqueakyToy": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemHedgeShears": "Two-Handed Hedge Shears",
+  "@gameItemHedgeShears": {
+    "description": "Generated from game/items.toml"
+  },
+  "gameItemOvenMittShield": "Oven-Mitt Shield",
+  "@gameItemOvenMittShield": {
+    "description": "Generated from game/items.toml"
+  },
   "gameItemSecondWind": "Second Wind",
   "@gameItemSecondWind": {
     "description": "Generated from game/items.toml"
@@ -1700,8 +1804,16 @@
   "@gameBossDustFedBy": {
     "description": "Generated from game/bosses.toml"
   },
-  "gameBossDustTrophy": "Golden Feather Duster",
+  "gameBossDustTrophy": "Grand Feather Duster",
   "@gameBossDustTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustForm2": "Dust Bunny Emperor",
+  "@gameBossDustForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossDustForm3": "Dust Bunny Tyrant of the Rug",
+  "@gameBossDustForm3": {
     "description": "Generated from game/bosses.toml"
   },
   "gameBossLaundry": "Laundry Hydra",
@@ -1716,6 +1828,14 @@
   "@gameBossLaundryFedBy": {
     "description": "Generated from game/bosses.toml"
   },
+  "gameBossLaundryForm2": "Hydra of Many Socks",
+  "@gameBossLaundryForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossLaundryForm3": "Spin-Cycle Hydra",
+  "@gameBossLaundryForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
   "gameBossKitchen": "Sink Kraken",
   "@gameBossKitchen": {
     "description": "Generated from game/bosses.toml"
@@ -1726,6 +1846,14 @@
   },
   "gameBossKitchenFedBy": "dishes, kitchen",
   "@gameBossKitchenFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchenForm2": "Grease Kraken",
+  "@gameBossKitchenForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossKitchenForm3": "Kraken of the Deep Drain",
+  "@gameBossKitchenForm3": {
     "description": "Generated from game/bosses.toml"
   },
   "gameBossBath": "Porcelain Golem",
@@ -1740,6 +1868,14 @@
   "@gameBossBathFedBy": {
     "description": "Generated from game/bosses.toml"
   },
+  "gameBossBathForm2": "Granite Golem",
+  "@gameBossBathForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBathForm3": "Golem of the Endless Grout",
+  "@gameBossBathForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
   "gameBossTrash": "Trash Titan",
   "@gameBossTrash": {
     "description": "Generated from game/bosses.toml"
@@ -1750,6 +1886,14 @@
   },
   "gameBossTrashFedBy": "trash, recycling",
   "@gameBossTrashFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrashForm2": "Trash Titan Rex",
+  "@gameBossTrashForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossTrashForm3": "Landfill Colossus",
+  "@gameBossTrashForm3": {
     "description": "Generated from game/bosses.toml"
   },
   "gameBossBedroom": "Pillow Phantom",
@@ -1764,6 +1908,14 @@
   "@gameBossBedroomFedBy": {
     "description": "Generated from game/bosses.toml"
   },
+  "gameBossBedroomForm2": "Duvet Phantom",
+  "@gameBossBedroomForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossBedroomForm3": "Phantom of the Midnight Snooze",
+  "@gameBossBedroomForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
   "gameBossOutside": "Window Wraith",
   "@gameBossOutside": {
     "description": "Generated from game/bosses.toml"
@@ -1774,6 +1926,14 @@
   },
   "gameBossOutsideFedBy": "windows, plants, errands",
   "@gameBossOutsideFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutsideForm2": "Storm Window Wraith",
+  "@gameBossOutsideForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossOutsideForm3": "Wraith of the Smudged Panes",
+  "@gameBossOutsideForm3": {
     "description": "Generated from game/bosses.toml"
   },
   "gameBossClutter": "Clutter Gremlin",
@@ -1792,6 +1952,14 @@
   "@gameBossClutterTrophy": {
     "description": "Generated from game/bosses.toml"
   },
+  "gameBossClutterForm2": "Clutter Goblin King",
+  "@gameBossClutterForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossClutterForm3": "Hoarder of the Junk Drawer",
+  "@gameBossClutterForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
   "gameBossOverlord": "Chore Overlord",
   "@gameBossOverlord": {
     "description": "Generated from game/bosses.toml"
@@ -1802,6 +1970,86 @@
   },
   "gameBossOverlordTrophy": "Crown of the Week",
   "@gameBossOverlordTrophy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossHomework": "Paper Pile Lich",
+  "@gameBossHomework": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseHomework": "Smudged Notes",
+  "@gameCurseHomework": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossHomeworkFedBy": "homework, reading",
+  "@gameBossHomeworkFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossHomeworkForm2": "Overdue Lich",
+  "@gameBossHomeworkForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossHomeworkForm3": "Lich of the Endless Exam",
+  "@gameBossHomeworkForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossPets": "Fur Ball Beast",
+  "@gameBossPets": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCursePets": "Fur Everywhere",
+  "@gameCursePets": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossPetsFedBy": "pets",
+  "@gameBossPetsFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossPetsForm2": "Shedding Fluff Fiend",
+  "@gameBossPetsForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossPetsForm3": "Great Furricane",
+  "@gameBossPetsForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossGarden": "Weed Wyrm",
+  "@gameBossGarden": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseGarden": "Thorny Hands",
+  "@gameCurseGarden": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossGardenFedBy": "garden, lawn",
+  "@gameBossGardenFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossGardenForm2": "Bramble Wyrm",
+  "@gameBossGardenForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossGardenForm3": "Root Wyrm of the Wild Lawn",
+  "@gameBossGardenForm3": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossCooking": "Pot Gremlin",
+  "@gameBossCooking": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameCurseCooking": "Burnt Fingers",
+  "@gameCurseCooking": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossCookingFedBy": "cooking, meals",
+  "@gameBossCookingFedBy": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossCookingForm2": "Pressure-Cooker Gremlin",
+  "@gameBossCookingForm2": {
+    "description": "Generated from game/bosses.toml"
+  },
+  "gameBossCookingForm3": "Gremlin of the Burnt Feast",
+  "@gameBossCookingForm3": {
     "description": "Generated from game/bosses.toml"
   },
   "gameQuestDusting": "Dusting",
@@ -1887,5 +2135,437 @@
   "gameQuestTidyUp": "Tidy up",
   "@gameQuestTidyUp": {
     "description": "Generated from game/quests.toml"
+  },
+  "gameQuestHomework": "Do homework",
+  "@gameQuestHomework": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestPackSchoolBag": "Pack the school bag",
+  "@gameQuestPackSchoolBag": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestReading": "Read for 20 minutes",
+  "@gameQuestReading": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestFeedPets": "Feed the pets",
+  "@gameQuestFeedPets": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestWalkDog": "Walk the dog",
+  "@gameQuestWalkDog": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCleanPetHome": "Clean the litter box or cage",
+  "@gameQuestCleanPetHome": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestWeeding": "Weed the garden",
+  "@gameQuestWeeding": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestMowLawn": "Mow the lawn",
+  "@gameQuestMowLawn": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestWaterGarden": "Water the garden",
+  "@gameQuestWaterGarden": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestCookMeal": "Cook a meal",
+  "@gameQuestCookMeal": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestPlanMeals": "Plan the meals for the week",
+  "@gameQuestPlanMeals": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameQuestBake": "Bake something",
+  "@gameQuestBake": {
+    "description": "Generated from game/quests.toml"
+  },
+  "gameOverlordName0": "Grimeclaw",
+  "@gameOverlordName0": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName1": "Moldmaw",
+  "@gameOverlordName1": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName2": "Crumblebeard",
+  "@gameOverlordName2": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName3": "Fluffgrub",
+  "@gameOverlordName3": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName4": "Soggybones",
+  "@gameOverlordName4": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName5": "Stinkwhisker",
+  "@gameOverlordName5": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName6": "Dribblefang",
+  "@gameOverlordName6": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName7": "Smudgefist",
+  "@gameOverlordName7": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName8": "Gloomsponge",
+  "@gameOverlordName8": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName9": "Sockmuncher",
+  "@gameOverlordName9": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName10": "Rustgrin",
+  "@gameOverlordName10": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName11": "Clutterhorn",
+  "@gameOverlordName11": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName12": "Mildewmuck",
+  "@gameOverlordName12": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName13": "Puddlepaw",
+  "@gameOverlordName13": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName14": "Lintwick",
+  "@gameOverlordName14": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName15": "Greasegob",
+  "@gameOverlordName15": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName16": "Dustdrake",
+  "@gameOverlordName16": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName17": "Gunkgut",
+  "@gameOverlordName17": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName18": "Snarlmop",
+  "@gameOverlordName18": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName19": "Sludgesnout",
+  "@gameOverlordName19": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName20": "Tanglehair",
+  "@gameOverlordName20": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName21": "Crustknuckle",
+  "@gameOverlordName21": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName22": "Fumblefoot",
+  "@gameOverlordName22": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordName23": "Wobblechin",
+  "@gameOverlordName23": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle0": "of the Sticky Floor",
+  "@gameOverlordTitle0": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle1": "of the Last Sock",
+  "@gameOverlordTitle1": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle2": "of the Overflowing Bin",
+  "@gameOverlordTitle2": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle3": "of the Dusty Shelf",
+  "@gameOverlordTitle3": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle4": "of the Unmade Bed",
+  "@gameOverlordTitle4": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle5": "of the Greasy Pan",
+  "@gameOverlordTitle5": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle6": "of the Endless Laundry",
+  "@gameOverlordTitle6": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle7": "of the Foggy Mirror",
+  "@gameOverlordTitle7": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle8": "of the Crumb Mountains",
+  "@gameOverlordTitle8": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle9": "of the Lost Lid",
+  "@gameOverlordTitle9": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle10": "of the Muddy Boots",
+  "@gameOverlordTitle10": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle11": "of the Smelly Fridge",
+  "@gameOverlordTitle11": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle12": "of the Tangled Cables",
+  "@gameOverlordTitle12": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle13": "of the Dripping Tap",
+  "@gameOverlordTitle13": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle14": "of the Forgotten Dishes",
+  "@gameOverlordTitle14": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle15": "of the Mystery Stain",
+  "@gameOverlordTitle15": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle16": "of the Cluttered Hall",
+  "@gameOverlordTitle16": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle17": "of the Wilted Plants",
+  "@gameOverlordTitle17": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle18": "of the Soggy Towel",
+  "@gameOverlordTitle18": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle19": "of the Sock Drawer",
+  "@gameOverlordTitle19": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle20": "of the Sticky Jam Jar",
+  "@gameOverlordTitle20": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle21": "of the Overstuffed Closet",
+  "@gameOverlordTitle21": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle22": "of the Clogged Drain",
+  "@gameOverlordTitle22": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTitle23": "of the Rumbling Washer",
+  "@gameOverlordTitle23": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitRobe": "Classic",
+  "@gameOverlordTraitRobe": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitRobeDesc": "Plays the beaten bosses' rhythms as they are.",
+  "@gameOverlordTraitRobeDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitArmor": "Heavy",
+  "@gameOverlordTraitArmor": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitArmorDesc": "Slower, but longer rhythms.",
+  "@gameOverlordTraitArmorDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitBlob": "Wobbly",
+  "@gameOverlordTraitBlob": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitBlobDesc": "More beats between the beats.",
+  "@gameOverlordTraitBlobDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSleeves": "Swift",
+  "@gameOverlordTraitSleeves": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSleevesDesc": "More quick eighth notes.",
+  "@gameOverlordTraitSleevesDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSpider": "Skittering",
+  "@gameOverlordTraitSpider": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSpiderDesc": "A faster tempo.",
+  "@gameOverlordTraitSpiderDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSerpent": "Coiling",
+  "@gameOverlordTraitSerpent": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameOverlordTraitSerpentDesc": "More notes in the last phase.",
+  "@gameOverlordTraitSerpentDesc": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayChristmas": "Tinsel Tyrant",
+  "@gameHolidayChristmas": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayChristmasTrophy": "Christmas Star",
+  "@gameHolidayChristmasTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayChristmasSetting": "Christmas",
+  "@gameHolidayChristmasSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEaster": "Egg-Hoarding Hare",
+  "@gameHolidayEaster": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEasterTrophy": "Golden Egg",
+  "@gameHolidayEasterTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEasterSetting": "Easter",
+  "@gameHolidayEasterSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayValentine": "Heartbreak Harpy",
+  "@gameHolidayValentine": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayValentineTrophy": "Heart Locket",
+  "@gameHolidayValentineTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayValentineSetting": "Valentine's Day",
+  "@gameHolidayValentineSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHalloween": "Pumpkin Poltergeist",
+  "@gameHolidayHalloween": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHalloweenTrophy": "Pumpkin Lantern",
+  "@gameHolidayHalloweenTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHalloweenSetting": "Halloween",
+  "@gameHolidayHalloweenSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNewYear": "Count Down",
+  "@gameHolidayNewYear": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNewYearTrophy": "Party Popper",
+  "@gameHolidayNewYearTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNewYearSetting": "New Year's Eve",
+  "@gameHolidayNewYearSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayLunarNewYear": "Nian Beast",
+  "@gameHolidayLunarNewYear": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayLunarNewYearTrophy": "Red Envelope",
+  "@gameHolidayLunarNewYearTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayLunarNewYearSetting": "Lunar New Year",
+  "@gameHolidayLunarNewYearSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayDiwali": "Sweets Snatcher",
+  "@gameHolidayDiwali": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayDiwaliTrophy": "Box of Sweets",
+  "@gameHolidayDiwaliTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayDiwaliSetting": "Diwali",
+  "@gameHolidayDiwaliSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEidAlFitr": "Maamoul Muncher",
+  "@gameHolidayEidAlFitr": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEidAlFitrTrophy": "Golden Lantern",
+  "@gameHolidayEidAlFitrTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEidAlFitrSetting": "Eid al-Fitr",
+  "@gameHolidayEidAlFitrSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHanukkah": "Gelt Gobbler",
+  "@gameHolidayHanukkah": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHanukkahTrophy": "Silver Dreidel",
+  "@gameHolidayHanukkahTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayHanukkahSetting": "Hanukkah",
+  "@gameHolidayHanukkahSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNowruz": "Spring-Cleaning Storm",
+  "@gameHolidayNowruz": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNowruzTrophy": "Hyacinth",
+  "@gameHolidayNowruzTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayNowruzSetting": "Nowruz (start of spring)",
+  "@gameHolidayNowruzSetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEarthDay": "Litterbug Lord",
+  "@gameHolidayEarthDay": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEarthDayTrophy": "Green Globe",
+  "@gameHolidayEarthDayTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidayEarthDaySetting": "Earth Day",
+  "@gameHolidayEarthDaySetting": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidaySolstice": "Heatwave Horror",
+  "@gameHolidaySolstice": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidaySolsticeTrophy": "Sun Medal",
+  "@gameHolidaySolsticeTrophy": {
+    "description": "Generated from game/overlords.toml"
+  },
+  "gameHolidaySolsticeSetting": "Summer solstice",
+  "@gameHolidaySolsticeSetting": {
+    "description": "Generated from game/overlords.toml"
   }
 }

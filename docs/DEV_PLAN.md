@@ -1,6 +1,6 @@
 # Development Plan: Household Chores Gamification App
 
-> Name: **Dust & Dungeons** (decided 2026-11-03; the working title "Homework & Chores" goes with the beta, 0.14.0)
+> Name: **Dust & Dungeons** (decided 2026-11-03; the working title "Homework & Chores" goes with the beta, 0.17.0)
 > Status: 0.13.0 released 2026-11-03; next is the beta. This plan dates from 2026-10-28 (core decisions in §16); the roadmap below is kept current.
 > Target: Android APK first, then macOS/iOS later. Built with Flutter 3.47 / Dart 3.13.
 
@@ -275,7 +275,9 @@ Users can add, edit, archive and re-color chores. Built-in chores can be hidden,
 | **0.12.0** ✅ | Game data | Items, bosses, built-in quests and balance numbers in TOML files under `game/`, checked and turned into code and texts by `tool/build_game_data.py`; descriptions generated from effects; easy / balanced / hard per person ([design](design/game-data.md)) |
 | **0.13.0** ✅ | Fight feedback | A start button before every round, a timeline with a playhead for the rhythm, a pixel hero that wears its gear, also in fights; from the first testers ([design](design/fight-feedback.md)) |
 | **0.14.0** ✅ | Round rules | A heart is lost only for a round under 50 % accuracy, and only rounds at 50 % or more damage the boss; shields protect failed rounds; from the testers ([design](design/round-rules.md)) |
-| **0.15.0** | Beta | Name **Dust & Dungeons**, final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) ([plan](design/beta.md)) |
+| **0.15.0** ✅ | Weekly Overlords | A different Overlord every week from six parts, with a generated name and a trait that changes its rhythms; opt-in holiday Overlords with their own trophies ([design](design/weekly-overlords.md)) |
+| **0.16.0** ✅ | More bosses | Four new bosses (homework, pets, garden, cooking) with suggested quests and an onboarding question, stronger forms at tiers 2 and 3 for every chore boss, bronze, silver and gold trophies, sleeping bosses in the Arena ([design](design/more-bosses.md)) |
+| **0.17.0** | Beta | Name **Dust & Dungeons**, final app ID, push to GitHub, GitHub Actions CI (analyze, test, APK build, no-INTERNET check), signed release APK, testing on real devices, bug fixing, F-Droid metadata (`fastlane/metadata/android/...`) ([plan](design/beta.md)) |
 | **1.0.0** | Release | Icon and logo for Dust & Dungeons, store/F-Droid listing, chosen genre theme |
 | later | | macOS/iOS, home screen widget, more themes, device-to-device sync without a server |
 

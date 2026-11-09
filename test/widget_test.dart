@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:homework_and_chores/game/game_data.dart' show overlordHolidays;
 import 'package:homework_and_chores/app/theme/chore_palette.dart';
 import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/chores/chore_edit_screen.dart';
@@ -649,7 +650,10 @@ void main() {
     await tester.pumpAndSettle();
     final card = find.byKey(const ValueKey('boss-overlord'));
     expect(
-      find.descendant(of: card, matching: find.text('Chore Overlord')),
+      find.descendant(
+        of: card,
+        matching: find.textContaining('Chore Overlord · Tier 1'),
+      ),
       findsOneWidget,
     );
     expect(
@@ -900,12 +904,63 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('sleeping bosses wake up with their suggested quests', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
+    await tester.pumpAndSettle();
+    final pets = find.byKey(const ValueKey('sleeping-pets'));
+    await tester.scrollUntilVisible(pets, 300);
+    expect(find.byKey(const ValueKey('boss-pets')), findsNothing);
+    await tester.tap(pets);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('3 suggested quests are waiting in the archive.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('wake-boss')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('sleeping-pets')), findsNothing);
+    expect(find.byKey(const ValueKey('boss-pets')), findsOneWidget);
+    final chores = await tester.runAsync(() => db.select(db.chores).get());
+    expect(
+      chores!.singleWhere((c) => c.seedKey == 'feed_pets').isArchived,
+      isFalse,
+    );
+  });
+
+  testWidgets('holiday Overlords are off until turned on, then per holiday', (
+    tester,
+  ) async {
+    final db = await pumpApp(tester);
+    await openFightSettings(tester);
+    final toggle = find.byKey(const ValueKey('setting-holidays'));
+    await tester.ensureVisible(toggle);
+    await tester.pumpAndSettle();
+    expect(find.text('Holiday Overlords'), findsOneWidget);
+    expect(find.text('Christmas'), findsNothing);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    final easter = find.byKey(const ValueKey('setting-holiday-easter'));
+    await tester.ensureVisible(easter);
+    await tester.pumpAndSettle();
+    await tester.tap(easter);
+    await tester.pumpAndSettle();
+    final saved = await tester.runAsync(() => SettingsRepository(db).load());
+    expect(saved!.holidays, {...overlordHolidays.keys}..remove('easter'));
+  });
+
   testWidgets('timing calibration measures and saves the delay', (
     tester,
   ) async {
     final db = await pumpApp(tester);
     await openFightSettings(tester);
+    await tester.ensureVisible(find.text('Slow mode'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Slow mode'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Timing calibration'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Timing calibration'));
     await tester.pumpAndSettle();

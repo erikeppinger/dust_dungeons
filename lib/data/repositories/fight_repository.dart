@@ -22,12 +22,14 @@ class FightRepository {
           .watch();
 
   /// Records the start of a fight (this spends the token) and returns its
-  /// id. A waiting curse works in this fight, so it's used up now.
+  /// id. [look] is the Overlord's `OverlordLook.key`. A waiting curse works
+  /// in this fight, so it's used up now.
   Future<int> start({
     required int profileId,
     required BossFamily family,
     required int tier,
     required bool storyMode,
+    String? look,
   }) => _db.transaction(() async {
     await _setCurse(profileId, null);
     return _db
@@ -39,6 +41,7 @@ class FightRepository {
             tier: tier,
             storyMode: Value(storyMode),
             startedAt: _clock(),
+            look: Value(look),
           ),
         );
   });

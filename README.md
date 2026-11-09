@@ -5,19 +5,22 @@ points, XP and fight tokens. Spend tokens on rhythm duels against household boss
 and dress your hero in the gear you win or buy.
 
 > The app still shows its working title, *Homework & Chores*. The rename to Dust & Dungeons comes with
-> the beta (0.15.0), see [the beta plan](docs/design/beta.md).
+> the beta (0.17.0), see [the beta plan](docs/design/beta.md).
 
 **Local only.** No account, no server, no network, no telemetry, no ads. All data stays on your device.
 
-> Status: 0.13.0, before the beta. Android first. Source: <https://github.com/erikeppinger/dust_dungeons>
+> Status: 0.16.0, before the beta. Android first. Source: <https://github.com/erikeppinger/dust_dungeons>
 
 ## Features
-- **Quests:** 21 built-in chores plus your own, with flexible schedules (daily, weekly, monthly,
+- **Quests:** 21 built-in chores and 12 suggestions (homework, pets, garden, cooking) plus your own, with flexible schedules (daily, weekly, monthly,
   monthly on a weekday, every N days after the last time, day ranges, times of day)
 - **Progress:** points with on-time bonuses, XP and levels, streaks, a quest log by week and month
 - **Several people on one phone:** chores for anyone, one person or each person, and a weekly
   leaderboard
-- **Boss fights:** eight household bosses fed by their chores, plus a weekly Chore Overlord. Each is a
+- **Boss fights:** twelve household bosses fed by their chores, each growing into stronger forms,
+  plus a weekly Chore Overlord that
+  looks, plays and is named differently every week and on every phone (twelve holiday Overlords
+  too, if you like, with a boon for two weeks). Each is a
   rhythm duel: the boss plays a rhythm, you tap it back. A start button before every round, a timeline
   with a playhead, story mode, slow mode, Easy / Balanced / Hard and timing calibration
 - **Loot and gear:** six gear slots, an Armory, boss loot, consumables and mild curses. The hero wears

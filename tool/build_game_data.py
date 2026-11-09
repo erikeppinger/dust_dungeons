@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -25,6 +26,10 @@ DATA_OUT = ROOT / "lib" / "game" / "game_data.dart"
 TEXTS_OUT = ROOT / "lib" / "game" / "game_texts.dart"
 ARB = {"en": ROOT / "lib/l10n/app_en.arb", "de": ROOT / "lib/l10n/app_de.arb"}
 LOCK = GAME / "keys.lock"
+OVERLORD_ART = ROOT / "assets" / "art" / "bosses" / "overlord"
+BOSS_ART = ROOT / "assets" / "art" / "bosses"
+PART_KINDS = ("body", "face", "hat", "item", "extra")
+TRAIT_FIELDS = ("bpm", "beats", "offbeat", "eighth", "lanes")
 GENERATED = "Generated from game/"
 
 # Effects in the order of the Dart `Effects` class: TOML name -> Dart name.
@@ -79,8 +84,10 @@ def validate(value, schema, root, where):
         "boolean": lambda v: isinstance(v, bool),
         "array": lambda v: isinstance(v, list),
     }
-    if kind and not checks[kind](value):
-        raise DataError(f"{where}: needs a {kind}, not {value!r}")
+    kinds = kind if isinstance(kind, list) else [kind] if kind else []
+    if kinds and not any(checks[k](value) for k in kinds):
+        raise DataError(f"{where}: needs a {' or '.join(kinds)}, not {value!r}")
+    kind = kind if isinstance(kind, str) else None
     if kind in ("integer", "number"):
         if "minimum" in schema and value < schema["minimum"]:
             raise DataError(f"{where}: {value} is below {schema['minimum']}")
@@ -88,6 +95,8 @@ def validate(value, schema, root, where):
             raise DataError(f"{where}: {value} is above {schema['maximum']}")
     if kind == "string" and len(value) < schema.get("minLength", 0):
         raise DataError(f"{where}: may not be empty")
+    if kind == "string" and "pattern" in schema and not re.fullmatch(schema["pattern"], value):
+        raise DataError(f"{where}: {value!r} doesn't match {schema['pattern']}")
     if kind == "array":
         if not schema.get("minItems", 0) <= len(value) <= schema.get("maxItems", 1 << 30):
             raise DataError(f"{where}: needs {schema.get('minItems')} to {schema.get('maxItems')} values")
@@ -231,6 +240,19 @@ def check_bosses(bosses, all_bosses):
             raise DataError(f"game/bosses.toml: missing [bosses.{b}]")
     for key, boss in bosses.items():
         w = f"game/bosses.toml: [bosses.{key}]"
+        if key == "overlord":
+            if "forms" in boss:
+                raise DataError(f"{w}: the Overlord has weekly looks, not forms")
+        else:
+            if "forms" not in boss:
+                raise DataError(f"{w}: needs two [[bosses.{key}.forms]], for tier 2 and 3")
+            for tier in (2, 3):
+                art = BOSS_ART / "forms" / f"{key}_{tier}.png"
+                if not art.exists():
+                    raise DataError(f"{w}: form {tier} has no drawing "
+                                    f"assets/art/bosses/forms/{key}_{tier}.png")
+        if not (BOSS_ART / f"{key}.png").exists() and key != "overlord":
+            raise DataError(f"{w}: has no drawing assets/art/bosses/{key}.png")
         if (key == "overlord") == ("fed_by" in boss):
             raise DataError(f"{w}: every boss but the Overlord needs fed_by")
         if (boss["curse"]["kind"] == "slot_off") != ("slot" in boss["curse"]):
@@ -264,6 +286,81 @@ def check_balance(b):
             raise DataError(f"{w}: [timing] {name}: perfect must be narrower than good")
     if b["points"]["min_base"] > b["points"]["max_base"]:
         raise DataError(f"{w}: [points] min_base is above max_base")
+
+
+def check_overlords(o):
+    w = "game/overlords.toml"
+    parts = o["parts"]
+    for kind, keys in parts.items():
+        if len(set(keys)) != len(keys):
+            raise DataError(f"{w}: [parts] {kind} lists a key twice")
+    for scheme in parts["scheme"]:
+        if scheme not in o["schemes"]:
+            raise DataError(f"{w}: [parts] scheme {scheme!r} has no [schemes] entry")
+    for body in parts["body"]:
+        if body not in o["traits"]:
+            raise DataError(f"{w}: body {body!r} needs [traits.{body}]")
+    for key in o["traits"]:
+        if key not in parts["body"]:
+            raise DataError(f"{w}: [traits.{key}] is for no body in [parts]")
+    sizes = {**{k: len(v) for k, v in parts.items()},
+             "name": len(o["names"]), "title": len(o["titles"])}
+    previous = None
+    for era in o["eras"]:
+        where = f"{w}: [[eras]] {era['from']}"
+        try:
+            monday = date.fromisoformat(era["from"])
+        except ValueError as e:
+            raise DataError(f"{where}: {e}") from e
+        if monday.weekday() != 0:
+            raise DataError(f"{where}: must be a Monday")
+        for kind, size in sizes.items():
+            if era[kind] > size:
+                raise DataError(f"{where}: {kind} = {era[kind]}, but there are only {size}")
+            if previous and era[kind] < previous[kind]:
+                raise DataError(f"{where}: {kind} may only grow from one era to the next")
+        if previous:
+            if monday <= date.fromisoformat(previous["from"]):
+                raise DataError(f"{where}: eras must be in order")
+            if all(era[k] == previous[k] for k in sizes):
+                raise DataError(f"{where}: changes nothing")
+        previous = era
+    for key, h in o["holidays"].items():
+        where = f"{w}: [holidays.{key}]"
+        if ("day" in h) == ("dates" in h):
+            raise DataError(f"{where}: needs either day or dates")
+        if h.get("day", "easter") not in ("easter", "hanukkah"):
+            month, day = map(int, h["day"].split("-"))
+            try:
+                date(2024, month, day)
+            except ValueError as e:
+                raise DataError(f"{where}: day {h['day']!r}: {e}") from e
+        days = []
+        for text in h.get("dates", []):
+            try:
+                days.append(date.fromisoformat(text))
+            except ValueError as e:
+                raise DataError(f"{where}: date {text!r}: {e}") from e
+        if days != sorted(set(days)):
+            raise DataError(f"{where}: dates must be in order, each once")
+        if h["scheme"] not in o["schemes"]:
+            raise DataError(f"{where}: scheme {h['scheme']!r} has no [schemes] entry")
+        for effect in h["boon"]:
+            if effect not in EFFECTS:
+                raise DataError(f"{where}: boon {effect!r} is not an effect "
+                                f"({', '.join(EFFECTS)})")
+    for kind, key in overlord_art_keys(o):
+        if not (OVERLORD_ART / kind / f"{key}.png").exists():
+            raise DataError(f"{w}: {kind} {key!r} has no drawing "
+                            f"assets/art/bosses/overlord/{kind}/{key}.png")
+
+
+def overlord_art_keys(o):
+    """(kind, key) of every part that needs a drawing."""
+    keys = {(kind, k) for kind in PART_KINDS for k in o["parts"][kind]}
+    for h in o["holidays"].values():
+        keys |= {("hat", h["hat"]), ("item", h["item"]), ("extra", h["extra"])}
+    return sorted(keys)
 
 
 def check_lock(keys):
@@ -305,7 +402,52 @@ def ident(key):
     return camel(key) + "Item"
 
 
-def generate_data(items, bosses, quests, balance):
+def color_int(hex_color):
+    return "0xFF" + hex_color[1:].upper()
+
+
+def generate_overlords(o):
+    out = ["", "// ---- Overlords (game/overlords.toml) ----", ""]
+    lists = {"body": "overlordBodies", "face": "overlordFaces", "hat": "overlordHats",
+             "item": "overlordItems", "extra": "overlordExtras", "scheme": "overlordSchemeOrder"}
+    for kind, name in lists.items():
+        keys = ", ".join(f"'{k}'" for k in o["parts"][kind])
+        out.append(f"const {name} = <String>[{keys}];")
+    out += ["", "const overlordEras = <OverlordEra>["]
+    for era in o["eras"]:
+        y, m, d = map(int, era["from"].split("-"))
+        counts = ", ".join(str(era[k]) for k in ("body", "face", "hat", "item", "extra", "scheme"))
+        out.append(f"  OverlordEra({y}, {m}, {d}, parts: [{counts}], "
+                   f"names: {era['name']}, titles: {era['title']}),")
+    out += ["];", "", "/// Main and light color by scheme.",
+            "const overlordSchemes = <String, (int, int)>{"]
+    for key, sc in o["schemes"].items():
+        out.append(f"  '{key}': ({color_int(sc['main'])}, {color_int(sc['light'])}),")
+    out += ["};", "", "/// How each body plays.", "const overlordTraits = <String, BossTrait>{"]
+    for key, t in o["traits"].items():
+        args = ", ".join(
+            f"{f}: {dart_value(float(t[f]) if f in ('offbeat', 'eighth', 'lanes') else t[f])}"
+            for f in TRAIT_FIELDS if f in t)
+        out.append(f"  '{key}': BossTrait({args}),")
+    out += ["};", "", "const overlordHolidays = <String, OverlordHoliday>{"]
+    for key, h in o["holidays"].items():
+        if "dates" in h:
+            days = ", ".join("({}, {}, {})".format(*map(int, t.split("-"))) for t in h["dates"])
+            day = f"dates: [{days}]"
+        elif h["day"] in ("easter", "hanukkah"):
+            day = f"{h['day']}: true"
+        else:
+            month, d = map(int, h["day"].split("-"))
+            day = f"month: {month}, day: {d}"
+        out.append(f"  '{key}': OverlordHoliday({day}, hat: '{h['hat']}', item: '{h['item']}', "
+                   f"extra: '{h['extra']}', scheme: '{h['scheme']}', "
+                   f"boon: {effects_code(h['boon'])}),")
+    out += ["};", "", "/// How many days a holiday boon lasts.",
+            f"const overlordBoonDays = {o['boons']['days']};", ""]
+    return out
+
+
+def generate_data(items, bosses, quests, balance, overlords):
     out = [
         "// GENERATED by tool/build_game_data.py from game/*.toml. Do not edit:",
         "// change the TOML files and run `python tool/build_game_data.py`.",
@@ -315,6 +457,7 @@ def generate_data(items, bosses, quests, balance):
         "import '../domain/fight/difficulty.dart';",
         "import '../domain/fight/echo_duel.dart';",
         "import '../domain/fight/items.dart';",
+        "import '../domain/fight/overlord.dart';",
         "import '../domain/fight/shop.dart';",
         "import '../domain/recurrence.dart';",
         "",
@@ -386,6 +529,20 @@ def generate_data(items, bosses, quests, balance):
         t = boss["tempo"]
         out.append(f"  BossFamily.{key}: BossStyle(baseBpm: {t['bpm']}, "
                    f"offbeatChance: {float(t['offbeat'])!r}, eighthChance: {float(t['eighth'])!r}),")
+    out += ["};", "", "/// Forms at tier 2 and 3 (chore bosses).",
+            "const bossForms = <BossFamily, List<BossForm>>{"]
+    for key, boss in bosses.items():
+        if "forms" not in boss:
+            continue
+        forms = []
+        for f in boss["forms"]:
+            args = ", ".join(
+                f"{k}: {dart_value(float(f[k]) if k in ('offbeat', 'eighth') else f[k])}"
+                for k in ("bpm", "beats", "offbeat", "eighth") if k in f)
+            trait = f", trait: BossTrait({args})" if args else ""
+            forms.append(f"BossForm(main: {color_int(f['main'])}, "
+                         f"light: {color_int(f['light'])}{trait})")
+        out.append(f"  BossFamily.{key}: [{', '.join(forms)}],")
     out += ["};", "", "const bossCurses = <BossFamily, Curse>{"]
     for key, boss in bosses.items():
         c = boss["curse"]
@@ -397,7 +554,8 @@ def generate_data(items, bosses, quests, balance):
             "const defaultChores = <SeedChore>["]
     for key, q in quests.items():
         r = q["repeat"]
-        out.append(f"  SeedChore('{key}', '{q['icon']}', {q['color']}, {q['points']}, "
+        ctor = "SeedChore.suggestion" if q.get("suggested") else "SeedChore"
+        out.append(f"  {ctor}('{key}', '{q['icon']}', {q['color']}, {q['points']}, "
                    f"RepeatType.{REPEATS[r['type']]}, {r.get('every', 1)}),")
     out += ["];", "", "/// The boss each built-in quest feeds.",
             "const seedFamilies = <String, BossFamily>{"]
@@ -419,11 +577,12 @@ def generate_data(items, bosses, quests, balance):
     for name, p in balance["difficulty"].items():
         out.append(f"  Difficulty.{name}: DifficultyPreset(bossHealth: {float(p['boss_health'])!r}, "
                    f"timingMs: {p['timing_ms']}, tempo: {float(p['tempo'])!r}),")
-    out += ["};", ""]
+    out += ["};"]
+    out += generate_overlords(overlords)
     return "\n".join(out)
 
 
-def generate_texts(items, bosses, quests):
+def generate_texts(items, bosses, quests, overlords):
     """The lookups and the ARB entries: {arb key: (source file, {lang: text})}."""
     arb = {}
     item_names, item_descs, item_flavors, sprites = [], [], [], []
@@ -440,7 +599,7 @@ def generate_texts(items, bosses, quests):
             item_flavors.append(f"  '{key}' => l.gameItem{c}Flavor,")
         if it.get("kind", "gear") in ("gear", "consumable"):
             sprites.append(f"  '{key}' => Sprites.{camel(key)},")
-    boss_names, fed_by, trophies, curses = [], [], [], []
+    boss_names, fed_by, trophies, curses, form_names = [], [], [], [], []
     for key, boss in bosses.items():
         c = camel(key, upper=True)
         arb[f"gameBoss{c}"] = ("bosses", boss["name"])
@@ -453,11 +612,38 @@ def generate_texts(items, bosses, quests):
         if "trophy" in boss:
             arb[f"gameBoss{c}Trophy"] = ("bosses", boss["trophy"])
             trophies.append(f"  BossFamily.{key} => l.gameBoss{c}Trophy,")
+        for tier, form in enumerate(boss.get("forms", []), start=2):
+            arb[f"gameBoss{c}Form{tier}"] = ("bosses", form["name"])
+            form_names.append(f"  (BossFamily.{key}, {tier}) => l.gameBoss{c}Form{tier},")
     quest_titles = []
     for key, q in quests.items():
         c = camel(key, upper=True)
         arb[f"gameQuest{c}"] = ("quests", q["title"])
         quest_titles.append(f"  '{key}' => l.gameQuest{c},")
+
+    names, titles = [], []
+    for i, t in enumerate(overlords["names"]):
+        arb[f"gameOverlordName{i}"] = ("overlords", t)
+        names.append(f"  {i} => l.gameOverlordName{i},")
+    for i, t in enumerate(overlords["titles"]):
+        arb[f"gameOverlordTitle{i}"] = ("overlords", t)
+        titles.append(f"  {i} => l.gameOverlordTitle{i},")
+    traits, trait_descs = [], []
+    for key, t in overlords["traits"].items():
+        c = camel(key, upper=True)
+        arb[f"gameOverlordTrait{c}"] = ("overlords", t["name"])
+        arb[f"gameOverlordTrait{c}Desc"] = ("overlords", t["description"])
+        traits.append(f"  '{key}' => l.gameOverlordTrait{c},")
+        trait_descs.append(f"  '{key}' => l.gameOverlordTrait{c}Desc,")
+    holidays, holiday_trophies, holiday_settings = [], [], []
+    for key, h in overlords["holidays"].items():
+        c = camel(key, upper=True)
+        arb[f"gameHoliday{c}"] = ("overlords", h["name"])
+        arb[f"gameHoliday{c}Trophy"] = ("overlords", h["trophy"])
+        arb[f"gameHoliday{c}Setting"] = ("overlords", h["setting"])
+        holidays.append(f"  '{key}' => l.gameHoliday{c},")
+        holiday_trophies.append(f"  '{key}' => l.gameHoliday{c}Trophy,")
+        holiday_settings.append(f"  '{key}' => l.gameHoliday{c}Setting,")
 
     def lookup(doc, sig, cases, exhaustive=False):
         return [f"/// {doc}", f"{sig} => switch (key) {{"] + cases + \
@@ -485,11 +671,29 @@ def generate_texts(items, bosses, quests):
                   "String? gameBossFedBy(AppLocalizations l, BossFamily key)", fed_by)
     out += lookup("A boss's own trophy name, if it has one.",
                   "String? gameBossTrophy(AppLocalizations l, BossFamily key)", trophies)
+    out += ["/// A boss's name in its form at [tier] (2 or 3).",
+            "String? gameBossFormName(AppLocalizations l, BossFamily key, int tier) =>",
+            "    switch ((key, tier)) {"] + form_names + ["  _ => null,", "};", ""]
     out += lookup("The name of a boss's curse.",
                   "String gameCurseName(AppLocalizations l, BossFamily key)", curses,
                   exhaustive=True)
     out += lookup("A built-in quest's title, by seed key.",
                   "String? gameQuestTitle(AppLocalizations l, String key)", quest_titles)
+    out += lookup("An Overlord's name, by number.",
+                  "String? gameOverlordName(AppLocalizations l, int key)", names)
+    out += lookup("An Overlord's title, by number.",
+                  "String? gameOverlordTitle(AppLocalizations l, int key)", titles)
+    out += lookup("The name of an Overlord body's trait.",
+                  "String? gameOverlordTrait(AppLocalizations l, String key)", traits)
+    out += lookup("What an Overlord body's trait does.",
+                  "String? gameOverlordTraitDescription(AppLocalizations l, String key)",
+                  trait_descs)
+    out += lookup("A holiday Overlord's name.",
+                  "String? gameHolidayName(AppLocalizations l, String key)", holidays)
+    out += lookup("A holiday Overlord's trophy.",
+                  "String? gameHolidayTrophy(AppLocalizations l, String key)", holiday_trophies)
+    out += lookup("A holiday, as the settings name it.",
+                  "String? gameHolidaySetting(AppLocalizations l, String key)", holiday_settings)
     return "\n".join(out), arb
 
 
@@ -528,6 +732,7 @@ def build():
     bosses_data, boss_schema = load("bosses")
     quests_data, _ = load("quests")
     balance, balance_schema = load("balance")
+    overlords, _ = load("overlords")
     items, bosses, quests = items_data["items"], bosses_data["bosses"], quests_data["quests"]
 
     boss_values = dart_enum("lib/domain/fight/boss.dart", "BossFamily")
@@ -548,12 +753,17 @@ def build():
     check_bosses(bosses, boss_values)
     check_quests(quests)
     check_balance(balance)
+    check_overlords(overlords)
     keys = {("item", k) for k in items} | {("boss", k) for k in bosses} | \
-        {("quest", k) for k in quests}
+        {("quest", k) for k in quests} | \
+        {(f"overlord_{kind}", k) for kind, k in overlord_art_keys(overlords)} | \
+        {("overlord_scheme", k) for k in overlords["schemes"]} | \
+        {("overlord_holiday", k) for k in overlords["holidays"]} | \
+        {("overlord_era", e["from"]) for e in overlords["eras"]}
     check_lock(keys)
 
-    data = generate_data(items, bosses, quests, balance)
-    texts, arb_entries = generate_texts(items, bosses, quests)
+    data = generate_data(items, bosses, quests, balance, overlords)
+    texts, arb_entries = generate_texts(items, bosses, quests, overlords)
     formatted = dart_format({"game_data.dart": data, "game_texts.dart": texts})
     lock = "# Every key ever shipped; written by tool/build_game_data.py.\n" + \
         "".join(f"{kind} {key}\n" for kind, key in sorted(keys))

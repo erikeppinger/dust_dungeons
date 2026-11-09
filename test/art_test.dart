@@ -9,7 +9,8 @@ import 'package:homework_and_chores/app/art/art.dart';
 /// files in `assets/art`: if this fails, run `python tool/build_art.py`.
 void main() {
   const digits =
-      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+      '!#%&*+-/:;<=>?@^_~|';
   final manifest = jsonDecode(
     File('assets/art/art.json').readAsStringSync(),
   ) as Map<String, dynamic>;

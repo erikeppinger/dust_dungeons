@@ -37,7 +37,17 @@ void main() {
       expect(profiles, hasLength(1));
 
       final active = await chores.watchActive().first;
-      expect(active.map((c) => c.seedKey), defaultChores.map((s) => s.key));
+      expect(
+        active.map((c) => c.seedKey),
+        defaultChores.where((s) => !s.suggested).map((s) => s.key),
+      );
+      // Suggestions wait in the archive.
+      final all = await chores.watchAll().first;
+      expect(
+        all.where((c) => c.isArchived).map((c) => c.seedKey).toSet(),
+        suggestedSeeds,
+      );
+      expect(suggestedSeeds, hasLength(12));
     });
 
     test('a restart neither duplicates nor revives chores', () async {
@@ -135,7 +145,12 @@ void main() {
         isNot(contains(chore.id)),
       );
       final all = await chores.watchAll().first;
-      expect(all.last.id, chore.id, reason: 'archived chores sort last');
+      expect(
+        all.skipWhile((c) => !c.isArchived).map((c) => c.id),
+        contains(chore.id),
+        reason: 'archived chores sort last',
+      );
+      expect(all.where((c) => !c.isArchived), everyElement(isNot(chore)));
 
       await chores.setArchived(chore.id, archived: false);
       expect((await chores.watchActive().first).first.id, chore.id);
@@ -382,12 +397,16 @@ void main() {
   group('settings', () {
     test('round-trip through the database', () async {
       final repo = SettingsRepository(db);
-      expect(await repo.load(), const AppSettings());
+      final first = await repo.load();
+      // The phone's Overlord number is made once and then kept.
+      expect(first, AppSettings(overlordSeed: first.overlordSeed));
+      expect((await repo.load()).overlordSeed, first.overlordSeed);
 
-      const custom = AppSettings(
+      final custom = AppSettings(
         themeMode: ThemeMode.dark,
         colorblindSafe: true,
-        locale: Locale('de'),
+        locale: const Locale('de'),
+        overlordSeed: first.overlordSeed,
       );
       await repo.save(custom);
       expect(await repo.load(), custom);

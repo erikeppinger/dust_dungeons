@@ -26,6 +26,10 @@ String? gameItemName(AppLocalizations l, String key) => switch (key) {
   'lost_remote' => l.gameItemLostRemote,
   'mop_of_doom' => l.gameItemMopOfDoom,
   'cape_of_clean_sweep' => l.gameItemCapeOfCleanSweep,
+  'highlighter_wand' => l.gameItemHighlighterWand,
+  'squeaky_toy' => l.gameItemSqueakyToy,
+  'hedge_shears' => l.gameItemHedgeShears,
+  'oven_mitt_shield' => l.gameItemOvenMittShield,
   'second_wind' => l.gameItemSecondWind,
   'coffee_of_haste' => l.gameItemCoffeeOfHaste,
   'snack_break' => l.gameItemSnackBreak,
@@ -70,6 +74,10 @@ Sprite? gameItemSprite(String key) => switch (key) {
   'lost_remote' => Sprites.lostRemote,
   'mop_of_doom' => Sprites.mopOfDoom,
   'cape_of_clean_sweep' => Sprites.capeOfCleanSweep,
+  'highlighter_wand' => Sprites.highlighterWand,
+  'squeaky_toy' => Sprites.squeakyToy,
+  'hedge_shears' => Sprites.hedgeShears,
+  'oven_mitt_shield' => Sprites.ovenMittShield,
   'second_wind' => Sprites.secondWind,
   'coffee_of_haste' => Sprites.coffeeOfHaste,
   'snack_break' => Sprites.snackBreak,
@@ -88,6 +96,10 @@ String gameBossName(AppLocalizations l, BossFamily key) => switch (key) {
   BossFamily.outside => l.gameBossOutside,
   BossFamily.clutter => l.gameBossClutter,
   BossFamily.overlord => l.gameBossOverlord,
+  BossFamily.homework => l.gameBossHomework,
+  BossFamily.pets => l.gameBossPets,
+  BossFamily.garden => l.gameBossGarden,
+  BossFamily.cooking => l.gameBossCooking,
 };
 
 /// Which quests feed a boss.
@@ -100,6 +112,10 @@ String? gameBossFedBy(AppLocalizations l, BossFamily key) => switch (key) {
   BossFamily.bedroom => l.gameBossBedroomFedBy,
   BossFamily.outside => l.gameBossOutsideFedBy,
   BossFamily.clutter => l.gameBossClutterFedBy,
+  BossFamily.homework => l.gameBossHomeworkFedBy,
+  BossFamily.pets => l.gameBossPetsFedBy,
+  BossFamily.garden => l.gameBossGardenFedBy,
+  BossFamily.cooking => l.gameBossCookingFedBy,
   _ => null,
 };
 
@@ -110,6 +126,36 @@ String? gameBossTrophy(AppLocalizations l, BossFamily key) => switch (key) {
   BossFamily.overlord => l.gameBossOverlordTrophy,
   _ => null,
 };
+
+/// A boss's name in its form at [tier] (2 or 3).
+String? gameBossFormName(AppLocalizations l, BossFamily key, int tier) =>
+    switch ((key, tier)) {
+      (BossFamily.dust, 2) => l.gameBossDustForm2,
+      (BossFamily.dust, 3) => l.gameBossDustForm3,
+      (BossFamily.laundry, 2) => l.gameBossLaundryForm2,
+      (BossFamily.laundry, 3) => l.gameBossLaundryForm3,
+      (BossFamily.kitchen, 2) => l.gameBossKitchenForm2,
+      (BossFamily.kitchen, 3) => l.gameBossKitchenForm3,
+      (BossFamily.bath, 2) => l.gameBossBathForm2,
+      (BossFamily.bath, 3) => l.gameBossBathForm3,
+      (BossFamily.trash, 2) => l.gameBossTrashForm2,
+      (BossFamily.trash, 3) => l.gameBossTrashForm3,
+      (BossFamily.bedroom, 2) => l.gameBossBedroomForm2,
+      (BossFamily.bedroom, 3) => l.gameBossBedroomForm3,
+      (BossFamily.outside, 2) => l.gameBossOutsideForm2,
+      (BossFamily.outside, 3) => l.gameBossOutsideForm3,
+      (BossFamily.clutter, 2) => l.gameBossClutterForm2,
+      (BossFamily.clutter, 3) => l.gameBossClutterForm3,
+      (BossFamily.homework, 2) => l.gameBossHomeworkForm2,
+      (BossFamily.homework, 3) => l.gameBossHomeworkForm3,
+      (BossFamily.pets, 2) => l.gameBossPetsForm2,
+      (BossFamily.pets, 3) => l.gameBossPetsForm3,
+      (BossFamily.garden, 2) => l.gameBossGardenForm2,
+      (BossFamily.garden, 3) => l.gameBossGardenForm3,
+      (BossFamily.cooking, 2) => l.gameBossCookingForm2,
+      (BossFamily.cooking, 3) => l.gameBossCookingForm3,
+      _ => null,
+    };
 
 /// The name of a boss's curse.
 String gameCurseName(AppLocalizations l, BossFamily key) => switch (key) {
@@ -122,6 +168,10 @@ String gameCurseName(AppLocalizations l, BossFamily key) => switch (key) {
   BossFamily.outside => l.gameCurseOutside,
   BossFamily.clutter => l.gameCurseClutter,
   BossFamily.overlord => l.gameCurseOverlord,
+  BossFamily.homework => l.gameCurseHomework,
+  BossFamily.pets => l.gameCursePets,
+  BossFamily.garden => l.gameCurseGarden,
+  BossFamily.cooking => l.gameCurseCooking,
 };
 
 /// A built-in quest's title, by seed key.
@@ -147,5 +197,149 @@ String? gameQuestTitle(AppLocalizations l, String key) => switch (key) {
   'groceries' => l.gameQuestGroceries,
   'water_plants' => l.gameQuestWaterPlants,
   'tidy_up' => l.gameQuestTidyUp,
+  'homework' => l.gameQuestHomework,
+  'pack_school_bag' => l.gameQuestPackSchoolBag,
+  'reading' => l.gameQuestReading,
+  'feed_pets' => l.gameQuestFeedPets,
+  'walk_dog' => l.gameQuestWalkDog,
+  'clean_pet_home' => l.gameQuestCleanPetHome,
+  'weeding' => l.gameQuestWeeding,
+  'mow_lawn' => l.gameQuestMowLawn,
+  'water_garden' => l.gameQuestWaterGarden,
+  'cook_meal' => l.gameQuestCookMeal,
+  'plan_meals' => l.gameQuestPlanMeals,
+  'bake' => l.gameQuestBake,
+  _ => null,
+};
+
+/// An Overlord's name, by number.
+String? gameOverlordName(AppLocalizations l, int key) => switch (key) {
+  0 => l.gameOverlordName0,
+  1 => l.gameOverlordName1,
+  2 => l.gameOverlordName2,
+  3 => l.gameOverlordName3,
+  4 => l.gameOverlordName4,
+  5 => l.gameOverlordName5,
+  6 => l.gameOverlordName6,
+  7 => l.gameOverlordName7,
+  8 => l.gameOverlordName8,
+  9 => l.gameOverlordName9,
+  10 => l.gameOverlordName10,
+  11 => l.gameOverlordName11,
+  12 => l.gameOverlordName12,
+  13 => l.gameOverlordName13,
+  14 => l.gameOverlordName14,
+  15 => l.gameOverlordName15,
+  16 => l.gameOverlordName16,
+  17 => l.gameOverlordName17,
+  18 => l.gameOverlordName18,
+  19 => l.gameOverlordName19,
+  20 => l.gameOverlordName20,
+  21 => l.gameOverlordName21,
+  22 => l.gameOverlordName22,
+  23 => l.gameOverlordName23,
+  _ => null,
+};
+
+/// An Overlord's title, by number.
+String? gameOverlordTitle(AppLocalizations l, int key) => switch (key) {
+  0 => l.gameOverlordTitle0,
+  1 => l.gameOverlordTitle1,
+  2 => l.gameOverlordTitle2,
+  3 => l.gameOverlordTitle3,
+  4 => l.gameOverlordTitle4,
+  5 => l.gameOverlordTitle5,
+  6 => l.gameOverlordTitle6,
+  7 => l.gameOverlordTitle7,
+  8 => l.gameOverlordTitle8,
+  9 => l.gameOverlordTitle9,
+  10 => l.gameOverlordTitle10,
+  11 => l.gameOverlordTitle11,
+  12 => l.gameOverlordTitle12,
+  13 => l.gameOverlordTitle13,
+  14 => l.gameOverlordTitle14,
+  15 => l.gameOverlordTitle15,
+  16 => l.gameOverlordTitle16,
+  17 => l.gameOverlordTitle17,
+  18 => l.gameOverlordTitle18,
+  19 => l.gameOverlordTitle19,
+  20 => l.gameOverlordTitle20,
+  21 => l.gameOverlordTitle21,
+  22 => l.gameOverlordTitle22,
+  23 => l.gameOverlordTitle23,
+  _ => null,
+};
+
+/// The name of an Overlord body's trait.
+String? gameOverlordTrait(AppLocalizations l, String key) => switch (key) {
+  'robe' => l.gameOverlordTraitRobe,
+  'armor' => l.gameOverlordTraitArmor,
+  'blob' => l.gameOverlordTraitBlob,
+  'sleeves' => l.gameOverlordTraitSleeves,
+  'spider' => l.gameOverlordTraitSpider,
+  'serpent' => l.gameOverlordTraitSerpent,
+  _ => null,
+};
+
+/// What an Overlord body's trait does.
+String? gameOverlordTraitDescription(AppLocalizations l, String key) =>
+    switch (key) {
+      'robe' => l.gameOverlordTraitRobeDesc,
+      'armor' => l.gameOverlordTraitArmorDesc,
+      'blob' => l.gameOverlordTraitBlobDesc,
+      'sleeves' => l.gameOverlordTraitSleevesDesc,
+      'spider' => l.gameOverlordTraitSpiderDesc,
+      'serpent' => l.gameOverlordTraitSerpentDesc,
+      _ => null,
+    };
+
+/// A holiday Overlord's name.
+String? gameHolidayName(AppLocalizations l, String key) => switch (key) {
+  'christmas' => l.gameHolidayChristmas,
+  'easter' => l.gameHolidayEaster,
+  'valentine' => l.gameHolidayValentine,
+  'halloween' => l.gameHolidayHalloween,
+  'new_year' => l.gameHolidayNewYear,
+  'lunar_new_year' => l.gameHolidayLunarNewYear,
+  'diwali' => l.gameHolidayDiwali,
+  'eid_al_fitr' => l.gameHolidayEidAlFitr,
+  'hanukkah' => l.gameHolidayHanukkah,
+  'nowruz' => l.gameHolidayNowruz,
+  'earth_day' => l.gameHolidayEarthDay,
+  'solstice' => l.gameHolidaySolstice,
+  _ => null,
+};
+
+/// A holiday Overlord's trophy.
+String? gameHolidayTrophy(AppLocalizations l, String key) => switch (key) {
+  'christmas' => l.gameHolidayChristmasTrophy,
+  'easter' => l.gameHolidayEasterTrophy,
+  'valentine' => l.gameHolidayValentineTrophy,
+  'halloween' => l.gameHolidayHalloweenTrophy,
+  'new_year' => l.gameHolidayNewYearTrophy,
+  'lunar_new_year' => l.gameHolidayLunarNewYearTrophy,
+  'diwali' => l.gameHolidayDiwaliTrophy,
+  'eid_al_fitr' => l.gameHolidayEidAlFitrTrophy,
+  'hanukkah' => l.gameHolidayHanukkahTrophy,
+  'nowruz' => l.gameHolidayNowruzTrophy,
+  'earth_day' => l.gameHolidayEarthDayTrophy,
+  'solstice' => l.gameHolidaySolsticeTrophy,
+  _ => null,
+};
+
+/// A holiday, as the settings name it.
+String? gameHolidaySetting(AppLocalizations l, String key) => switch (key) {
+  'christmas' => l.gameHolidayChristmasSetting,
+  'easter' => l.gameHolidayEasterSetting,
+  'valentine' => l.gameHolidayValentineSetting,
+  'halloween' => l.gameHolidayHalloweenSetting,
+  'new_year' => l.gameHolidayNewYearSetting,
+  'lunar_new_year' => l.gameHolidayLunarNewYearSetting,
+  'diwali' => l.gameHolidayDiwaliSetting,
+  'eid_al_fitr' => l.gameHolidayEidAlFitrSetting,
+  'hanukkah' => l.gameHolidayHanukkahSetting,
+  'nowruz' => l.gameHolidayNowruzSetting,
+  'earth_day' => l.gameHolidayEarthDaySetting,
+  'solstice' => l.gameHolidaySolsticeSetting,
   _ => null,
 };

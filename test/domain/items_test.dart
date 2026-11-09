@@ -60,6 +60,9 @@ void main() {
         featherDusterItem,
         laundryBasketHelmItem,
         plungerOfSmitingItem,
+        highlighterWandItem,
+        squeakyToyItem,
+        ovenMittShieldItem,
       });
     });
 

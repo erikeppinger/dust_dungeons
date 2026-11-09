@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/day_clock.dart';
 import '../domain/fight/items.dart';
+import '../game/game_data.dart' show overlordHolidays;
 import 'db/app_database.dart';
 import 'models/fight_progress.dart';
 import 'models/progress_stats.dart';
@@ -261,5 +262,22 @@ final gearLoadoutProvider = Provider<Loadout>(
   (ref) => Loadout.fromEquipped(
     ref.watch(equippedProvider).value ?? const {},
     curse: ref.watch(curseProvider),
+    boon: ref
+        .watch(activeBoonsProvider)
+        .fold(
+          Effects.none,
+          (sum, b) => sum + (overlordHolidays[b.$1]?.boon ?? Effects.none),
+        ),
   ),
+);
+
+/// Holiday boons working today for the current person: holiday and days
+/// left.
+final activeBoonsProvider = Provider<List<(String, int)>>(
+  (ref) =>
+      ref
+          .watch(fightProgressProvider)
+          .value
+          ?.activeBoons(ref.watch(todayProvider)) ??
+      const [],
 );
