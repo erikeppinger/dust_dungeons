@@ -1,8 +1,9 @@
 """Generates the launcher icon and splash picture from the pixel shield.
 
 The shield is assets/art/icons/app_shield.png (16x16, see docs/ART_GUIDE.md).
-Writes the legacy PNG icons on parchment, the adaptive icon foreground and
-the vector used by the splash screens. Run from the project root:
+Writes the legacy PNG icons on parchment, the adaptive icon foreground, the
+vector used by the splash screens and the Windows icon. Run from the project
+root:
 
     python tool/generate_icon.py
 """
@@ -12,6 +13,7 @@ from pathlib import Path
 from PIL import Image
 
 RES = Path("android/app/src/main/res")
+WINDOWS_ICON = Path("windows/runner/resources/app_icon.ico")
 SHIELD = Path("assets/art/icons/app_shield.png")
 PARCHMENT = (0xF3, 0xE5, 0xC3, 255)
 FRAME = (0x3A, 0x24, 0x14, 255)
@@ -31,6 +33,23 @@ def legacy_png(size):
             img.putpixel((x, y), FRAME)
     img.alpha_composite(shield(), (4, 4))
     return img.resize((size, size), Image.NEAREST)
+
+
+def windows_icon():
+    """The bare shield in the sizes Windows asks for, sharp pixels.
+
+    No parchment tile, unlike Android: the shield fills its 16-pixel grid,
+    so every size is a whole multiple, down to the title bar's 16 pixels.
+    """
+    tile = shield()
+    sizes = [256, 128, 64, 48, 32, 16]
+    images = [tile.resize((s, s), Image.NEAREST) for s in sizes]
+    images[0].save(
+        WINDOWS_ICON,
+        format="ICO",
+        sizes=[(s, s) for s in sizes],
+        append_images=images[1:],
+    )
 
 
 def vector(cell, offset, viewport):
@@ -78,6 +97,7 @@ def main():
     (RES / "drawable" / "ic_launcher_foreground.xml").write_text(
         vector(3, 30, 108), encoding="utf-8"
     )
+    windows_icon()
 
 
 if __name__ == "__main__":

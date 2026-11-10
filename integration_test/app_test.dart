@@ -96,8 +96,13 @@ void main() {
       // World: the bosses and the hero.
       await tester.tap(find.widgetWithText(NavigationDestination, 'Arena'));
       await tester.pumpAndSettle();
-      expect(find.text('Dust Bunny King'), findsOneWidget);
       expect(find.text('Wardrobe'), findsOneWidget);
+      // Below the hero and the weekly Overlord.
+      await tester.scrollUntilVisible(
+        find.text('Dust Bunny King'),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
 
       // Stats: level card and points explanation.
       await tester.tap(

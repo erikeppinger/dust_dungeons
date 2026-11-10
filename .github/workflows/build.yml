@@ -1,5 +1,5 @@
-# Checks every push and builds a test APK. A tag v* also publishes the APK
-# as a GitHub release, for testers.
+# Checks every push and builds a test APK and the Windows app. A tag v* also
+# publishes both as a GitHub release, for testers.
 #
 # Test APKs are signed with the debug key. With the repository secret
 # DEBUG_KEYSTORE_BASE64 (the base64 of a debug.keystore) every build uses
@@ -107,3 +107,46 @@ jobs:
             Test build ${{ github.ref_name }}, before the beta. See CHANGELOG.md for what changed.
 
             Install: download the APK on the phone and open it (Android asks to allow installs from the browser or file manager once).
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.1
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build windows --release
+
+      - name: Zip the app
+        id: zip
+        shell: bash
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            NAME="homework-chores-${VERSION}-windows-test"
+          else
+            NAME="homework-chores-${VERSION}-${GITHUB_SHA::7}-windows-test"
+          fi
+          mv build/windows/x64/runner/Release "$NAME"
+          7z a "$NAME.zip" "$NAME"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+
+      # The folder, not the zip: GitHub zips artifacts itself.
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ steps.zip.outputs.name }}
+          path: ${{ steps.zip.outputs.name }}
+          retention-days: 30
+
+      - name: Add it to the release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.zip.outputs.name }}.zip
+          prerelease: true

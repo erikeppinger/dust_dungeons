@@ -795,7 +795,7 @@
   "fightRetry": "Try again",
   "onboardingWelcomeTitle": "Welcome!",
   "onboardingWelcomeBody": "Complete quests (your chores), collect points and level up. Every quest also earns a fight token for the Arena.",
-  "onboardingPrivacy": "Everything stays on this phone: no account, no ads, no tracking.",
+  "onboardingPrivacy": "Everything stays on this device: no account, no ads, no tracking.",
   "onboardingChoresTitle": "Which quests apply to you?",
   "onboardingChoresBody": "Unticked ones are archived. Add your own or change them any time under Settings → Manage quests.",
   "onboardingSetupTitle": "Last touches",
@@ -1017,17 +1017,17 @@
       }
     }
   },
-  "backupIntro": "Everything is stored only on this phone. Save a backup to keep your quests, history and trophies safe, or to take them to a new phone.",
+  "backupIntro": "Everything is stored only on this device. Save a backup to keep your quests, history and trophies safe, or to take them to another device.",
   "backupExport": "Save a backup",
   "backupExportSubtitle": "Choose where to save the file",
   "backupExported": "Backup saved",
   "backupImport": "Import a backup",
-  "backupImportSubtitle": "Adds its history to what's on this phone",
+  "backupImportSubtitle": "Adds its history to what's on this device",
   "backupNotABackup": "This file isn't a Homework & Chores backup.",
   "backupTooNew": "This backup is from a newer version of the app. Update the app first.",
   "backupFailed": "That didn't work. Please try again.",
   "backupPreviewTitle": "Import this backup?",
-  "backupPreviewNothing": "This backup has nothing that isn't on this phone already.",
+  "backupPreviewNothing": "This backup has nothing that isn't on this device already.",
   "backupPreviewAdds": "It adds:",
   "backupCountChores": "{count, plural, =1{1 quest} other{{count} quests}}",
   "@backupCountChores": {
@@ -1054,7 +1054,7 @@
     }
   },
   "backupPreviewMore": "Points, items and screen-time days that are missing here",
-  "backupPreviewKeeps": "Nothing on this phone is deleted, and you can undo the import.",
+  "backupPreviewKeeps": "Nothing on this device is deleted, and you can undo the import.",
   "backupUseSettings": "Also use the backup's settings",
   "backupUseSettingsHint": "Look, language, notifications, screen time",
   "backupImportConfirm": "Import",
@@ -1063,7 +1063,7 @@
   "backupUndoSubtitle": "Puts everything back as it was before",
   "backupUndone": "Import undone",
   "backupAuto": "Automatic backup",
-  "backupAutoIntro": "Once a day the app saves a backup to a folder you choose and keeps the last 7. If a sync app copies that folder to a computer, your data is safe even if the phone is lost.",
+  "backupAutoIntro": "Once a day the app saves a backup to a folder you choose and keeps the last 7. If a sync app copies that folder to another device, your data is safe even if this one is lost.",
   "backupChooseFolder": "Choose a folder",
   "backupChangeFolder": "Change folder",
   "backupFolder": "Folder: {name}",
@@ -1152,7 +1152,7 @@
       }
     }
   },
-  "peopleIntro": "Everyone sharing this phone gets their own points, level, hero and fights. Switch person with the hero at the top.",
+  "peopleIntro": "Everyone sharing this device gets their own points, level, hero and fights. Switch person with the hero at the top.",
   "peopleManage": "Manage people",
   "peopleAdd": "Add a person",
   "peopleName": "Name",

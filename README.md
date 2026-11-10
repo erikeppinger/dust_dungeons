@@ -9,7 +9,7 @@ and dress your hero in the gear you win or buy.
 
 **Local only.** No account, no server, no network, no telemetry, no ads. All data stays on your device.
 
-> Status: 0.16.0, before the beta. Android first. Source: <https://github.com/erikeppinger/dust_dungeons>
+> Status: 0.16.0, before the beta. Android first, with a Windows app. Source: <https://github.com/erikeppinger/dust_dungeons>
 
 ## Features
 - **Quests:** 21 built-in chores and 12 suggestions (homework, pets, garden, cooking) plus your own, with flexible schedules (daily, weekly, monthly,
@@ -38,7 +38,9 @@ plan and roadmap.
 ## Test builds
 Test APKs for Android are on the [releases page](https://github.com/erikeppinger/dust_dungeons/releases)
 (from version tags) and under [Actions](https://github.com/erikeppinger/dust_dungeons/actions)
-(from every push, for 30 days). Download the APK on the phone and open it. There is no iPhone
+(from every push, for 30 days). Download the APK on the phone and open it. The Windows app is a
+zip in the same places: unpack it anywhere and start `homework_and_chores.exe`. Windows may warn
+that the app is from an unknown publisher, as test builds aren't signed. There is no iPhone
 version yet.
 
 ## Building
@@ -51,6 +53,15 @@ flutter pub get
 flutter test
 flutter build apk --release
 ```
+
+For the Windows app (on Windows, with Visual Studio's "Desktop development with C++"):
+
+```bash
+flutter build windows --release
+```
+
+The app is the whole folder `build\windows\x64\runner\Release`. Screen time, home screen widgets
+and vibration are Android only.
 
 ### Working inside Dropbox
 Generated folders (`build/`, `.dart_tool/`, Gradle caches …) must live outside Dropbox: Dropbox placeholder files

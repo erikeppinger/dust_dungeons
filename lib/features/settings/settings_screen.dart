@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/platform.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../backup/backup_screen.dart';
@@ -99,14 +100,15 @@ class SettingsScreen extends ConsumerWidget {
             const FightSettings(),
           ),
         ),
-        _Entry(
-          icon: Sprites.uiPhone,
-          title: l10n.settingsScreenTime,
-          subtitle: ref.watch(screenTimeActiveProvider)
-              ? l10n.screenOnSubtitle(settings.screenBaseMinutes)
-              : l10n.stateOff,
-          onTap: () => ScreenTimeScreen.open(context),
-        ),
+        if (isAndroidApp)
+          _Entry(
+            icon: Sprites.uiPhone,
+            title: l10n.settingsScreenTime,
+            subtitle: ref.watch(screenTimeActiveProvider)
+                ? l10n.screenOnSubtitle(settings.screenBaseMinutes)
+                : l10n.stateOff,
+            onTap: () => ScreenTimeScreen.open(context),
+          ),
         _Entry(
           icon: Sprites.uiGlobe,
           title: l10n.settingsLanguage,

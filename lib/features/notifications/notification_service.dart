@@ -6,6 +6,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../core/platform.dart';
 import 'notification_planner.dart';
 
 /// Localized Android channel names.
@@ -56,6 +57,12 @@ class LocalNotificationService implements NotificationService {
       settings: const InitializationSettings(
         // White silhouette; kept in release builds by res/raw/keep.xml.
         android: AndroidInitializationSettings('ic_notification'),
+        // The ID and GUID identify the app to Windows: never change them.
+        windows: WindowsInitializationSettings(
+          appName: 'Homework & Chores',
+          appUserModelId: 'HomeworkAndChores.App',
+          guid: '5d706548-c56f-47c7-8cde-616abb18aad4',
+        ),
       ),
       onDidReceiveNotificationResponse: (response) {
         final target = _parse(response.payload);
@@ -76,11 +83,13 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<bool> requestPermission() async =>
-      await _android?.requestNotificationsPermission() ?? false;
+      // Windows has no permission to ask for; its own settings can mute us.
+      isWindowsApp ||
+      (await _android?.requestNotificationsPermission() ?? false);
 
   @override
   Future<bool> permissionGranted() async =>
-      await _android?.areNotificationsEnabled() ?? false;
+      isWindowsApp || (await _android?.areNotificationsEnabled() ?? false);
 
   NotificationDetails _details(
     NotificationChannel channel,
@@ -101,7 +110,11 @@ class LocalNotificationService implements NotificationService {
     ChannelNames names,
   ) async {
     // Only pending ones: notifications already in the tray stay visible.
-    await _plugin.cancelAllPendingNotifications();
+    // Windows can't tell the two apart, and (without an installer package)
+    // leaves shown ones alone anyway.
+    await (isWindowsApp
+        ? _plugin.cancelAll()
+        : _plugin.cancelAllPendingNotifications());
     final now = DateTime.now();
     for (final n in plan) {
       if (!n.when.isAfter(now)) continue;

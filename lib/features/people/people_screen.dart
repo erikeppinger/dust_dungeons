@@ -4,6 +4,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/platform.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../domain/progress.dart';
@@ -130,7 +131,8 @@ class PeopleScreen extends ConsumerWidget {
     final settings = ref.read(settingsProvider);
     final people = ref.read(profilesProvider);
     // Screen time is per phone: a second person turns it off.
-    final turnsOffScreenTime = settings.screenTime && people.length == 1;
+    final turnsOffScreenTime =
+        isAndroidApp && settings.screenTime && people.length == 1;
     final name = await _askName(
       context,
       ref,

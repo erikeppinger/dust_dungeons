@@ -8,6 +8,24 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+### Added
+- **A Windows app.** The same app in a phone-shaped window, with its own data on the computer
+  (`%APPDATA%\io.github.changeme\homework_and_chores`). Backups move data between a phone and a
+  computer.
+  - Notifications, fight sounds, and backups with the Windows file dialogs work.
+  - Left out, as they need Android: screen time, home screen widgets and the vibration on beats.
+  - Without an installer package, Windows can't take back notifications that are already shown.
+- The Windows icon is the pixel shield, made by `tool/generate_icon.py` like the Android one.
+- CI builds the Windows app on every push; a version tag adds it to the release as a zip.
+
+### Changed
+- Texts say "this device" instead of "this phone" (welcome, backups, people), as the app now also
+  runs on computers.
+
+### Fixed
+- The on-device test looked for the Dust Bunny King without scrolling; since the weekly Overlord's
+  card it can be below the screen's edge.
+
 ## [0.16.0] - 2026-11-09
 ([design](docs/design/more-bosses.md))
 

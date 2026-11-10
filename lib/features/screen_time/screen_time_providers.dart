@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart' show AppLifecycleListener;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/day_clock.dart';
+import '../../core/platform.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../data/repositories/screen_time_repository.dart';
@@ -84,6 +85,8 @@ class ScreenToday {
 /// single person (docs/design/profiles.md).
 final screenTimeActiveProvider = Provider<bool>(
   (ref) =>
+      // Android only; a backup from a phone may carry the setting.
+      isAndroidApp &&
       ref.watch(settingsProvider).screenTime &&
       ref.watch(profilesProvider).length == 1,
 );

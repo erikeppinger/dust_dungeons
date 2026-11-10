@@ -8,7 +8,7 @@ This app does not collect, transmit or share any data.
 - Notifications are scheduled locally on the device and are off until you turn them on.
 - Screen time (optional, off by default): with Android's usage access, the app reads how long the apps
   **you** chose were open. Only daily totals for those apps are kept, on this device.
-- Backups are files that **you** choose where to save, using Android's own file and folder pickers. The app
+- Backups are files that **you** choose where to save, using the system's own file and folder pickers (Android's or Windows'). The app
   needs no storage permission. Automatic backups (optional, off by default) go only to the folder you picked.
   If a sync app copies that folder elsewhere, that's the sync app's doing, under your control.
 - A backup file contains everything the app stores, unencrypted. Keep it where you'd keep other private files.

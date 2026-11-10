@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart' show Value;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/game/game_data.dart' show overlordHolidays;
@@ -1256,6 +1257,28 @@ void main() {
     expect(find.text('System'), findsOneWidget); // theme
     expect(find.text('Off'), findsNWidgets(2)); // notifications, screen time
     expect(find.text('System default'), findsOneWidget); // language
+  });
+
+  testWidgets('the Windows app has no screen time', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    try {
+      await pumpApp(tester);
+      await _openSettings(tester);
+      await tester.scrollUntilVisible(
+        find.text('About'),
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.scrollUntilVisible(
+        find.text('Manage quests'),
+        -100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Notifications'), findsOneWidget);
+      expect(find.text('Screen time'), findsNothing);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   testWidgets('About shows privacy, license and the version', (tester) async {
