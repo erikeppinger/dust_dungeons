@@ -55,33 +55,114 @@ class WidgetArt {
     required this.look,
     required this.person,
     required this.points,
-  }) : _weekday = DateFormat.E(l10n.localeName);
+    required this.today,
+  }) : _weekday = DateFormat.E(l10n.localeName),
+       _date = DateFormat.Md(l10n.localeName);
 
   final AppLocalizations l10n;
   final WidgetLook look;
   final String person;
   final int points;
+
+  /// The day the pictures are for: later days within a week of it show as
+  /// a weekday, others as a date.
+  final DateTime today;
   final DateFormat _weekday;
+  final DateFormat _date;
 
   static const scale = 3.0;
 
   ColorScheme get _s => look.scheme;
 
-  Future<Uint8List> render(WidgetStyle style, List<WidgetQuest> quests) async {
+  Future<Uint8List> render(WidgetStyle style, List<WidgetQuest> quests) =>
+      _png(style.width, style.height, (c) {
+        _panel(c, style);
+        switch (style) {
+          case WidgetStyle.board:
+            _board(c, quests);
+          case WidgetStyle.path:
+            _path(c, quests);
+          case WidgetStyle.next:
+            _next(c, quests);
+        }
+      });
+
+  /// The list of all quests is a real, scrolling list on the Android side,
+  /// built from pictures: this heading, and one picture per row. Each has
+  /// the panel's color behind it, so it stays readable while Android still
+  /// shows day pictures on its night panel (or the other way round), until
+  /// the widget is next refreshed.
+  static const listWidth = 320.0, listHeaderHeight = 32.0, listRowHeight = 36.0;
+
+  Future<Uint8List> renderListHeader() =>
+      _png(listWidth, listHeaderHeight, (c) {
+        _listPanel(c, listHeaderHeight);
+        _header(c, '${l10n.widgetListTitle} · $person', listWidth);
+        c.drawRect(
+          const Rect.fromLTWH(10, 29, listWidth - 20, 2),
+          Paint()..color = look.pixels.frame,
+        );
+      });
+
+  /// A row of the list. With [done], as it looks once ticked off in the
+  /// widget: faded, crossed out, and the badge offers to undo.
+  Future<Uint8List> renderListRow(WidgetQuest q, {bool done = false}) =>
+      _png(listWidth, listRowHeight, (c) {
+        _listPanel(c, listRowHeight);
+        _tile(c, const Rect.fromLTWH(12, 4, 28, 28), q, faded: done);
+        final (bg, fg) = done
+            ? (_s.surfaceContainerLowest, _s.onSurfaceVariant)
+            : _colors(q.status);
+        final badge = _badge(
+          c,
+          done ? '✓ ${l10n.undo}' : _badgeText(q),
+          listWidth - 12,
+          18,
+          bg,
+          fg,
+          play: !done && q.status == WidgetStatus.now,
+        );
+        final title = _text(
+          c,
+          q.title,
+          const Offset(48, 10),
+          size: 14,
+          color: done ? _s.onSurfaceVariant : null,
+          maxWidth: listWidth - 48 - badge - 20,
+        );
+        if (done) {
+          // Crossed out: done is never shown by color alone.
+          c.drawRect(
+            Rect.fromLTWH(48, 10 + title.height / 2, title.width, 1.5),
+            Paint()..color = _s.onSurfaceVariant,
+          );
+        }
+      });
+
+  void _listPanel(Canvas c, double height) => c.drawRect(
+    Rect.fromLTWH(0, 0, listWidth, height),
+    Paint()..color = _s.surfaceContainerLow,
+  );
+
+  /// What a screen reader says for a row of the list.
+  String listRowLabel(WidgetQuest q) =>
+      '${q.title}, ${_statusLine(q)}, ${l10n.pointsValue(q.points)}';
+
+  /// The same for a row ticked off in the widget.
+  String listRowDoneLabel(WidgetQuest q) =>
+      l10n.widgetRowDone(q.title, l10n.undo);
+
+  Future<Uint8List> _png(
+    double width,
+    double height,
+    void Function(Canvas c) draw,
+  ) async {
     final recorder = ui.PictureRecorder();
     final c = Canvas(recorder)..scale(scale);
-    _panel(c, style);
-    switch (style) {
-      case WidgetStyle.board:
-        _board(c, quests);
-      case WidgetStyle.path:
-        _path(c, quests);
-      case WidgetStyle.next:
-        _next(c, quests);
-    }
+    draw(c);
     final image = await recorder.endRecording().toImage(
-      (style.width * scale).round(),
-      (style.height * scale).round(),
+      (width * scale).round(),
+      (height * scale).round(),
     );
     try {
       final png = await image.toByteData(format: ui.ImageByteFormat.png);
@@ -278,8 +359,15 @@ class WidgetArt {
     WidgetStatus.late => (_s.errorContainer, _s.onErrorContainer),
     WidgetStatus.now => (_s.primaryContainer, _s.onPrimaryContainer),
     WidgetStatus.at => (_s.secondaryContainer, _s.onSecondaryContainer),
-    WidgetStatus.upcoming => (_s.surfaceContainerLowest, _s.onSurfaceVariant),
+    WidgetStatus.upcoming ||
+    WidgetStatus.anytime => (_s.surfaceContainerLowest, _s.onSurfaceVariant),
   };
+
+  /// A later day: its weekday within a week of [today], else its date
+  /// ("Thu", "24.11.").
+  String _day(DateTime day) => day.difference(today).inDays.abs() < 7
+      ? _weekday.format(day)
+      : _date.format(day);
 
   /// The badge text: "! 2 days late", "▶ today", "18:00", "→ Thu".
   String _badgeText(WidgetQuest q) => switch (q.status) {
@@ -287,7 +375,8 @@ class WidgetArt {
       q.lateDays == 0 ? l10n.widgetTimeUp : l10n.widgetLate(q.lateDays),
     WidgetStatus.now => l10n.widgetToday,
     WidgetStatus.at => _time(q.atMinutes ?? 0),
-    WidgetStatus.upcoming => '→ ${_weekday.format(q.day!)}',
+    WidgetStatus.upcoming => '→ ${_day(q.day!)}',
+    WidgetStatus.anytime => l10n.statusAnytime,
   };
 
   /// The longer line for the next-quest card.
@@ -296,7 +385,8 @@ class WidgetArt {
       q.lateDays == 0 ? l10n.widgetTimeUp : l10n.statusOverdue(q.lateDays),
     WidgetStatus.now => l10n.statusDueToday,
     WidgetStatus.at => l10n.statusTodayFrom(_time(q.atMinutes ?? 0)),
-    WidgetStatus.upcoming => '→ ${_weekday.format(q.day!)}',
+    WidgetStatus.upcoming => '→ ${_day(q.day!)}',
+    WidgetStatus.anytime => l10n.statusAnytime,
   };
 
   void _empty(Canvas c, double top, double width) => _text(
@@ -382,6 +472,7 @@ class WidgetArt {
         WidgetStatus.now => l10n.widgetPathNow,
         WidgetStatus.at => _time(q.atMinutes ?? 0),
         WidgetStatus.upcoming => _weekday.format(q.day!),
+        WidgetStatus.anytime => l10n.statusAnytime,
       };
       _text(
         c,

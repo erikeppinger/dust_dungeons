@@ -28,11 +28,13 @@ class ProgressRepository {
     required int choreId,
     required int profileId,
     bool onTime = false,
+    DateTime? at,
   }) => _db.transaction(() async {
     final chore = await (_db.select(
       _db.chores,
     )..where((c) => c.id.equals(choreId))).getSingle();
-    final now = _clock();
+    // [at]: done earlier and booked now (ticked in the home screen widget).
+    final now = at ?? _clock();
     final breakdown = pointsFor(
       basePoints: chore.basePoints,
       onTime: onTime,

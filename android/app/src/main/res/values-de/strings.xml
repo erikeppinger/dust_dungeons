@@ -6,6 +6,8 @@
     <string name="widget_path_description">Deine nächsten Quests als Pfad, wie bei einem Brettspiel</string>
     <string name="widget_next_label">Nächste Quest</string>
     <string name="widget_next_description">Deine nächste Quest und was danach kommt</string>
+    <string name="widget_list_label">Alle Quests</string>
+    <string name="widget_list_description">Alle Quests in einer Liste zum Scrollen</string>
     <string name="widget_setup">Tippen, um deine Quests zu zeigen</string>
     <string name="widget_picture_description">Deine offenen Quests</string>
 </resources>

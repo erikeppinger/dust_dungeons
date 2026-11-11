@@ -65,6 +65,13 @@ class MainActivity : FlutterActivity() {
                         QuestWidget.refresh(this)
                         result.success(null)
                     }
+                    "ticks" -> result.success(Ticks.all(this))
+                    "dropTicks" -> {
+                        // Dart sends small numbers as Int, large ones as Long.
+                        val at = call.argument<List<Number>>("at") ?: listOf()
+                        Ticks.drop(this, at.map { it.toLong() })
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }

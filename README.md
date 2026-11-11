@@ -27,7 +27,8 @@ and dress your hero in the gear you win or buy.
   what it has on
 - **A weekly quest map** that grows into your realm in the Hall of Fame
 - **Screen time** (optional): chores earn screen-time minutes
-- **Reminders and summaries** as local notifications, and three home screen widgets
+- **Reminders and summaries** as local notifications, and four home screen widgets
+  (three looks for what's due, and a scrolling list of all quests)
 - **Backups:** export, import that merges, and daily automatic backups to a folder you choose
 - **16-bit look:** pixel art throughout, day and night themes, a colorblind-safe palette, German and
   English, and screen reader and large-font support

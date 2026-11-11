@@ -85,8 +85,42 @@ They can also place more than one. The styles came from tester feedback ("text o
   may have been placed, or the mode changed). Otherwise about every 30 minutes.
 - **No wasted work:** nothing is drawn when no widget is placed. A freshly placed widget says "Tap
   to show your quests" until the app has drawn it.
-- **Not in this version:** ticking quests off right in the widget. It needs the database outside
-  the app, so it comes later.
+- **Ticking quests off** works in the "All quests" widget (below), not in the three picture
+  widgets: a picture has no rows to tap.
+
+### All quests (0.17.0)
+A fourth widget, **All quests**, lists every active quest of the current person and scrolls. The
+three above stop at what is due (at most 8); this one has no limit.
+
+- **Order:** late, open today, later today, due this week (weekday), due later ("→ 11/27", within
+  a year), then quests without a schedule ("Anytime").
+- **A real list, made of pictures:** the list itself is Android's (`ListView` with a
+  `RemoteViewsService`), so it scrolls. Each row is a picture the app drew, like the other
+  widgets, to keep the pixel font and icons. The app writes a heading (`list-<day|night>-head.png`),
+  each different row once (`list-<day|night>-row-<n>.png`; most rows are the same all week), and
+  per day which rows to show with a text for screen readers (`list-<date>.json`).
+- **Day and night:** every picture carries the panel color behind it. Right after the phone
+  switches mode, the old pictures stay readable until the next refresh brings the matching ones.
+- **Tapping the heading** or the empty text opens the app.
+
+### Ticking off in the widget (0.17.0)
+Tapping a quest that is open (late, due today, or anytime) ticks it off. The row turns faded and
+crossed out, and its badge says "✓ Undo": tapping it again takes the tick back, for a slip of the
+finger. Quests due on a later day can't be ticked; their tap does nothing.
+
+- **The widget only remembers.** Booking a quest means points, the on-time bonus, the streak,
+  fight tokens and curses, all of which live in the app's database and its Dart code. The widget
+  keeps a list of ticks instead (`widget_ticks.json`: quest, person, day, time, on time or not).
+- **The app books them** when it is next opened or comes back to the front, before it draws the
+  widgets again: each tick becomes a normal completion **at the time it was ticked**, oldest
+  first. Ticks for a quest that was archived or a person who was removed meanwhile are dropped.
+- **On time** is decided at the tap: the quest is due today and, if it has a time of day, the tap
+  is within it.
+- **Undo** in the widget works until the app has booked the tick. After that the quest is done
+  like any other and can be undone in the app's history.
+- **Limits:** until the app is opened, the coin count in the heading doesn't move, and the next
+  day's list is still the one drawn before the tick (a daily quest ticked yesterday shows as late
+  until the app has booked it). Opening the app sets both right.
 
 ## On time, in one rule
 A completion is on time if it's on a day inside the open window and, when times are set, inside the

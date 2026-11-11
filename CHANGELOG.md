@@ -18,6 +18,13 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - The Windows icon is the pixel shield, made by `tool/generate_icon.py` like the Android one.
 - CI builds the Windows app on every push; a version tag adds it to the release as a zip.
 
+- **A fourth home screen widget, "All quests"** (Android): a list of every active quest that
+  scrolls, in the app's pixel look. After what is due come the quests due later (with their date)
+  and the ones without a schedule ("Anytime").
+  - **Tick quests off right in the widget:** tap an open quest and it is crossed out; tap it again
+    to undo a slip. The app books the ticks (points, bonus, streak, tokens) at the time they were
+    made, the next time it is opened.
+  - Tapping the heading opens the app.
 - **Restore a backup on first start:** the welcome screen has "Restore a backup". It runs the
   normal import and then skips the rest of the introduction.
 - **"That's me" when importing:** if the backup has a person this device doesn't know (the usual

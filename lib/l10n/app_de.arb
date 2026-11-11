@@ -419,6 +419,8 @@
   "widgetPathTitle": "Pfad · {name}",
   "widgetPathLate": "{n, plural, =1{1 Tag!} other{{n} Tage!}}",
   "widgetPathNow": "jetzt",
+  "widgetListTitle": "Alle Quests",
+  "widgetRowDone": "{title}, erledigt. Tippen für {undo}",
   "widgetNextTitle": "Nächste Quest",
   "widgetThen": "Danach:",
   "slotHead": "Kopf",

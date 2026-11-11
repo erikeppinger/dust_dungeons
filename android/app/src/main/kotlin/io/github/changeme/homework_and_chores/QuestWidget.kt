@@ -32,16 +32,18 @@ abstract class QuestWidget(private val style: String) : AppWidgetProvider() {
             "next" to NextQuestWidget::class.java,
         )
 
-        /** The styles placed on the home screen. */
+        /** The styles placed on the home screen, and "list" for the list. */
         fun placed(context: Context): List<String> {
             val manager = AppWidgetManager.getInstance(context)
-            return STYLES.filter { (_, type) ->
+            val pictures = STYLES.filter { (_, type) ->
                 manager.getAppWidgetIds(ComponentName(context, type)).isNotEmpty()
             }.keys.toList()
+            return if (QuestListWidget.ids(context).isEmpty()) pictures else pictures + "list"
         }
 
         /** Redraws every placed widget from the pictures. */
         fun refresh(context: Context) {
+            QuestListWidget.refresh(context)
             val manager = AppWidgetManager.getInstance(context)
             for ((style, type) in STYLES) {
                 for (id in manager.getAppWidgetIds(ComponentName(context, type))) {

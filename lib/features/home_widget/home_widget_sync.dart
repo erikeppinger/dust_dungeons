@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -33,6 +34,8 @@ class WidgetInputs {
   const WidgetInputs({
     required this.today,
     required this.days,
+    required this.allDays,
+    required this.profileId,
     required this.person,
     required this.points,
     required this.l10n,
@@ -43,6 +46,12 @@ class WidgetInputs {
 
   /// The quests for today and each following day.
   final List<List<WidgetQuest>> days;
+
+  /// Every active quest, for today and each following day (the list).
+  final List<List<WidgetQuest>> allDays;
+
+  /// Whose quests these are: ticks in the list widget are booked for them.
+  final int profileId;
   final String person;
   final int points;
   final AppLocalizations l10n;
@@ -55,22 +64,29 @@ class WidgetInputs {
   bool operator ==(Object other) =>
       other is WidgetInputs &&
       other.today == today &&
+      other.profileId == profileId &&
       other.person == person &&
       other.points == points &&
       other.l10n.localeName == l10n.localeName &&
       other.colorblindSafe == colorblindSafe &&
-      other.days.length == days.length &&
-      [for (var i = 0; i < days.length; i++) listEquals(other.days[i], days[i])]
+      _same(other.days, days) &&
+      _same(other.allDays, allDays);
+
+  static bool _same(List<List<WidgetQuest>> a, List<List<WidgetQuest>> b) =>
+      a.length == b.length &&
+      [for (var i = 0; i < a.length; i++) listEquals(a[i], b[i])]
           .every((same) => same);
 
   @override
   int get hashCode => Object.hash(
     today,
+    profileId,
     person,
     points,
     l10n.localeName,
     colorblindSafe,
     _daysHash(days),
+    _daysHash(allDays),
   );
 }
 
@@ -90,6 +106,17 @@ final _widgetInputsProvider = Provider<WidgetInputs?>((ref) {
       for (var i = 0; i < homeWidgetDays; i++)
         widgetQuests(chores: chores, today: today, l10n: l10n, offset: i),
     ],
+    allDays: [
+      for (var i = 0; i < homeWidgetDays; i++)
+        widgetQuests(
+          chores: chores,
+          today: today,
+          l10n: l10n,
+          offset: i,
+          all: true,
+        ),
+    ],
+    profileId: ref.watch(currentProfileIdProvider),
     person: ref.watch(currentProfileProvider).name,
     points: points,
     l10n: l10n,
@@ -108,6 +135,30 @@ abstract class HomeWidgetHost {
 
   /// Redraws every placed widget from the pictures.
   Future<void> refresh();
+
+  /// Quests ticked off in the list widget that the app hasn't booked yet.
+  Future<List<WidgetTick>> ticks();
+
+  /// Forgets the ticks made at these moments ([WidgetTick.at]): booked.
+  Future<void> dropTicks(List<DateTime> at);
+}
+
+/// A quest ticked off in the list widget, waiting to be booked.
+@immutable
+class WidgetTick {
+  const WidgetTick({
+    required this.choreId,
+    required this.profileId,
+    required this.at,
+    required this.onTime,
+  });
+
+  final int choreId;
+  final int profileId;
+
+  /// When it was ticked; also what tells ticks apart.
+  final DateTime at;
+  final bool onTime;
 }
 
 class PlatformHomeWidgetHost implements HomeWidgetHost {
@@ -124,20 +175,92 @@ class PlatformHomeWidgetHost implements HomeWidgetHost {
 
   @override
   Future<void> refresh() => _channel.invokeMethod<void>('refresh');
+
+  @override
+  Future<List<WidgetTick>> ticks() async => [
+    for (final t
+        in await _channel.invokeListMethod<Map<Object?, Object?>>('ticks') ??
+            const <Map<Object?, Object?>>[])
+      WidgetTick(
+        choreId: t['chore']! as int,
+        profileId: t['profile']! as int,
+        at: DateTime.fromMillisecondsSinceEpoch(t['at']! as int),
+        onTime: t['onTime'] as bool? ?? false,
+      ),
+  ];
+
+  @override
+  Future<void> dropTicks(List<DateTime> at) =>
+      _channel.invokeMethod<void>('dropTicks', {
+        'at': [for (final t in at) t.millisecondsSinceEpoch],
+      });
+}
+
+/// Books the quests ticked off in the list widget: each becomes a normal
+/// completion at the moment it was ticked, so points, streak and fight
+/// tokens are as if it had been done in the app. Ticks for quests or people
+/// that are gone by now are dropped. Returns how many were booked.
+Future<int> bookWidgetTicks(ProviderContainer container) async {
+  final host = container.read(homeWidgetHostProvider);
+  final ticks = await host.ticks();
+  if (ticks.isEmpty) return 0;
+  final db = container.read(databaseProvider);
+  final progress = container.read(progressRepositoryProvider);
+  final chores = {
+    for (final c in await db.select(db.chores).get())
+      if (!c.isArchived) c.id,
+  };
+  final people = {
+    for (final p in await db.select(db.profiles).get())
+      if (p.archivedAt == null) p.id,
+  };
+  var booked = 0;
+  // Oldest first, so streaks build up in order. Each is forgotten right
+  // after it's booked: stopping halfway never books one twice.
+  for (final t in [...ticks]..sort((a, b) => a.at.compareTo(b.at))) {
+    if (chores.contains(t.choreId) && people.contains(t.profileId)) {
+      await progress.complete(
+        choreId: t.choreId,
+        profileId: t.profileId,
+        onTime: t.onTime,
+        at: t.at,
+      );
+      booked++;
+    }
+    await host.dropTicks([t.at]);
+  }
+  return booked;
 }
 
 final homeWidgetHostProvider = Provider<HomeWidgetHost>(
   (ref) => PlatformHomeWidgetHost(),
 );
 
+/// The name of the list of all quests among the placed widgets. It isn't a
+/// [WidgetStyle]: it's a scrolling list of row pictures, not one picture.
+const listWidget = 'list';
+
 /// Draws the pictures for [styles]: day and night, for each of the next
 /// [homeWidgetDays] days. Files are named `<style>-<day|night>-<date>.png`;
 /// any others in [folder] are removed.
+///
+/// With [list], also the list of all quests:
+/// - `list-<day|night>-head.png`, its heading;
+/// - `list-<day|night>-row-<n>.png`, each different row once, and
+///   `…-row-<n>-done.png` as it looks ticked off (rows that can be);
+/// - `list-<date>.json`, the day's rows and whose they are:
+///   `{"profile": id, "rows": [{"row": n, "label": "…", "chore": id,
+///   "tick": true, "doneLabel": "…", "due": true, "from": 480, "to": 600}],
+///   "empty": "…"}`. `label` and `doneLabel` are for screen readers; `tick`
+///   says the row can be ticked off; `due` with the time of day (`from`,
+///   `to`, if any) tells Android whether a tick is on time; `empty` is the
+///   text for a day without quests.
 Future<void> drawHomeWidgets(
   WidgetInputs inputs,
   Set<WidgetStyle> styles,
-  Directory folder,
-) async {
+  Directory folder, {
+  bool list = false,
+}) async {
   await folder.create(recursive: true);
   // The pictures name weekdays; Flutter may not have loaded them yet.
   await initializeDateFormatting(inputs.l10n.localeName);
@@ -151,17 +274,66 @@ Future<void> drawHomeWidgets(
       look: WidgetLook(brightness, colorblindSafe: inputs.colorblindSafe),
       person: inputs.person,
       points: inputs.points,
+      today: inputs.today,
     );
+    // Written whole, then renamed: a widget never reads half a file.
+    Future<void> write(String name, List<int> bytes) async {
+      keep.add(name);
+      final tmp = File('${folder.path}/$name.tmp');
+      await tmp.writeAsBytes(bytes, flush: true);
+      await tmp.rename('${folder.path}/$name');
+    }
+
+    if (list) {
+      await write('list-$mode-head.png', await art.renderListHeader());
+      // Most rows are the same on every day: each is drawn once.
+      final rows = <WidgetQuest, int>{};
+      for (final (i, quests) in inputs.allDays.indexed) {
+        final day = <Map<String, Object>>[];
+        for (final q in quests) {
+          var n = rows[q];
+          if (n == null) {
+            n = rows[q] = rows.length;
+            await write('list-$mode-row-$n.png', await art.renderListRow(q));
+            if (q.canTick) {
+              await write(
+                'list-$mode-row-$n-done.png',
+                await art.renderListRow(q, done: true),
+              );
+            }
+          }
+          day.add({
+            'row': n,
+            'label': art.listRowLabel(q),
+            'chore': q.choreId,
+            'tick': q.canTick,
+            if (q.canTick) 'doneLabel': art.listRowDoneLabel(q),
+            'due': q.dueToday,
+            'from': ?q.atMinutes,
+            'to': ?q.untilMinutes,
+          });
+        }
+        // The same for day and night; written with the first.
+        if (brightness == Brightness.light) {
+          await write(
+            'list-${_dayKey(addDays(inputs.today, i))}.json',
+            utf8.encode(
+              jsonEncode({
+                'profile': inputs.profileId,
+                'rows': day,
+                'empty': inputs.l10n.widgetNothingOpen,
+              }),
+            ),
+          );
+        }
+      }
+    }
     for (final style in styles) {
       for (final (i, quests) in inputs.days.indexed) {
-        final name =
-            '${style.name}-$mode-${_dayKey(addDays(inputs.today, i))}.png';
-        keep.add(name);
-        final png = await art.render(style, quests);
-        // Written whole, then renamed: a widget never reads half a file.
-        final tmp = File('${folder.path}/$name.tmp');
-        await tmp.writeAsBytes(png, flush: true);
-        await tmp.rename('${folder.path}/$name');
+        await write(
+          '${style.name}-$mode-${_dayKey(addDays(inputs.today, i))}.png',
+          await art.render(style, quests),
+        );
       }
     }
   }
@@ -190,6 +362,9 @@ void Function() syncHomeWidget(ProviderContainer container) {
     try {
       do {
         again = false;
+        // First what was ticked off in the widget: booking it changes
+        // what there is to draw, which runs this again.
+        await bookWidgetTicks(container);
         final inputs = container.read(_widgetInputsProvider);
         if (inputs == null) return;
         final host = container.read(homeWidgetHostProvider);
@@ -205,7 +380,12 @@ void Function() syncHomeWidget(ProviderContainer container) {
           for (final s in WidgetStyle.values)
             if (placed.contains(s.name)) s,
         };
-        await drawHomeWidgets(inputs, styles, await host.folder());
+        await drawHomeWidgets(
+          inputs,
+          styles,
+          await host.folder(),
+          list: placed.contains(listWidget),
+        );
         await host.refresh();
         drawn = inputs;
         drawnStyles = placed;
