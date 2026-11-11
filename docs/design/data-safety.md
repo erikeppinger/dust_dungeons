@@ -45,17 +45,32 @@ local ID as rows are matched or inserted.
 
 | Table | Same row if … | If it's new |
 |---|---|---|
-| Profiles | same name (case-insensitive) | inserted (shown once profiles arrive in 0.9) |
+| Profiles | same name (case-insensitive), or the user says "that's me" (see below) | inserted |
 | Chores | built-in: same `seedKey`. User chores: same title (case-insensitive, trimmed) | inserted with the backup's schedule, icon, color and archived state |
 | Completions | same chore, profile and `completedAt` | inserted. A completion undone in either copy ends up undone. |
 | Point ledger | entries tied to a completion: follow that completion. Others (spending): same profile, reason, delta and `createdAt` | inserted |
 | Fights | same profile, boss family and `startedAt` | inserted |
 | Inventory | same profile and item | the larger count is kept (gear is 1 anyway) |
 | Screen days | same profile and day | per column, the larger value is kept |
-| Settings | — | not merged, except with **"Also use the backup's settings"** (on by default when the phone has no history yet, i.e. a new phone) |
+| Settings | — | not merged, except with **"Also use the backup's settings"** (on by default when the device has no history yet, i.e. a new device) |
 
-When a chore matches, the phone's version of it wins (title, schedule, reminder). The backup only
-adds history to it.
+When a chore matches, the device's version of it wins (title, schedule, reminder) and the backup
+only adds history to it. With **"Also use the backup's settings"** it is the other way round: the
+matching chore takes everything from the backup (schedule, times of day, reminder, points, icon,
+color, who it's for, and whether it's archived). Since 0.17.0; before, a restore onto a new device
+kept the built-in quests' default times and brought archived ones back.
+
+**"That's me" (0.17.0).** A new device starts with a person called "Me", and the backup's person
+has another name, so matching by name alone made two people. When the backup has people this
+device doesn't know by name, and the person using the app isn't in the backup under their own
+name, the preview asks: "Are you ("Me") one of the people in this backup?" with one choice per
+new person and "No, add them as new people". The chosen person's history goes to the current
+person, who takes the backup's name, hero look and fight settings; nothing they had is removed.
+On a device without history the backup's last player is preselected. The counts in the preview
+follow the choices.
+
+**First start (0.17.0).** The welcome screen has "Restore a backup", which runs the same import and
+then ends the introduction.
 
 **Why this is safe:**
 - Points stay consistent, because the balance is the sum of the ledger and XP is the sum of

@@ -82,25 +82,64 @@ class PendingImport {
     this._backups,
     this._source,
     this._path,
-    this.report,
-    this.hasHistory,
-  );
+    this.report, {
+    required this.hasHistory,
+    required this.newPeople,
+    required this.me,
+    required this.suggestedMe,
+  });
 
   final Backups _backups;
   final AppDatabase _source;
   final String _path;
 
-  /// What importing would add.
+  /// What importing would add, with [suggestedMe] and the settings as
+  /// suggested ([hasHistory]).
   final MergeReport report;
 
-  /// This phone already has history (otherwise it's a new phone, and the
+  /// This device already has history (otherwise it's a new device, and the
   /// backup's settings are suggested).
   final bool hasHistory;
 
+  /// People in the backup that this device doesn't know by name.
+  final List<Profile> newPeople;
+
+  /// Who is using the app here, if one of [newPeople] can be them (they
+  /// aren't in the backup under their own name); else `null`.
+  final Profile? me;
+
+  /// The one of [newPeople] suggested to be [me]: on a new device, who used
+  /// the app last in the backup. Else `null`.
+  final Profile? suggestedMe;
+
+  Map<int, int> _sameAs(Profile? isMe) => {
+    if (isMe != null && me != null) isMe.id: me!.id,
+  };
+
+  /// What importing would add with these choices; writes nothing.
+  Future<MergeReport> preview({
+    required bool useSettings,
+    required Profile? isMe,
+  }) => mergeBackup(
+    _backups._db,
+    _source,
+    preview: true,
+    useSettings: useSettings,
+    sameAs: _sameAs(isMe),
+  );
+
   /// Merges the backup in; a safety snapshot taken first allows undo.
-  Future<MergeReport> confirm({required bool useSettings}) async {
+  /// [isMe] is the one of [newPeople] who is [me], if any.
+  Future<MergeReport> confirm({
+    required bool useSettings,
+    Profile? isMe,
+  }) async {
     try {
-      return await _backups._import(_source, useSettings: useSettings);
+      return await _backups._import(
+        _source,
+        useSettings: useSettings,
+        sameAs: _sameAs(isMe),
+      );
     } finally {
       await cancel();
     }
@@ -158,9 +197,57 @@ class Backups {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final source = AppDatabase(NativeDatabase(File(path)));
     try {
-      final report = await mergeBackup(_db, source, preview: true);
       final history = await (_db.select(_db.completions)..limit(1)).get();
-      return PendingImport._(this, source, path, report, history.isNotEmpty);
+      final hasHistory = history.isNotEmpty;
+      final people = await newPeople(_db, source);
+      // Whoever uses the app here can be one of the backup's new people,
+      // unless the backup has them under their own name already.
+      final current =
+          await (_db.select(
+                _db.profiles,
+              )..where((p) => p.id.equals(_ref.read(currentProfileIdProvider))))
+              .getSingleOrNull();
+      final theirs = await source.select(source.profiles).get();
+      final me =
+          current == null ||
+              people.isEmpty ||
+              theirs.any(
+                (p) =>
+                    p.name.trim().toLowerCase() ==
+                    current.name.trim().toLowerCase(),
+              )
+          ? null
+          : current;
+      // A new device: the backup's last player is who sits here now.
+      Profile? suggestedMe;
+      if (me != null && !hasHistory) {
+        final last = await (source.select(
+          source.settings,
+        )..where((s) => s.key.equals(currentProfileSetting))).getSingleOrNull();
+        final lastId = int.tryParse(last?.value ?? '');
+        final active = people.where((p) => p.archivedAt == null);
+        suggestedMe =
+            people.where((p) => p.id == lastId).firstOrNull ??
+            active.firstOrNull ??
+            people.first;
+      }
+      final report = await mergeBackup(
+        _db,
+        source,
+        preview: true,
+        useSettings: !hasHistory,
+        sameAs: {if (suggestedMe != null) suggestedMe.id: me!.id},
+      );
+      return PendingImport._(
+        this,
+        source,
+        path,
+        report,
+        hasHistory: hasHistory,
+        newPeople: people,
+        me: me,
+        suggestedMe: suggestedMe,
+      );
     } catch (_) {
       await source.close();
       File(path).deleteSync();
@@ -174,9 +261,15 @@ class Backups {
   Future<MergeReport> _import(
     AppDatabase source, {
     required bool useSettings,
+    required Map<int, int> sameAs,
   }) async {
     await writeSnapshot(_db, await _safetyPath);
-    final report = await mergeBackup(_db, source, useSettings: useSettings);
+    final report = await mergeBackup(
+      _db,
+      source,
+      useSettings: useSettings,
+      sameAs: sameAs,
+    );
     if (report.settings > 0) {
       await _ref.read(settingsProvider.notifier).reload();
     }

@@ -268,6 +268,135 @@ void main() {
     expect((await mergeBackup(here, phone)).chores, 0);
   });
 
+  group('quests on both sides', () {
+    /// A phone where Dusting has a time of day and a reminder, and Ironing
+    /// is archived.
+    Future<AppDatabase> phoneWithQuestSettings() async {
+      final phone = memory();
+      await (phone.update(
+        phone.chores,
+      )..where((c) => c.seedKey.equals('dusting'))).write(
+        const ChoresCompanion(
+          windowFrom: Value(480),
+          windowTo: Value(600),
+          reminderMinutes: Value(450),
+          basePoints: Value(40),
+        ),
+      );
+      await (phone.update(phone.chores)
+            ..where((c) => c.seedKey.equals('ironing')))
+          .write(const ChoresCompanion(isArchived: Value(true)));
+      return phone;
+    }
+
+    Future<Chore> chore(AppDatabase db, String seedKey) => (db.select(
+      db.chores,
+    )..where((c) => c.seedKey.equals(seedKey))).getSingle();
+
+    test("with the backup's settings, its times and archive win", () async {
+      final phone = await phoneWithQuestSettings();
+      final here = memory();
+      final report = await mergeBackup(here, phone, useSettings: true);
+      expect(report.choreSettings, greaterThanOrEqualTo(2));
+      expect(report.chores, 0);
+      final dusting = await chore(here, 'dusting');
+      expect(dusting.windowFrom, 480);
+      expect(dusting.windowTo, 600);
+      expect(dusting.reminderMinutes, 450);
+      expect(dusting.basePoints, 40);
+      expect((await chore(here, 'ironing')).isArchived, isTrue);
+      // Everything about a quest comes along, so a second import finds
+      // nothing left to change.
+      expect(
+        (await mergeBackup(here, phone, useSettings: true)).isEmpty,
+        isTrue,
+      );
+    });
+
+    test("without them, the device's version stays", () async {
+      final phone = await phoneWithQuestSettings();
+      final here = memory();
+      final report = await mergeBackup(here, phone);
+      expect(report.choreSettings, 0);
+      expect((await chore(here, 'dusting')).windowFrom, isNull);
+      expect((await chore(here, 'ironing')).isArchived, isFalse);
+    });
+  });
+
+  group('a person under another name', () {
+    /// A phone whose only person is Erik, with a look and one completion.
+    Future<AppDatabase> eriksPhone() async {
+      final phone = memory();
+      await (phone.update(phone.profiles)).write(
+        const ProfilesCompanion(
+          name: Value('Erik'),
+          avatarHair: Value(2),
+          storyMode: Value(true),
+        ),
+      );
+      await complete(phone, 'dusting', DateTime(2026, 10, 1, 9));
+      return phone;
+    }
+
+    test('is new unless said to be someone here', () async {
+      final phone = await eriksPhone();
+      final here = memory();
+      expect((await newPeople(here, phone)).map((p) => p.name), ['Erik']);
+      final report = await mergeBackup(here, phone);
+      expect(report.profiles, 1);
+      expect(report.renamed, 0);
+      expect(
+        (await here.select(here.profiles).get()).map((p) => p.name),
+        unorderedEquals(['Me', 'Erik']),
+      );
+    });
+
+    test('said to be someone here: one person, with the name and look', () async {
+      final phone = await eriksPhone();
+      final here = memory();
+      final me = await here.defaultProfileId();
+      final erik = (await newPeople(here, phone)).single;
+      final report = await mergeBackup(here, phone, sameAs: {erik.id: me});
+      expect(report.profiles, 0);
+      expect(report.renamed, 1);
+      expect(report.completions, 1);
+      final person = (await here.select(here.profiles).get()).single;
+      expect(person.id, me);
+      expect(person.name, 'Erik');
+      expect(person.avatarHair, 2);
+      expect(person.storyMode, isTrue);
+      expect((await here.select(here.completions).get()).single.profileId, me);
+      // By now they share the name: nothing is left, with or without saying so.
+      expect((await newPeople(here, phone)), isEmpty);
+      expect(
+        (await mergeBackup(here, phone, sameAs: {erik.id: me})).isEmpty,
+        isTrue,
+      );
+      expect((await mergeBackup(here, phone)).isEmpty, isTrue);
+    });
+
+    test(
+      'someone here who is in the backup by name cannot be another',
+      () async {
+        final phone = await eriksPhone();
+        // The backup also has a "Me".
+        await phone
+            .into(phone.profiles)
+            .insert(ProfilesCompanion.insert(name: 'Me'));
+        final here = memory();
+        final me = await here.defaultProfileId();
+        final erik = (await newPeople(here, phone)).single;
+        final report = await mergeBackup(here, phone, sameAs: {erik.id: me});
+        expect(report.renamed, 0);
+        expect(report.profiles, 1);
+        expect(
+          (await here.select(here.profiles).get()).map((p) => p.name),
+          unorderedEquals(['Me', 'Erik']),
+        );
+      },
+    );
+  });
+
   test('inventory and screen days keep the larger values', () async {
     final phone = memory();
     final here = memory();

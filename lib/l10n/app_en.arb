@@ -1056,7 +1056,27 @@
   "backupPreviewMore": "Points, items and screen-time days that are missing here",
   "backupPreviewKeeps": "Nothing on this device is deleted, and you can undo the import.",
   "backupUseSettings": "Also use the backup's settings",
-  "backupUseSettingsHint": "Look, language, notifications, screen time",
+  "backupUseSettingsHint": "Quest times and archive, look, language, notifications",
+  "backupMeQuestion": "Are you (“{me}”) one of the people in this backup?",
+  "@backupMeQuestion": {
+    "placeholders": {
+      "me": {
+        "type": "String"
+      }
+    }
+  },
+  "backupMeYes": "Yes, I'm {name}",
+  "@backupMeYes": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "backupMeNo": "No, add them as new people",
+  "backupMeHint": "You keep what you have here and take the backup's name, hero and history.",
+  "onboardingRestoreHint": "Played on another device before?",
+  "onboardingRestore": "Restore a backup",
   "backupImportConfirm": "Import",
   "backupImported": "Backup imported",
   "backupUndo": "Undo last import",

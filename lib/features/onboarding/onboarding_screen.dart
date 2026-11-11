@@ -5,6 +5,7 @@ import '../../app/theme/chore_palette.dart';
 import '../../data/db/app_database.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../backup/backup_screen.dart';
 import '../chores/chore_icons.dart';
 import '../chores/chore_titles.dart';
 import '../fight/boss_art.dart';
@@ -85,7 +86,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 controller: _controller,
                 onPageChanged: (p) => setState(() => _page = p),
                 children: [
-                  const _WelcomePage(),
+                  _WelcomePage(onRestored: () => _finish(applyChoices: false)),
                   _ChoresPage(
                     unticked: _unticked,
                     onChanged: (id, on) => setState(
@@ -188,7 +189,10 @@ class _Page extends StatelessWidget {
 }
 
 class _WelcomePage extends ConsumerWidget {
-  const _WelcomePage();
+  const _WelcomePage({required this.onRestored});
+
+  /// A backup was imported: the introduction is over.
+  final VoidCallback onRestored;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -229,6 +233,19 @@ class _WelcomePage extends ConsumerWidget {
                 onSelected: (_) => controller.setLocale(Locale(entry.key)),
               ),
           ],
+        ),
+        const SizedBox(height: 24),
+        Text(l10n.onboardingRestoreHint),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: TextButton.icon(
+            key: const ValueKey('onboarding-restore'),
+            onPressed: () async {
+              if (await importBackup(context, ref)) onRestored();
+            },
+            icon: const PixelIcon(Sprites.uiDownload),
+            label: Text(l10n.onboardingRestore),
+          ),
         ),
       ],
     );

@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:homework_and_chores/data/backup/backup_file.dart';
 import 'package:homework_and_chores/data/db/app_database.dart';
+import 'package:homework_and_chores/data/repositories/settings_repository.dart';
 import 'package:homework_and_chores/features/backup/backup_screen.dart';
 import 'package:homework_and_chores/features/backup/backups.dart';
 
@@ -33,11 +34,20 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  /// A backup file from "another phone" with one completed chore.
-  Future<String> otherPhoneBackup(WidgetTester tester) async {
+  /// A backup file from "another phone" with one completed chore. With
+  /// [person], its only person has that name (else the default, "Me").
+  Future<String> otherPhoneBackup(WidgetTester tester, {String? person}) async {
     final path = '${tmp.path}/other.sqlite';
     await tester.runAsync(() async {
       final other = memoryDb();
+      if (person != null) {
+        await other
+            .update(other.profiles)
+            .write(ProfilesCompanion(name: Value(person)));
+        await (other.update(other.chores)
+              ..where((c) => c.seedKey.equals('ironing')))
+            .write(const ChoresCompanion(isArchived: Value(true)));
+      }
       final dusting = await (other.select(
         other.chores,
       )..where((c) => c.seedKey.equals('dusting'))).getSingle();
@@ -153,6 +163,102 @@ void main() {
     expect(find.text('Import undone'), findsOneWidget);
     expect(await completions(tester, db), 0);
     expect(find.byKey(const ValueKey('backup-undo')), findsNothing);
+  });
+
+  Future<List<Profile>> people(WidgetTester tester, AppDatabase db) async =>
+      (await tester.runAsync(() => db.select(db.profiles).get()))!;
+
+  testWidgets('a new device: the person in the backup is me', (tester) async {
+    final backup = FakeBackupService()
+      ..pick = await otherPhoneBackup(tester, person: 'Erik');
+    final db = await pumpApp(tester, backup: backup);
+    await openBackupPage(tester);
+    await tapAndWait(tester, find.byKey(const ValueKey('backup-import')));
+
+    // No history here: suggested, so no second person is announced.
+    expect(
+      find.text('Are you (“Me”) one of the people in this backup?'),
+      findsOneWidget,
+    );
+    expect(find.text("Yes, I'm Erik"), findsOneWidget);
+    expect(find.text('• 1 person'), findsNothing);
+
+    // Saying no counts again: Erik would be added.
+    await tapAndWait(tester, find.byKey(const ValueKey('backup-me-none')));
+    expect(find.text('• 1 person'), findsOneWidget);
+    await tapAndWait(tester, find.byKey(const ValueKey('backup-me-Erik')));
+    expect(find.text('• 1 person'), findsNothing);
+
+    await tapAndWait(
+      tester,
+      find.byKey(const ValueKey('backup-import-confirm')),
+    );
+    expect(find.text('Backup imported'), findsOneWidget);
+    expect((await people(tester, db)).map((p) => p.name), ['Erik']);
+    expect(await completions(tester, db), 1);
+    // The backup's quest settings came along: Ironing is archived.
+    final ironing = await tester.runAsync(
+      () => (db.select(
+        db.chores,
+      )..where((c) => c.seedKey.equals('ironing'))).getSingle(),
+    );
+    expect(ironing!.isArchived, isTrue);
+  });
+
+  testWidgets('the same name on both sides: no question', (tester) async {
+    final backup = FakeBackupService()..pick = await otherPhoneBackup(tester);
+    await pumpApp(tester, backup: backup);
+    await openBackupPage(tester);
+    await tapAndWait(tester, find.byKey(const ValueKey('backup-import')));
+    expect(find.text('Import this backup?'), findsOneWidget);
+    expect(find.byKey(const ValueKey('backup-me-none')), findsNothing);
+    // Closes the opened backup, so its file can be removed.
+    await tapAndWait(tester, find.text('Cancel'));
+  });
+
+  testWidgets('first start: restoring a backup ends the introduction', (
+    tester,
+  ) async {
+    final backup = FakeBackupService()
+      ..pick = await otherPhoneBackup(tester, person: 'Erik');
+    final db = await pumpApp(tester, backup: backup, onboarding: true);
+    expect(find.text('Welcome!'), findsOneWidget);
+    await tapAndWait(tester, find.byKey(const ValueKey('onboarding-restore')));
+    expect(find.text('Import this backup?'), findsOneWidget);
+    // The app behind the introduction loads from the database: wait for
+    // it outside the fake clock.
+    await tester.runAsync(
+      () => tester.tap(find.byKey(const ValueKey('backup-import-confirm'))),
+    );
+    var settled = 0;
+    for (var i = 0; i < 300 && settled < 10; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+      // The message comes once the import is through; then a few rounds
+      // more for the screens behind it.
+      if (find.text('Backup imported').evaluate().isNotEmpty &&
+          find.byType(NavigationDestination).evaluate().isNotEmpty) {
+        settled++;
+      }
+    }
+    expect(find.text('Welcome!'), findsNothing);
+    expect(
+      find.widgetWithText(NavigationDestination, 'Quests'),
+      findsOneWidget,
+    );
+    expect((await people(tester, db)).map((p) => p.name), ['Erik']);
+    final saved = await tester.runAsync(() => SettingsRepository(db).load());
+    expect(saved!.onboardingDone, isTrue);
+  });
+
+  testWidgets('first start: cancelling the restore stays on the welcome', (
+    tester,
+  ) async {
+    await pumpApp(tester, onboarding: true);
+    await tapAndWait(tester, find.byKey(const ValueKey('onboarding-restore')));
+    expect(find.text('Welcome!'), findsOneWidget);
   });
 
   testWidgets('cancelling the import changes nothing', (tester) async {

@@ -7,7 +7,14 @@ import '../db/app_database.dart';
 /// What merging a backup adds (or would add, for a preview).
 class MergeReport {
   int profiles = 0;
+
+  /// People of the backup who are someone here under another name: that
+  /// person took the backup's name and look.
+  int renamed = 0;
   int chores = 0;
+
+  /// Quests that are here already and took the backup's settings.
+  int choreSettings = 0;
 
   /// People added to chores' assignments.
   int assignees = 0;
@@ -27,7 +34,9 @@ class MergeReport {
   /// Nothing would change.
   bool get isEmpty =>
       profiles +
+          renamed +
           chores +
+          choreSettings +
           assignees +
           completions +
           undone +
@@ -66,17 +75,27 @@ class _Preview implements Exception {
 /// never deleted, and merging the same backup twice changes nothing. With
 /// [preview] nothing is written; the report says what would change.
 /// [useSettings] also takes the backup's settings (except
-/// [deviceOnlySettings]).
+/// [deviceOnlySettings]) and its version of quests that exist on both
+/// sides. [sameAs] says which people of the backup are someone here under
+/// another name (backup profile id to local profile id): their history goes
+/// to that person, who takes the backup's name and look.
 Future<MergeReport> mergeBackup(
   AppDatabase target,
   AppDatabase source, {
   bool preview = false,
   bool useSettings = false,
+  Map<int, int> sameAs = const {},
 }) async {
   final report = MergeReport();
   try {
     await target.transaction(() async {
-      await _merge(target, source, report, useSettings: useSettings);
+      await _merge(
+        target,
+        source,
+        report,
+        useSettings: useSettings,
+        sameAs: sameAs,
+      );
       // Rolls the transaction back: the same code computes the preview.
       if (preview) throw const _Preview();
     });
@@ -90,21 +109,61 @@ int _ms(DateTime t) => t.millisecondsSinceEpoch;
 
 String _title(String? title) => (title ?? '').trim().toLowerCase();
 
+/// The people in [source] that [target] doesn't know by name: importing
+/// adds them, unless they're said to be someone here (`sameAs`).
+Future<List<Profile>> newPeople(AppDatabase target, AppDatabase source) async {
+  final local = {
+    for (final p in await target.select(target.profiles).get()) _title(p.name),
+  };
+  return [
+    for (final p in await source.select(source.profiles).get())
+      if (!local.contains(_title(p.name))) p,
+  ];
+}
+
 Future<void> _merge(
   AppDatabase t,
   AppDatabase s,
   MergeReport report, {
   required bool useSettings,
+  required Map<int, int> sameAs,
 }) async {
-  // Profiles, by name.
+  // Profiles, by name; then those said to be someone here.
   final profileIds = <int, int>{};
   final localProfiles = await t.select(t.profiles).get();
-  for (final p in await s.select(s.profiles).get()) {
+  final sourceProfiles = await s.select(s.profiles).get();
+  // Someone here who is in the backup by name can't also be someone else.
+  final taken = <int>{};
+  for (final p in sourceProfiles) {
     final match = localProfiles
         .where((l) => _title(l.name) == _title(p.name))
         .firstOrNull;
     if (match != null) {
       profileIds[p.id] = match.id;
+      taken.add(match.id);
+    }
+  }
+  for (final p in sourceProfiles) {
+    if (profileIds.containsKey(p.id)) continue;
+    final same = sameAs[p.id];
+    if (same != null &&
+        localProfiles.any((l) => l.id == same) &&
+        taken.add(same)) {
+      profileIds[p.id] = same;
+      await (t.update(t.profiles)..where((x) => x.id.equals(same))).write(
+        ProfilesCompanion(
+          name: Value(p.name),
+          colorKey: Value(p.colorKey),
+          avatarSkin: Value(p.avatarSkin),
+          avatarHair: Value(p.avatarHair),
+          avatarCape: Value(p.avatarCape),
+          avatarHat: Value(p.avatarHat),
+          storyMode: Value(p.storyMode),
+          slowMode: Value(p.slowMode),
+          difficulty: Value(p.difficulty),
+        ),
+      );
+      report.renamed++;
     } else {
       profileIds[p.id] = await t
           .into(t.profiles)
@@ -127,6 +186,14 @@ Future<void> _merge(
         .firstOrNull;
     if (match != null) {
       choreIds[c.id] = match.id;
+      // Normally the device's version of a quest wins. With the backup's
+      // settings, the backup's does: schedule, times, reminder, points,
+      // look and whether it's archived.
+      final theirs = c.copyWith(id: match.id);
+      if (useSettings && theirs != match) {
+        await t.update(t.chores).replace(theirs);
+        report.choreSettings++;
+      }
     } else {
       choreIds[c.id] = await t
           .into(t.chores)

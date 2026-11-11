@@ -18,11 +18,24 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 - The Windows icon is the pixel shield, made by `tool/generate_icon.py` like the Android one.
 - CI builds the Windows app on every push; a version tag adds it to the release as a zip.
 
+- **Restore a backup on first start:** the welcome screen has "Restore a backup". It runs the
+  normal import and then skips the rest of the introduction.
+- **"That's me" when importing:** if the backup has a person this device doesn't know (the usual
+  case on a new device, where the person is still called "Me"), the preview asks whether that's
+  you. If so, their history goes to you and you take their name and hero, instead of a second
+  person appearing that you'd have to switch to. On a device without history it is preselected.
+
 ### Changed
+- **"Also use the backup's settings" now includes quest settings:** for quests that exist on both
+  sides, the backup's schedule, times of day, reminder, points, look and archive state are taken.
+  It is on by default on a device without history.
 - Texts say "this device" instead of "this phone" (welcome, backups, people), as the app now also
   runs on computers.
 
 ### Fixed
+- **Restoring onto a new device lost quest settings:** built-in quests kept their default times
+  instead of the ones in the backup, and built-in quests archived in the backup came back active.
+  The device's version of a quest always won; see "Changed".
 - The on-device test looked for the Dust Bunny King without scrolling; since the weekly Overlord's
   card it can be below the screen's edge.
 
