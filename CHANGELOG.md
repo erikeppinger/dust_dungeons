@@ -8,6 +8,8 @@ Build numbers (`+N` in `pubspec.yaml`) increase with every release build.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-12
+
 ### Added
 - **A Windows app.** The same app in a phone-shaped window, with its own data on the computer
   (`%APPDATA%\io.github.changeme\homework_and_chores`). Backups move data between a phone and a
@@ -552,6 +554,7 @@ From the first testers' feedback ([design](docs/design/fight-feedback.md)).
 - Project docs: README, GPL-3.0 LICENSE, PRIVACY, ASSETS_LICENSES, CONTRIBUTING, docs/DEV_PLAN.md, docs/ARCHITECTURE.md.
 
 [Unreleased]: #
+[0.17.0]: #
 [0.10.0]: #
 [0.9.0]: #
 [0.8.0]: #

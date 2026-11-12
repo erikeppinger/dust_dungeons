@@ -1,4 +1,4 @@
-# Beta (0.17.0) — plan
+# Beta (0.18.0) — plan
 
 **Goal:** the app leaves the emulator. It gets its final app ID, public source on GitHub, checks
 on every push, a properly signed release APK, and a way for testers to install and update it,
@@ -7,8 +7,8 @@ including F-Droid-style through IzzyOnDroid.
 > **Status:** postponed (2026-10-29); moved from 0.10.0 to 0.11.0 on 2026-11-02, after the
 > better schedules (0.10.0), to 0.12.0 the same day, after loot & gear (0.11.0), to 0.13.0 after the game data catalog
 > (0.12.0), to 0.14.0 after the testers' fight feedback (0.13.0), to 0.15.0 after the round rules
-> (0.14.0), to 0.16.0 after the weekly Overlords (0.15.0), and to 0.17.0 after more bosses
-> (0.16.0). The GitHub repository and the Google Play developer
+> (0.14.0), to 0.16.0 after the weekly Overlords (0.15.0), to 0.17.0 after more bosses
+> (0.16.0), and to 0.18.0 after the Windows app, the restore fixes and the list widget (0.17.0). The GitHub repository and the Google Play developer
 > account are being prepared first.
 
 ## Defaults (2026-10-29)
@@ -176,7 +176,7 @@ Releases and IzzyOnDroid. What that changes:
 3. Signing setup, then you create the key, then a signed local build verified on the emulator.
 4. Fastlane metadata and screenshots.
 5. GitHub: you create the repo, I push and add the workflows, and CI turns green.
-6. Tag v0.17.0, with a signed release from CI; you then send the IzzyOnDroid request.
+6. Tag v0.18.0, with a signed release from CI; you then send the IzzyOnDroid request.
 7. Testing on real phones, with patch releases as needed.
 
 ## Risks

@@ -5,11 +5,11 @@ points, XP and fight tokens. Spend tokens on rhythm duels against household boss
 and dress your hero in the gear you win or buy.
 
 > The app still shows its working title, *Homework & Chores*. The rename to Dust & Dungeons comes with
-> the beta (0.17.0), see [the beta plan](docs/design/beta.md).
+> the beta (0.18.0), see [the beta plan](docs/design/beta.md).
 
 **Local only.** No account, no server, no network, no telemetry, no ads. All data stays on your device.
 
-> Status: 0.16.0, before the beta. Android first, with a Windows app. Source: <https://github.com/erikeppinger/dust_dungeons>
+> Status: 0.17.0, before the beta. Android first, with a Windows app. Source: <https://github.com/erikeppinger/dust_dungeons>
 
 ## Features
 - **Quests:** 21 built-in chores and 12 suggestions (homework, pets, garden, cooking) plus your own, with flexible schedules (daily, weekly, monthly,
